@@ -1,0 +1,1 @@
+## This is a project for playing with fastapi and docker for microservice app

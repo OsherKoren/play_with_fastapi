@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "play_with_fastapi"
+version = "0.1.0"
+description = "A demo for a service app using fastapi"
+authors = ["Osher Koren <oshrats@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0.post1"
+databases = {extras = ["postgresql"], version = "^0.8.0"}
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.0"
+pydantic = {extras = ["email"], version = "^2.5.2"}
+confluent-kafka = "^2.3.0"
+
+
+[tool.poetry.group.dev.dependencies]
+sphinx = "^7.2.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
