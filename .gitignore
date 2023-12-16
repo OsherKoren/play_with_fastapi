@@ -1,0 +1,8 @@
+/.env
+/poetry.lock
+/WORKSPACE/
+/venv/
+/docs/
+*.log
+__pycache__/
+.idea/
