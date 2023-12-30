@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.8'
 
 services:
   db:
@@ -6,13 +6,18 @@ services:
     env_file:
       - .env
     volumes:
+      - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
-      - ./setup/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U postgres -d ${DB_NAME} -c 'SELECT 1 FROM accounts LIMIT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -32,31 +37,34 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: [ "CMD", "kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
+      test: ["CMD", "nc", "-zv", "kafka", "9092"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
 
-  fastapi-app:
-    build: .
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
     volumes:
-      - .:/app
+      - ./app:/app
     ports:
       - "8000:8000"
     depends_on:
-      - db
-      - kafka
+      db:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       DATABASE_URL: ${DB_URL}
 
   kafka-consumer:
-    build: .
-    volumes:
-      - .:/app
-    command: python ./mock_external/kafka_consumer.py
+    build:
+      context: ./kafka_consumer
+      dockerfile: Dockerfile
     depends_on:
       - kafka
-      - fastapi-app
+      - app
 
 volumes:
   postgres_data:

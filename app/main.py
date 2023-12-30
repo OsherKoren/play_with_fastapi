@@ -10,12 +10,12 @@ from confluent_kafka import KafkaError, KafkaException
 from confluent_kafka.admin import AdminClient, NewTopic
 from fastapi import FastAPI
 
-from app.api.messages import messages
-from setup.db import database, engine, metadata
+from api import messages
+from api.tables_metadata import database, engine, metadata
 
 metadata.create_all(engine)
 
-app = FastAPI()
+app = FastAPI(title="Message Prediction App", version="1.0")
 
 
 @app.on_event("startup")
@@ -57,4 +57,4 @@ async def shutdown() -> None:
     await database.disconnect()
 
 
-app.include_router(messages, tags=["messages"])
+app.include_router(messages.router, prefix='/api/v1', tags=["messages"])

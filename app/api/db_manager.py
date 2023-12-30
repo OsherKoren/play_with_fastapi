@@ -10,8 +10,8 @@ from typing import List, Optional
 
 from databases.interfaces import Record
 
-from setup.db import (accounts_table, database, messages_predictions_table,
-                      messages_table)
+from .tables_metadata import (accounts_table, database, messages_predictions_table,
+                                     messages_table)
 
 
 async def get_all_messages() -> List[Record]:

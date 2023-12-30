@@ -7,7 +7,7 @@ from typing import Optional
 
 from databases.interfaces import Record
 
-from app.api import db_manager
+from api import db_manager
 
 
 async def get_current_user() -> Optional[Record]:

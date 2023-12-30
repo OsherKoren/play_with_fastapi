@@ -8,26 +8,26 @@ from datetime import datetime
 from confluent_kafka import Producer
 from fastapi import APIRouter, Depends, Query
 
-from app.api import db_manager, predict, schemas
-from mock_external import authentication
+from . import db_manager, predict, schemas
+from mock_external import mock_authentication as authentication
 
-messages = APIRouter()
+router = APIRouter(prefix="/messages", tags=["messages"])
 producer = Producer({"bootstrap.servers": "kafka:9092"})
 
 
-@messages.get("/", status_code=200)
+@router.get("/", status_code=200)
 async def root():
     """Root endpoint that welcomes users to the Messages Services."""
-    return "Welcome to Our Organization Messages Services"
+    return "Messages Prediction Services"
 
 
-@messages.get("/messages", status_code=200)
+@router.get("/all", status_code=200)
 async def get_messages():
     """Retrieve all messages."""
     return await db_manager.get_all_messages()
 
 
-@messages.post("/scores", status_code=201, response_model=schemas.MessageScore)
+@router.post("/scores", status_code=201, response_model=schemas.MessageScore)
 async def predict_message(
     payload: schemas.MessageIn, account: dict = Depends(authentication.get_current_user)
 ):
@@ -64,7 +64,7 @@ async def predict_message(
     return response
 
 
-@messages.get("/messages/{msg_id}", status_code=200)
+@router.get("/messages/{msg_id}", status_code=200)
 async def get_message(msg_id: int):
     """
     Retrieve a specific message by its ID.
@@ -81,13 +81,13 @@ async def get_message(msg_id: int):
     return message
 
 
-@messages.get("/scores", status_code=200)
+@router.get("/scores", status_code=200)
 async def get_scores():
     """Retrieve all message scores."""
     return await db_manager.get_all_scores()
 
 
-@messages.get("/highscores", status_code=200)
+@router.get("/highscores", status_code=200)
 async def get_high_scorers(threshold: float = Query(0.95, ge=0, le=1)):
     """
     Retrieve high scorers based on a specified threshold.
