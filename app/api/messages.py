@@ -12,7 +12,20 @@ from . import db_manager, predict, schemas
 from mock_external import mock_authentication as authentication
 
 router = APIRouter(prefix="/messages", tags=["messages"])
+health_router = APIRouter(prefix="/health", tags=["health"])
+
 producer = Producer({"bootstrap.servers": "kafka:9092"})
+
+
+@health_router.get("/", status_code=200)
+async def health_check():
+    """
+    Health check endpoint to verify the status of the Messages Prediction Service.
+
+    Returns:
+        dict: A dictionary indicating the health status.
+    """
+    return {"status": "ok"}
 
 
 @router.get("/", status_code=200)

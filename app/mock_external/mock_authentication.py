@@ -7,8 +7,6 @@ from typing import Optional
 
 from databases.interfaces import Record
 
-from api import db_manager
-
 
 async def get_current_user() -> Optional[Record]:
     """
@@ -20,5 +18,7 @@ async def get_current_user() -> Optional[Record]:
     Returns:
         The randomly selected account object.
     """
+    from api import db_manager
+
     random_account = random.randint(1, 5)
     return await db_manager.get_account(account_id=random_account)

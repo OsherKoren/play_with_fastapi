@@ -8,3 +8,4 @@ __pycache__/
 .idea/
 *.pyc
 /.mypy_cache/
+/app/.pytest_cache/

@@ -16,8 +16,9 @@ COPY pyproject.toml ./
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
-    && poetry install --no-root --no-dev \
-    && poetry export -f requirements.txt -o requirements.txt --without-hashes
+    && poetry install --no-root \
+    && poetry export -f requirements.txt --output requirements.txt --without-hashes --with test
+
 
 FROM python:3.11-slim as final
 
@@ -43,3 +44,4 @@ COPY . .
 EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["pytest", "tests/test_api/test_messages.py"]

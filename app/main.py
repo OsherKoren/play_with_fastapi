@@ -6,6 +6,9 @@ This module is responsible for creating the FastAPI application
 and performing startup and shutdown actions.
 """
 
+# from aiohttp import ClientSession
+from contextlib import asynccontextmanager
+import asyncio
 from confluent_kafka import KafkaError, KafkaException
 from confluent_kafka.admin import AdminClient, NewTopic
 from fastapi import FastAPI
@@ -15,19 +18,11 @@ from api.tables_metadata import database, engine, metadata
 
 metadata.create_all(engine)
 
-app = FastAPI(title="Message Prediction App", version="1.0")
 
-
-@app.on_event("startup")
-async def startup() -> None:
-    """
-    Performs startup actions for the FastAPI application.
-
-    This function is called when the FastAPI application starts. It connects to the database
-    and tries to create a Kafka topic. If the topic already exists, it is ignored; otherwise,
-    it creates the new topic.
-    """
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     await database.connect()
+    print("Starting up database ... ")
     # Kafka topic creation
     admin_client = AdminClient({"bootstrap.servers": "kafka:9092"})
     topic_name = "message_scores_topic"
@@ -45,16 +40,11 @@ async def startup() -> None:
                 print(f"Topic {topic} already exists")
             else:
                 print(f"Failed to create topic {topic}: {ex}")
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    """
-    Performs shutdown actions for the FastAPI application.
-    This function is called when the FastAPI application shuts down.
-    It disconnects from the database.
-    """
+    yield
     await database.disconnect()
+    print("Shutting down ... ")
 
+app = FastAPI(title="Message Prediction App", version="1.0", lifespan=lifespan)
 
+app.include_router(messages.health_router, prefix='/api/v1', tags=["health"])
 app.include_router(messages.router, prefix='/api/v1', tags=["messages"])
