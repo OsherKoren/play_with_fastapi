@@ -8,7 +8,8 @@ from datetime import datetime
 from confluent_kafka import Producer
 from fastapi import APIRouter, Depends, Query
 
-from . import db_manager, predict, schemas
+from . import predict, schemas
+from db import db_manager
 from mock_external import mock_authentication as authentication
 
 router = APIRouter(prefix="/messages", tags=["messages"])

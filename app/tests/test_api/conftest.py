@@ -8,7 +8,7 @@ from asgi_lifespan import LifespanManager
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from app.main import app
-from app.api.tables_metadata import database
+from app.db.tables_metadata import database
 
 BASE_URL = "http://localhost:8000/api/v1"
 

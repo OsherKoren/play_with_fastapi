@@ -14,7 +14,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 from fastapi import FastAPI
 
 from api import messages
-from api.tables_metadata import database, engine, metadata
+from db.tables_metadata import database, engine, metadata
 
 metadata.create_all(engine)
 
