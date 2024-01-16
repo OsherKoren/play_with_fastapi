@@ -3,4 +3,4 @@
 
 """A sub-folder for API services and endpoints"""
 
-from . import messages, predict, schemas
+from . import messages, schemas

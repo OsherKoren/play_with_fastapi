@@ -4,13 +4,15 @@
 """Module for API endpoints"""
 import json
 from datetime import datetime
+from typing import Annotated, Any, Dict, List, Union, Optional
 
 from confluent_kafka import Producer
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Path, Query
+from pydantic import ValidationError
 
-from . import predict, schemas
+from . import schemas
 from db import db_manager
-from mock_external import mock_authentication as authentication
+from mock_external import mock_authentication as authentication, predict
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 health_router = APIRouter(prefix="/health", tags=["health"])
@@ -41,7 +43,7 @@ async def get_messages():
     return await db_manager.get_all_messages()
 
 
-@router.post("/scores", status_code=201, response_model=schemas.MessageScore)
+@router.post("/score", status_code=201, response_model=schemas.MessageScore)
 async def predict_message(
     payload: schemas.MessageIn, account: dict = Depends(authentication.get_current_user)
 ):
@@ -78,7 +80,7 @@ async def predict_message(
     return response
 
 
-@router.get("/messages/{msg_id}", status_code=200)
+@router.get("/{msg_id}", status_code=200)
 async def get_message(msg_id: int):
     """
     Retrieve a specific message by its ID.
@@ -95,14 +97,26 @@ async def get_message(msg_id: int):
     return message
 
 
-@router.get("/scores", status_code=200)
-async def get_scores():
-    """Retrieve all message scores."""
-    return await db_manager.get_all_scores()
+@router.get("/{msg_id}/score", status_code=200)
+async def get_message_score(msg_id: int) -> Dict[str, Any]:
+    """
+    Retrieves the score of a specific message by its message ID.
+
+    Args:
+        msg_id (int): The ID of the message for which the score is to be retrieved.
+
+    Returns:
+        dict: A dictionary containing the message score details.
+    """
+    message_score = await db_manager.get_message_score(msg_id)
+    if message_score:
+        return {"message_id": msg_id, "score": message_score["score"]}
+    else:
+        return {"message": f"Message {msg_id} not found or no score available"}
 
 
-@router.get("/highscores", status_code=200)
-async def get_high_scorers(threshold: float = Query(0.95, ge=0, le=1)):
+@router.get("/scores/{threshold}", status_code=200)
+async def get_high_scorers(threshold: Annotated[float, Path(ge=0, le=1)]):
     """
     Retrieve high scorers based on a specified threshold.
 

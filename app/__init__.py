@@ -3,4 +3,4 @@
 
 """A package for API service"""
 
-from . import api, main, mock_external
+from . import api, db, main, mock_external

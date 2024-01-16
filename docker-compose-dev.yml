@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  db:
+  dev-db:
     image: postgres:alpine
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
@@ -22,41 +22,42 @@ services:
       timeout: 10s
       retries: 3
 
-  zookeeper:
+  dev-zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  kafka:
+  dev-kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
-      - zookeeper
+      - dev-zookeeper
     ports:
       - "9092:9092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ZOOKEEPER_CONNECT: dev-zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
-      test: ["CMD", "nc", "-zv", "kafka", "9092"]
+      #test: ["CMD", "nc", "-zv", "kafka", "9092"]
+      test: [ "CMD", "kafka-topics", "--list", "--bootstrap-server", "kafka:9092" ]
       interval: 30s
       timeout: 10s
       retries: 3
 
-  app:
+  dev-app:
     build:
-      context: ./app
+      context: app
       dockerfile: Dockerfile.dev
     volumes:
       - ./app:/app
     ports:
       - "8000:8000"
     depends_on:
-      db:
+      dev-db:
         condition: service_healthy
-      kafka:
+      dev-kafka:
         condition: service_healthy
     env_file:
       - .env.dev
@@ -69,14 +70,14 @@ services:
       timeout: 10s
       retries: 3
 
-  kafka-consumer:
+  dev_kafka-consumer:
     build:
       context: ./kafka_consumer
       dockerfile: Dockerfile.dev
     depends_on:
-      kafka:
+      dev-kafka:
         condition: service_healthy
-      app:
+      dev-app:
         condition: service_healthy
 
 volumes:
