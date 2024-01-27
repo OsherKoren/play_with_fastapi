@@ -16,7 +16,7 @@ COPY pyproject.toml ./
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
-    && poetry install --no-root \
+    && poetry install --no-root --no-cache \
     && poetry export -f requirements.txt --output requirements.txt --without-hashes --with test
 
 
@@ -43,10 +43,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "\
-    uvicorn main:app \
-    --host 0.0.0.0 \
-    --port 8000 \
-    --reload \
-    --log-level debug \
-    && pytest -vv tests/test_api/test_messages.py"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]

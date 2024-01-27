@@ -9,6 +9,10 @@ authors = ["Osher Koren"]
 python = "^3.11"
 confluent-kafka = "^2.3.0"
 
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.4"
+pytest-cov = "^4.1.0"
+
 
 [build-system]
 requires = ["poetry-core>=1.7.1"]

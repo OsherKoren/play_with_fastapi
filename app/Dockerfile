@@ -16,7 +16,7 @@ COPY pyproject.toml ./
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
-    && poetry install --no-root --no-dev \
+    && poetry install --no-root --no-cache --only main \
     && poetry export -f requirements.txt -o requirements.txt --without-hashes
 
 FROM python:3.11-slim as final

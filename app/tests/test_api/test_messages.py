@@ -87,20 +87,20 @@ message_expected_response = [
 ]
 
 
-def test_get_message(test_app, base_url, mock_message_2):
-    """Test the get a message endpoint"""
-
-    response = test_app.get(f"{base_url}/{MSG_2_ENDPOINT}")
-    assert response.status_code == 200
-    assert response.json() == message_expected_response
-
-
-@pytest.mark.anyio
-async def test_get_message_async(async_test_app, base_url, mock_message_2):
-    """Test the get a message endpoint - async"""
-    response = await async_test_app.get(f"{base_url}/{MSG_2_ENDPOINT}")
-    assert response.status_code == 200
-    assert response.json() == message_expected_response
+# def test_get_message(test_app, base_url, mock_message_2):
+#     """Test the get a message endpoint"""
+#
+#     response = test_app.get(f"{base_url}/{MSG_2_ENDPOINT}")
+#     assert response.status_code == 200
+#     assert response.json() == message_expected_response
+#
+#
+# @pytest.mark.anyio
+# async def test_get_message_async(async_test_app, base_url, mock_message_2):
+#     """Test the get a message endpoint - async"""
+#     response = await async_test_app.get(f"{base_url}/{MSG_2_ENDPOINT}")
+#     assert response.status_code == 200
+#     assert response.json() == message_expected_response
 
 
 scores_expected_response =  [

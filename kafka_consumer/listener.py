@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import time
+from typing import Optional
 
 from confluent_kafka import Consumer, KafkaError
 
@@ -16,42 +17,60 @@ logger = logging.getLogger(__name__)
 bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
 
 
-def set_consumer(retries: int = 5) -> Consumer:
-    """
-    Sets up and returns a Kafka consumer.
+class KafkaConsumer:
+    """A singleton class for managing a Kafka consumer instance."""
 
-    This function attempts to create a Kafka consumer with specified configuration settings.
-    If the initial connection attempt fails, it retries a specified number of times before
-    giving up.
+    _consumer_instance: Optional[Consumer] = None
 
-    Args:
-        retries (int, optional): The number of attempts to make for connecting to Kafka.
-                                 Defaults to 5.
+    @classmethod
+    def get_consumer(cls, retries: int = 5) -> Consumer:
+        """
+        Retrieves or creates a Kafka consumer instance.
 
-    Returns:
-        Consumer: A configured Kafka consumer instance.
+        Args:
+            retries (int): The number of attempts to connect to Kafka. Defaults to 5.
 
-    Raises:
-        Exception: If the function fails to connect to Kafka after the specified number of retries.
+        Returns:
+            Consumer: A configured Kafka consumer instance.
 
-    """
-    for i in range(retries):
-        try:
-            _consumer = Consumer(
-                {
-                    "bootstrap.servers": bootstrap_servers,
-                    "group.id": "department1-consumer-group",
-                    "auto.offset.reset": "earliest",
-                }
-            )
-            logger.info("Connected to Kafka")
-            return _consumer
-        except ConnectionError as err:
-            logger.error("Failed to connect to Kafka: %s", err)
-            if i < retries - 1:
-                logger.info("Retrying in 10 seconds... (Attempt %d/%d)", i + 2, retries)
-                time.sleep(10)
-    raise ConnectionError(f"Failed to connect to Kafka after {retries} retries")
+        Raises:
+            ConnectionError: If the function fails to connect to Kafka after the specified number of retries.
+        """
+        if cls._consumer_instance is None:
+            cls._consumer_instance = cls._create_consumer(retries)
+        return cls._consumer_instance
+
+    @classmethod
+    def _create_consumer(cls, retries: int) -> Consumer:
+        """
+        Creates a new Kafka consumer instance.
+
+        Args:
+            retries (int): The number of attempts to connect to Kafka.
+
+        Returns:
+            Consumer: A configured Kafka consumer instance.
+
+        Raises:
+            ConnectionError: If the function fails to connect to Kafka after the specified number of retries.
+        """
+        for i in range(retries):
+            try:
+                consumer = Consumer(
+                    {
+                        "bootstrap.servers": bootstrap_servers,
+                        "group.id": "department1-consumer-group",
+                        "auto.offset.reset": "earliest",
+                    }
+                )
+                logger.info("Connected to Kafka")
+                return consumer
+            except ConnectionError as err:
+                logger.error("Failed to connect to Kafka: %s", err)
+                if i < retries - 1:
+                    logger.info("Retrying in 10 seconds... (Attempt %d/%d)", i + 2, retries)
+                    time.sleep(10)
+        raise ConnectionError(f"Failed to connect to Kafka after {retries} retries")
 
 
 def consume_messages(kafka_consumer: Consumer) -> None:
@@ -92,5 +111,5 @@ def consume_messages(kafka_consumer: Consumer) -> None:
 
 
 if __name__ == "__main__":
-    consumer = set_consumer()
+    consumer = KafkaConsumer.get_consumer()
     consume_messages(consumer)

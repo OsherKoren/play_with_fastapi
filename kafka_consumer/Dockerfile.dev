@@ -16,8 +16,8 @@ COPY pyproject.toml ./
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
-    && poetry install --no-root --no-dev \
-    && poetry export -f requirements.txt -o requirements.txt
+    && poetry install --no-root --no-cache \
+    && poetry export -f requirements.txt --output requirements.txt --without-hashes --with test
 
 
 ### Final stage - to reduce image size
