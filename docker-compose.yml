@@ -39,8 +39,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /tmp/kafka-logs
     healthcheck:
-      test: ["CMD", "nc", "-zv", "kafka", "9092"]
+      test: ["CMD", "nc", "-zv","kafka", "9092"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -60,8 +61,6 @@ services:
         condition: service_healthy
     env_file:
       - .env
-    environment:
-      DB_NAME: ${DB_NAME}
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read().decode()"]

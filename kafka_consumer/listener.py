@@ -4,12 +4,16 @@
 """This module mocks external user that consumes messages from Kafka"""
 import json
 import logging
+import os
 import time
 
 from confluent_kafka import Consumer, KafkaError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
 
 
 def set_consumer(retries: int = 5) -> Consumer:
@@ -35,7 +39,7 @@ def set_consumer(retries: int = 5) -> Consumer:
         try:
             _consumer = Consumer(
                 {
-                    "bootstrap.servers": "kafka:9092",
+                    "bootstrap.servers": bootstrap_servers,
                     "group.id": "department1-consumer-group",
                     "auto.offset.reset": "earliest",
                 }
@@ -61,7 +65,7 @@ def consume_messages(kafka_consumer: Consumer) -> None:
     Args:
         kafka_consumer (Consumer): A configured Kafka Consumer instance.
     """
-    kafka_consumer.subscribe(["message_scores_topic"])
+    kafka_consumer.subscribe(["message_score_topic"])
     logger.info("Subscribing to topic: message_scores_topic")
 
     try:

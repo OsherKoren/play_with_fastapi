@@ -15,7 +15,7 @@ services:
       POSTGRES_HOST: ${PS_HOST:-localhost}
       POSTGRES_PORT: ${PS_PORT:-5432}
     ports:
-      - "${PS_PORT}:${PS_PORT}"
+      - "5433:${PS_PORT}"
     healthcheck:
       test: ["CMD-SHELL", "psql -U postgres -d ${DB_NAME} -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
@@ -33,15 +33,16 @@ services:
     depends_on:
       - dev-zookeeper
     ports:
-      - "9092:9092"
+      - "29092:29092"
     environment:
-      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_ID: 2
       KAFKA_ZOOKEEPER_CONNECT: dev-zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://dev-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LOG_DIRS: /tmp/kafka-logs-dev
+      DEV_ENV: true
     healthcheck:
-      #test: ["CMD", "nc", "-zv", "kafka", "9092"]
-      test: [ "CMD", "kafka-topics", "--list", "--bootstrap-server", "kafka:9092" ]
+      test: [ "CMD", "nc", "-zv","dev-kafka", "29092" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -62,7 +63,7 @@ services:
     env_file:
       - .env.dev
     environment:
-      DB_NAME: ${DB_NAME}
+      DEV_ENV: true
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read().decode()"]
@@ -70,7 +71,7 @@ services:
       timeout: 10s
       retries: 3
 
-  dev_kafka-consumer:
+  dev-kafka-consumer:
     build:
       context: ./kafka_consumer
       dockerfile: Dockerfile.dev
@@ -79,6 +80,8 @@ services:
         condition: service_healthy
       dev-app:
         condition: service_healthy
+    environment:
+        DEV_ENV: true
 
 volumes:
   postgres_data_dev:

@@ -10,8 +10,12 @@ from databases import Database
 from dotenv import load_dotenv
 from sqlalchemy import (Column, DateTime, Float, ForeignKey, Integer, MetaData,
                         String, Table, create_engine, func)
+from .utils import logger
 
-load_dotenv()
+
+env_file = ".env.dev" if os.getenv("DEV_ENV", False) else ".env"
+load_dotenv(env_file)
+
 
 def get_database_url():
     """
@@ -52,16 +56,13 @@ def get_database_url():
         raise ValueError("Some required environment variables are not set.")
 
     db_url = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+    logger.debug(f"Database URL:\n {db_url}")
     return db_url
 
 
 db_url = get_database_url()
-
-if db_url is None:
-    raise ValueError("DATABASE_URL environment variable not set")
-
-
 engine = create_engine(db_url)
+
 metadata = MetaData()
 
 accounts_table = Table(

@@ -9,6 +9,7 @@ and performing startup and shutdown actions.
 # from aiohttp import ClientSession
 from contextlib import asynccontextmanager
 import asyncio
+import os
 from confluent_kafka import KafkaError, KafkaException
 from confluent_kafka.admin import AdminClient, NewTopic
 from fastapi import FastAPI
@@ -18,14 +19,16 @@ from db.tables_metadata import database, engine, metadata
 
 metadata.create_all(engine)
 
+bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await database.connect()
     print("Starting up database ... ")
     # Kafka topic creation
-    admin_client = AdminClient({"bootstrap.servers": "kafka:9092"})
-    topic_name = "message_scores_topic"
+    admin_client = AdminClient({"bootstrap.servers": bootstrap_servers})
+    topic_name = "message_score_topic"
     topics = [NewTopic(topic_name, 1, 1)]
 
     futures = admin_client.create_topics(topics, request_timeout=15.0)

@@ -8,10 +8,12 @@ and running sql statements on the database tables.
 
 from typing import List, Optional
 
+from sqlalchemy import join, select
 from databases.interfaces import Record
 
-from .tables_metadata import (accounts_table, database, messages_predictions_table,
-                                    messages_table)
+from .tables_metadata import (accounts_table, database, messages_predictions_table, messages_table)
+
+
 
 
 async def get_all_messages() -> List[Record]:
@@ -21,7 +23,29 @@ async def get_all_messages() -> List[Record]:
     Returns:
         List[Record]: A list of records, each representing a message.
     """
-    query = messages_table.select()
+    query = (
+        select(
+            [
+                messages_table.c.message_id,
+                messages_table.c.message,
+                messages_table.c.created_at,
+                accounts_table.c.account_id,
+                accounts_table.c.first_name,
+                accounts_table.c.surname,
+                accounts_table.c.email,
+                accounts_table.c.phone,
+                accounts_table.c.birthday,
+                accounts_table.c.gender,
+            ]
+        )
+        .select_from(
+            join(
+                accounts_table,
+                messages_table,
+                messages_table.c.account_id == accounts_table.c.account_id,
+            )
+        )
+    )
     return await database.fetch_all(query=query)
 
 
@@ -49,7 +73,29 @@ async def get_message(msg_id: int) -> Optional[Record]:
     Returns:
         Optional[Record]: A record representing the message, or None if not found.
     """
-    query = messages_table.select(messages_table.c.message_id == msg_id)
+    query = (
+        select(
+            [
+                messages_table.c.message_id,
+                messages_table.c.message,
+                messages_table.c.created_at,
+                accounts_table.c.account_id,
+                accounts_table.c.first_name,
+                accounts_table.c.surname,
+                accounts_table.c.email,
+                accounts_table.c.phone,
+                accounts_table.c.birthday,
+                accounts_table.c.gender,
+            ]
+        )
+        .select_from(
+            join(
+                accounts_table,
+                messages_table,
+                messages_table.c.account_id == accounts_table.c.account_id,
+            )
+        ).where(messages_table.c.message_id == msg_id)
+    )
     return await database.fetch_one(query=query)
 
 
@@ -82,8 +128,34 @@ async def get_message_score(msg_id: int) -> Optional[Record]:
     Returns:
         Optional[Record]: A record representing the message score, or None if not found.
     """
-    query = messages_predictions_table.select(
-        messages_predictions_table.c.message_id == msg_id
+    query = (
+        select(
+            [
+                messages_table.c.message_id,
+                messages_table.c.message,
+                messages_table.c.created_at,
+                messages_predictions_table.c.score,
+                messages_predictions_table.c.predicted_at,
+                accounts_table.c.account_id,
+                accounts_table.c.first_name,
+                accounts_table.c.surname,
+                accounts_table.c.email,
+                accounts_table.c.phone,
+                accounts_table.c.birthday,
+                accounts_table.c.gender,
+            ]
+        )
+        .select_from(
+            join(
+                accounts_table,
+                join(
+                    messages_table,
+                    messages_predictions_table,
+                    messages_table.c.message_id
+                    == messages_predictions_table.c.message_id,
+                ),
+            )
+        ).where(messages_table.c.message_id == msg_id)
     )
     return await database.fetch_one(query=query)
 
@@ -99,34 +171,90 @@ async def add_message_score(message_id: int, score: float) -> int:
     Returns:
         int: The primary key ID of the newly inserted message score.
     """
+
     query = messages_predictions_table.insert().values(
         message_id=message_id, score=score
     )
     return await database.execute(query=query)
 
 
-async def get_all_scores() -> List[Record]:
+async def get_messages_scores() -> List[Record]:
     """
-    Retrieve all scores from the messages_predictions_table.
+    Retrieves all messages with scores and account details.
 
     Returns:
-        List[Record]: A list of records representing the scores.
+        List[Record]: A list of records, each representing a message with scores and account details.
     """
-    query = messages_predictions_table.select()
+    query = (
+        select(
+            [
+                messages_table.c.message_id,
+                messages_table.c.message,
+                messages_table.c.created_at,
+                messages_predictions_table.c.score,
+                messages_predictions_table.c.predicted_at,
+                accounts_table.c.account_id,
+                accounts_table.c.first_name,
+                accounts_table.c.surname,
+                accounts_table.c.email,
+                accounts_table.c.phone,
+                accounts_table.c.birthday,
+                accounts_table.c.gender,
+            ]
+        )
+        .select_from(
+            join(
+                accounts_table,
+                join(
+                    messages_table,
+                    messages_predictions_table,
+                    messages_table.c.message_id
+                    == messages_predictions_table.c.message_id,
+                ),
+            )
+        )
+    )
     return await database.fetch_all(query=query)
 
 
-async def get_high_scorers(threshold: float) -> List[Record]:
+async def filter_messages_scores(threshold: float) -> List[Record]:
     """
-    Retrieve records with scores equal to or greater than the specified threshold.
+    Retrieve records with scores equal to or greater than the specified threshold
+    along with associated message and account details.
 
     Args:
         threshold (float): The minimum score threshold for filtering.
 
     Returns:
-        List[Record]: A list of records representing the high scorers.
+        List[Record]: A list of records representing high scorers with details.
     """
-    query = messages_predictions_table.select(
-        messages_predictions_table.c.score >= threshold
+    query = (
+        select(
+            [
+                messages_table.c.message_id,
+                messages_table.c.message,
+                messages_table.c.created_at,
+                messages_predictions_table.c.score,
+                messages_predictions_table.c.predicted_at,
+                accounts_table.c.account_id,
+                accounts_table.c.first_name,
+                accounts_table.c.surname,
+                accounts_table.c.email,
+                accounts_table.c.phone,
+                accounts_table.c.birthday,
+                accounts_table.c.gender,
+            ]
+        )
+        .select_from(
+            join(
+                accounts_table,
+                join(
+                    messages_table,
+                    messages_predictions_table,
+                    messages_table.c.message_id
+                    == messages_predictions_table.c.message_id,
+                ),
+            )
+        ).where(messages_predictions_table.c.score >= threshold)
     )
     return await database.fetch_all(query=query)

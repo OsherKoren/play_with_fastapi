@@ -1,0 +1,8 @@
+__pycache__
+*.pyc
+*.pyo
+.git
+.svn
+.hg
+.mypy_cache
+/docs

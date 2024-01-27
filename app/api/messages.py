@@ -4,6 +4,8 @@
 """Module for API endpoints"""
 import json
 from datetime import datetime
+import logging
+import os
 from typing import Annotated, Any, Dict, List, Union, Optional
 
 from confluent_kafka import Producer
@@ -14,10 +16,12 @@ from . import schemas
 from db import db_manager
 from mock_external import mock_authentication as authentication, predict
 
+
 router = APIRouter(prefix="/messages", tags=["messages"])
 health_router = APIRouter(prefix="/health", tags=["health"])
 
-producer = Producer({"bootstrap.servers": "kafka:9092"})
+bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
+producer = Producer({"bootstrap.servers": bootstrap_servers})
 
 
 @health_router.get("/", status_code=200)
@@ -74,27 +78,33 @@ async def predict_message(
         "score": score,
     }
     message_serialized = json.dumps(response, default=str).encode("utf-8")
-    producer.produce("message_scores_topic", message_serialized)
+    producer.produce("message_score_topic", message_serialized)
     producer.flush()
 
     return response
 
 
-@router.get("/{msg_id}", status_code=200)
-async def get_message(msg_id: int):
-    """
-    Retrieve a specific message by its ID.
+@router.get("/scores", status_code=200)
+async def get_scores():
+    """Retrieve all scores."""
+    return await db_manager.get_messages_scores()
 
-    Args:
-        msg_id (int): The ID of the message to retrieve.
 
-    Returns:
-        dict: A dictionary containing the message details.
-    """
-    message = await db_manager.get_message(msg_id)
-    if not message:
-        return {"message": f"Message {msg_id} not found"}
-    return message
+# @router.get("/{msg_id}", status_code=200)
+# async def get_message(msg_id: int):
+#     """
+#     Retrieve a specific message by its ID.
+#
+#     Args:
+#         msg_id (int): The ID of the message to retrieve.
+#
+#     Returns:
+#         dict: A dictionary containing the message details.
+#     """
+#     message = await db_manager.get_message(msg_id)
+#     if not message:
+#         return {"message": f"Message {msg_id} not found"}
+#     return message
 
 
 @router.get("/{msg_id}/score", status_code=200)
@@ -109,24 +119,23 @@ async def get_message_score(msg_id: int) -> Dict[str, Any]:
         dict: A dictionary containing the message score details.
     """
     message_score = await db_manager.get_message_score(msg_id)
-    if message_score:
-        return {"message_id": msg_id, "score": message_score["score"]}
-    else:
+    if not message_score:
         return {"message": f"Message {msg_id} not found or no score available"}
+    return dict(message_score)
 
 
 @router.get("/scores/{threshold}", status_code=200)
-async def get_high_scorers(threshold: Annotated[float, Path(ge=0, le=1)]):
+async def get_filtered_scores(threshold: Annotated[float, Path(ge=0, le=1)]):
     """
-    Retrieve high scorers based on a specified threshold.
+    Retrieve scorers based on a specified threshold.
 
     Args:
-        threshold (float): The score threshold to filter high scorers.
+        threshold (float): The score threshold to filter scores.
 
     Returns:
-        dict: A dictionary containing high scorers' details.
+        dict: A dictionary containing filtered scores' details.
     """
-    high_scorers = await db_manager.get_high_scorers(threshold)
-    if high_scorers:
-        return high_scorers
-    return {"message": f"No high score greater than {threshold} found"}
+    scores = await db_manager.filter_messages_scores(threshold)
+    if not scores:
+        return {"message": f"No score greater than {threshold} found"}
+    return scores
