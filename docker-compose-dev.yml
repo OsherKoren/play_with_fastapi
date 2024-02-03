@@ -29,7 +29,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   dev-kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.5.1
     depends_on:
       - dev-zookeeper
     ports:
@@ -71,15 +71,17 @@ services:
       timeout: 10s
       retries: 3
 
-  dev-kafka-consumer:
+  dev-processor:
     build:
-      context: ./kafka_consumer
+      context: processor
       dockerfile: Dockerfile.dev
     depends_on:
       dev-kafka:
         condition: service_healthy
       dev-app:
         condition: service_healthy
+    env_file:
+      - .env.dev
     environment:
         DEV_ENV: true
 

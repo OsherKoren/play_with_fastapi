@@ -26,7 +26,19 @@ class MessageIn(BaseModel):
 
     message: str
     email: Optional[EmailStr] = None
-    phone: Optional[constr(pattern=r'^\+\d{1,3}-\d{1,14}$')] = None
+    phone: Optional[constr(pattern=r'^\d{3}-\d{2}-\d{7}$')] = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "message": "I am intersting in getting a loan. Please contact me",
+                    "email": "email@example.com",
+                    "phone": "972-52-1234567",
+                }
+            ]
+        }
+    }
 
     @model_validator(mode="before")
     @classmethod
