@@ -17,7 +17,7 @@ from . import schemas
 from db import db_manager
 from kafka import producer as kafka_producer
 
-from mock_external import mock_authentication as authentication #, predict
+from mock_external import mock_authentication as authentication
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -54,7 +54,7 @@ async def get_messages():
 @router.post("/send",
              status_code=201,
              response_model=None,
-             description="Post a message and store it in the database."
+             description="Post a message and store it in the database.",
              )
 async def send_message(
     payload: schemas.MessageIn,
@@ -105,7 +105,7 @@ async def send_message(
     # producer.flush()
 
         job_id = f"{created_at.isoformat()}_{message_id}"
-        return JSONResponse(content={"Job ID": job_id}, status_code=201)
+        return JSONResponse(content={"Message ID": message_id, "Job ID": job_id}, status_code=201)
     except ConnectionError as err:
         logger.error(f"ConnectionError: {err}")
         return JSONResponse(content={"Internal Server Error": "Failed to connect to Kafka"}, status_code=500)

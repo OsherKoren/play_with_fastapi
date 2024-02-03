@@ -6,10 +6,23 @@ import os
 from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener
 from aiokafka.errors import KafkaError
 
-logging.basicConfig(level=logging.INFO)
+from mock_ml import predict
+from db import db_manager
+from db.tables_metadata import database, engine, metadata
+
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
+
+
+async def startup_db():
+    metadata.create_all(engine)
+    await database.connect()
+
+
+async def shutdown_db():
+    await database.disconnect()
 
 
 async def set_consumer(retries: int = 3) -> AIOKafkaConsumer:
@@ -35,7 +48,7 @@ async def set_consumer(retries: int = 3) -> AIOKafkaConsumer:
                 consumer = AIOKafkaConsumer(
                     "evt.user_message",
                     bootstrap_servers=bootstrap_servers,
-                    group_id="department1",
+                    group_id="DataEngineersGroup",
                     auto_offset_reset="earliest",
                 )
                 await consumer.start()
@@ -76,6 +89,13 @@ async def consume_messages(consumer: AIOKafkaConsumer) -> None:
             message_dict = json.loads(message_str)
             logger.info("Received message: %s", message_dict)
 
+            score = predict.predict_score(message)
+            message_id = message_dict.get("message_id")
+            prediction_id = await db_manager.add_message_score(message_id, score)
+
+            logger.info("Predicted score: %s", score)
+            logger.info("Database updated with prediction_id: %s", prediction_id)
+
     except KeyboardInterrupt:
         pass
 
@@ -92,4 +112,11 @@ async def listen_to_kafka():
 
 
 if __name__ == "__main__":
-    asyncio.run(listen_to_kafka())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(startup_db())
+    try:
+        loop.run_until_complete(listen_to_kafka())
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.run_until_complete(shutdown_db())
