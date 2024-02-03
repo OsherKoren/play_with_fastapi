@@ -1,79 +1,63 @@
-# -*- coding: utf-8 -*-
-# !/usr/bin/env python
-
-"""This module mocks external user that consumes messages from Kafka"""
+import asyncio
 import json
 import logging
 import os
-import time
-from typing import Optional
 
-from confluent_kafka import Consumer, KafkaError
+from aiokafka import AIOKafkaConsumer, ConsumerRebalanceListener
+from aiokafka.errors import KafkaError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
 
 
-class KafkaConsumer:
-    """A singleton class for managing a Kafka consumer instance."""
+async def set_consumer(retries: int = 3) -> AIOKafkaConsumer:
+    """
+       Creates and starts an AIOKafkaConsumer instance.
 
-    _consumer_instance: Optional[Consumer] = None
+       Args:
+           retries (int): The number of retry attempts if connection to Kafka fails. Default is 3.
 
-    @classmethod
-    def get_consumer(cls, retries: int = 5) -> Consumer:
-        """
-        Retrieves or creates a Kafka consumer instance.
+       Returns:
+           AIOKafkaConsumer: An instance of AIOKafkaConsumer connected to the specified Kafka topic.
 
-        Args:
-            retries (int): The number of attempts to connect to Kafka. Defaults to 5.
+       Raises:
+           ConnectionError: If failed to connect to Kafka after the specified number of retry attempts.
+       """
+    consumer = None
 
-        Returns:
-            Consumer: A configured Kafka consumer instance.
+    async def _create_consumer():
+        nonlocal consumer
 
-        Raises:
-            ConnectionError: If the function fails to connect to Kafka after the specified number of retries.
-        """
-        if cls._consumer_instance is None:
-            cls._consumer_instance = cls._create_consumer(retries)
-        return cls._consumer_instance
-
-    @classmethod
-    def _create_consumer(cls, retries: int) -> Consumer:
-        """
-        Creates a new Kafka consumer instance.
-
-        Args:
-            retries (int): The number of attempts to connect to Kafka.
-
-        Returns:
-            Consumer: A configured Kafka consumer instance.
-
-        Raises:
-            ConnectionError: If the function fails to connect to Kafka after the specified number of retries.
-        """
-        for i in range(retries):
+        for i in range(1, retries + 1):
             try:
-                consumer = Consumer(
-                    {
-                        "bootstrap.servers": bootstrap_servers,
-                        "group.id": "department1-consumer-group",
-                        "auto.offset.reset": "earliest",
-                    }
+                consumer = AIOKafkaConsumer(
+                    "evt.user_message",
+                    bootstrap_servers=bootstrap_servers,
+                    group_id="department1",
+                    auto_offset_reset="earliest",
                 )
+                await consumer.start()
                 logger.info("Connected to Kafka")
                 return consumer
-            except ConnectionError as err:
+            except KafkaError as err:
                 logger.error("Failed to connect to Kafka: %s", err)
-                if i < retries - 1:
-                    logger.info("Retrying in 10 seconds... (Attempt %d/%d)", i + 2, retries)
-                    time.sleep(10)
-        raise ConnectionError(f"Failed to connect to Kafka after {retries} retries")
+                if i <= retries:
+                    logger.info("Retrying in 1 second... (Attempt %d of %d)", i, retries)
+                    await asyncio.sleep(1)
+                else:
+                    raise ConnectionError(f"Failed to connect to Kafka after {retries} attempts.")
+
+    try:
+        yield await _create_consumer()
+    finally:
+        if consumer:
+            await consumer.stop()
+            logger.info("Consumer stopped")
 
 
-def consume_messages(kafka_consumer: Consumer) -> None:
+async def consume_messages(consumer: AIOKafkaConsumer) -> None:
     """
     Consumes messages from a Kafka topic.
 
@@ -82,34 +66,30 @@ def consume_messages(kafka_consumer: Consumer) -> None:
     The function runs indefinitely until interrupted or an unrecoverable error occurs.
 
     Args:
-        kafka_consumer (Consumer): A configured Kafka Consumer instance.
+        consumer (AIOKafkaConsumer): A configured Kafka Consumer instance.
     """
-    kafka_consumer.subscribe(["message_score_topic"])
-    logger.info("Subscribing to topic: message_scores_topic")
-
     try:
-        while True:
-            msg = kafka_consumer.poll(1.0)
-            if msg is None:
-                continue
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    logger.debug("End of partition reached: %s", msg.error())
-                    continue
-                logger.error("Error in message consumption: %s", msg.error())
-                break
+        async for message in consumer:
+            logger.info("Received from topic: %s", message.topic)
             # Decode the message bytes into a string and then load it as JSON
-            message_str = msg.value().decode("utf-8")
+            message_str = message.value.decode("utf-8")
             message_dict = json.loads(message_str)
             logger.info("Received message: %s", message_dict)
 
     except KeyboardInterrupt:
         pass
 
-    finally:
-        kafka_consumer.close()
+
+async def listen_to_kafka():
+    """
+    Listens to Kafka messages.
+
+    This function creates a Kafka consumer and consumes messages from the specified topic.
+    """
+    consumer_generator = set_consumer()
+    async for consumer_instance in consumer_generator:
+        await consume_messages(consumer_instance)
 
 
 if __name__ == "__main__":
-    consumer = KafkaConsumer.get_consumer()
-    consume_messages(consumer)
+    asyncio.run(listen_to_kafka())

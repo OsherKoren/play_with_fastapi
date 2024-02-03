@@ -7,7 +7,8 @@ authors = ["Osher Koren"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-confluent-kafka = "^2.3.0"
+asyncio = "^3.4.3"
+aiokafka = "^0.10.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.4"

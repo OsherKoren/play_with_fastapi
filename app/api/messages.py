@@ -8,20 +8,23 @@ import logging
 import os
 from typing import Annotated, Any, Dict, List, Union, Optional
 
-from confluent_kafka import Producer
+from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, Depends, Path, Query
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
 from . import schemas
 from db import db_manager
-from mock_external import mock_authentication as authentication, predict
+from kafka import producer as kafka_producer
+
+from mock_external import mock_authentication as authentication #, predict
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 health_router = APIRouter(prefix="/health", tags=["health"])
-
-bootstrap_servers = "dev-kafka:29092" if os.getenv("DEV_ENV", False) else "kafka:9092"
-producer = Producer({"bootstrap.servers": bootstrap_servers})
 
 
 @health_router.get("/", status_code=200)
@@ -47,12 +50,22 @@ async def get_messages():
     return await db_manager.get_all_messages()
 
 
-@router.post("/score", status_code=201, response_model=schemas.MessageScore)
-async def predict_message(
-    payload: schemas.MessageIn, account: dict = Depends(authentication.get_current_user)
-):
+# @router.post("/score", status_code=201, response_model=schemas.MessageScore)
+@router.post("/send",
+             status_code=201,
+             response_model=None,
+             description="Post a message and store it in the database."
+             )
+async def send_message(
+    payload: schemas.MessageIn,
+    # produce_message: Annotated[None, Depends(kafka_producer.produce_message)],
+    account: dict = Depends(authentication.get_current_user),
+    producer: AIOKafkaProducer = Depends(kafka_producer.set_producer),
+
+        # kafka_producer: Annotated[MsgProducer, Depends(producer.produce_message)] = None),
+) -> JSONResponse:
     """
-    Predict the score for a message and store it in the database.
+    Store the user message in the database and send it to the Kafka topic.
 
     Args:
         payload (schemas.MessageIn): The message payload.
@@ -67,21 +80,35 @@ async def predict_message(
     message_id = await db_manager.add_message(account_id, message)
     created_at = datetime.now()
 
-    score = predict.predict_score(message)
-    await db_manager.add_message_score(message_id, score)
-
-    response = {
+    kafka_message = {
         "message_id": message_id,
         "account_id": account_id,
         "message": message,
         "created_at": created_at,
-        "score": score,
     }
-    message_serialized = json.dumps(response, default=str).encode("utf-8")
-    producer.produce("message_score_topic", message_serialized)
-    producer.flush()
+    # score = predict.predict_score(message)
+    # await db_manager.add_message_score(message_id, score)
+    #
+    # response = {
+    #     "message_id": message_id,
+    #     "account_id": account_id,
+    #     "message": message,
+    #     "created_at": created_at,
+    #     "score": score,
+    # }
+    message_serialized = json.dumps(kafka_message, default=str).encode("utf-8")
+    try:
+        await producer.send("evt.user_message", value=message_serialized)
+        logger.info(f"Message sent to topic evt.user_message: {kafka_message}")
+        # await kafka_producer.produce_message("evt.user_message", message_serialized)
+    # producer.produce("message_score_topic", message_serialized)
+    # producer.flush()
 
-    return response
+        job_id = f"{created_at.isoformat()}_{message_id}"
+        return JSONResponse(content={"Job ID": job_id}, status_code=201)
+    except ConnectionError as err:
+        logger.error(f"ConnectionError: {err}")
+        return JSONResponse(content={"Internal Server Error": "Failed to connect to Kafka"}, status_code=500)
 
 
 @router.get("/scores", status_code=200)
