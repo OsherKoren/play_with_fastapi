@@ -29,16 +29,8 @@ profile = "black"
 src_paths = ["processor"]
 honor_noqa = true
 
-
-[tool.pylint]
-ignore-patterns = ["tests/*"]
-fail-under = 9.0
-
-[tool.pylint.format]
-max-line-length = 100
-
-[tool.pylint.messages_control]
-disable = ["too-few-public-methods"]
+[tool.mypy]
+ignore_missing_imports = true
 
 
 [build-system]

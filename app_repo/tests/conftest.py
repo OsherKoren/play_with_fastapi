@@ -4,10 +4,11 @@
 """pytest fixtures for the Messages API endpoints tests"""
 
 import pytest
-from app import main
 from asgi_lifespan import LifespanManager
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
+
+from app import main
 
 BASE_URL = "http://localhost:8000/api/v1"
 

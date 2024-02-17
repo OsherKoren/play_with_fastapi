@@ -27,7 +27,7 @@ def setup_producer() -> None:
         AIOKafkaProducer: An instance of AIOKafkaProducer with the specified Kafka
         bootstrap servers.
     """
-    global KAFKA_PRODUCER
+    global KAFKA_PRODUCER  # pylint: disable=global-statement
 
     if KAFKA_PRODUCER is None:
         KAFKA_PRODUCER = AIOKafkaProducer(bootstrap_servers=BOOTSTRAP_SERVERS)
@@ -43,9 +43,11 @@ async def get_producer() -> AIOKafkaProducer:
         bootstrap servers.
 
     Raises:
-        KafkaConnectionError: If failed to connect to Kafka after the specified number of retry attempts.
+        KafkaConnectionError: If failed to connect to Kafka
+        after the specified number of retry attempts.
     """
     setup_producer()
+    assert KAFKA_PRODUCER
 
     async def _connect_producer():
 

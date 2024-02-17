@@ -3,7 +3,6 @@
 
 """Utility functions for Kafka"""
 import logging
-import os
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

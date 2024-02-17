@@ -21,22 +21,25 @@ def setup_producer() -> None:
     """
     Set up an AIOKafkaProducer instance.
     """
-    global KAFKA_PRODUCER
+    global KAFKA_PRODUCER  # pylint: disable=global-statement
 
     if KAFKA_PRODUCER is None:
         KAFKA_PRODUCER = AIOKafkaProducer(bootstrap_servers=BOOTSTRAP_SERVERS)
         log.info(" Instancing Kafka producer ".center(40, "="))
 
 
+# pylint: disable=R0801
 async def start_producer(retries: int = 3) -> None:
     """
     Starts the AIOKafkaProducer instance connection.
 
     Raises:
-        KafkaConnectionError: If failed to connect to Kafka after the specified number of retry attempts.
+        KafkaConnectionError: If failed to connect to Kafka
+        after the specified number of retry attempts.
     """
     setup_producer()
 
+    assert KAFKA_PRODUCER
     for i in range(1, retries + 1):
         try:
             await KAFKA_PRODUCER.start()  # Start the producer
@@ -57,6 +60,6 @@ async def shutdown_producer() -> None:
     """
     Shut down by disconnecting the producer connection to the kafka broker.
     """
-
-    await KAFKA_PRODUCER.stop()
-    log.info(" Shutting down producer ".center(40, "="))
+    if KAFKA_PRODUCER:
+        await KAFKA_PRODUCER.stop()
+        log.info(" Shutting down producer ".center(40, "="))

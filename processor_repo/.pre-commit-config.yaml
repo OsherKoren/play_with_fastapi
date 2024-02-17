@@ -26,9 +26,3 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-
-  - repo: https://github.com/PyCQA/pylint
-    rev: v3.0.3
-    hooks:
-      - id: pylint
-        args: ['--rcfile=pyproject.toml']

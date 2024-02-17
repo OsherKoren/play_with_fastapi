@@ -47,17 +47,6 @@ honor_noqa = true
 ignore_missing_imports = true
 
 
-[tool.pylint]
-ignore-paths = './tests/*'
-fail-under = '9.0'
-
-[tool.pylint.format]
-max-line-length = 100
-
-[tool.pylint.messages_control]
-disable = ["too-few-public-methods"]
-
-
 [build-system]
 requires = ["poetry-core>=1.7.1"]
 build-backend = "poetry.core.masonry.api"

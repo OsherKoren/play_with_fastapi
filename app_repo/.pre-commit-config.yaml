@@ -26,19 +26,3 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-
-  - repo: https://github.com/PyCQA/pylint
-    rev: v3.0.3
-    hooks:
-      - id: pylint
-        files: ./app
-#        exclude: ./tests
-
-#  -   repo: local
-#      hooks:
-#      -   id: pylint
-#          entry: pylint --rcfile=./pyproject.toml
-#          name: pylint
-#          language: system
-#          types: [python]
-#          exclude: "^tests/.*"

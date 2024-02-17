@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# !/usr/bin/env python
+
+"""kafka consumer module."""
+
 import asyncio
 import json
 import os
@@ -5,11 +10,11 @@ from typing import Optional
 
 from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaConnectionError
-from mock_ml import predict
 
 from db import db_manager
 from kafka import producer
 from logger import log
+from mock_ml import predict
 
 BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_CONSUMER: Optional[AIOKafkaConsumer] = None
@@ -20,7 +25,7 @@ def setup_consumer() -> None:
     """
     Set up an AIOKafkaConsumer instance.
     """
-    global KAFKA_CONSUMER
+    global KAFKA_CONSUMER  # pylint: disable=global-statement
 
     if KAFKA_CONSUMER is None:
         KAFKA_CONSUMER = AIOKafkaConsumer(
@@ -32,6 +37,7 @@ def setup_consumer() -> None:
         log.info(" Instancing Kafka Consumer ".center(40, "="))
 
 
+# pylint: disable=R0801
 async def start_consumer(retries: int = 3) -> None:
     """
     Starts an AIOKafkaConsumer instance connection to the kafka broker.
@@ -46,6 +52,7 @@ async def start_consumer(retries: int = 3) -> None:
     """
     setup_consumer()
 
+    assert KAFKA_CONSUMER
     for i in range(1, retries + 1):
         try:
             await KAFKA_CONSUMER.start()
@@ -66,8 +73,9 @@ async def shutdown_consumer() -> None:
     """
     Shut down by disconnecting the consumer connection to the kafka broker.
     """
-    await KAFKA_CONSUMER.stop()
-    log.info(" Shutting Down Consumer ".center(40, "="))
+    if KAFKA_CONSUMER:
+        await KAFKA_CONSUMER.stop()
+        log.info(" Shutting Down Consumer ".center(40, "="))
 
 
 async def get_consumer() -> AIOKafkaConsumer:
@@ -79,9 +87,12 @@ async def get_consumer() -> AIOKafkaConsumer:
         bootstrap servers.
 
     Raises:
-        KafkaConnectionError: If failed to connect to Kafka after the specified number of retry attempts.
+        KafkaConnectionError: If failed to connect to Kafka
+        after the specified number of retry attempts.
     """
     setup_consumer()
+
+    assert KAFKA_CONSUMER
 
     async def _connect_consumer():
 
@@ -115,6 +126,8 @@ async def consume_messages() -> None:
     It logs each received message and handles errors and end-of-partition events.
     The function runs indefinitely until interrupted or an unrecoverable error occurs.
     """
+
+    assert KAFKA_CONSUMER
 
     while True:
         async for message in KAFKA_CONSUMER:

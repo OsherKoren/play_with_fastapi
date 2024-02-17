@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
-"""A package for API service"""
+"""Initializes the app package."""
 
 from . import api, db, main, mock_external
