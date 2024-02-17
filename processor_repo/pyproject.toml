@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "processor"
+version = "0.1.0"
+description = "Processing mocked llm on text data via kafka"
+authors = ["Osher Koren"]
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+asyncio = "^3.4.3"
+aiokafka = "^0.10.0"
+databases = {extras = ["postgresql"], version = "^0.8.0"}
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.0"
+uvicorn = "^0.27.1"
+fastapi = "^0.109.2"
+
+
+[tool.poetry.group.quality.dependencies]
+black = "^24.1.1"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+pylint = "^3.0.3"
+pre-commit = "^3.6.0"
+
+
+[tool.isort]
+profile = "black"
+src_paths = ["processor"]
+honor_noqa = true
+
+
+[tool.pylint]
+ignore-patterns = ["tests/*"]
+fail-under = 9.0
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.messages_control]
+disable = ["too-few-public-methods"]
+
+
+[build-system]
+requires = ["poetry-core>=1.7.1"]
+build-backend = "poetry.core.masonry.api"

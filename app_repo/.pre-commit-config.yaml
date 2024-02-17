@@ -1,0 +1,44 @@
+default_language_version:
+    python: python3.11
+
+default_stages: [commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  - repo: https://github.com/psf/black
+    rev: 24.1.1
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/pre-commit/mirrors-isort
+    rev: v5.10.1
+    hooks:
+      - id: isort
+
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/PyCQA/pylint
+    rev: v3.0.3
+    hooks:
+      - id: pylint
+        files: ./app
+#        exclude: ./tests
+
+#  -   repo: local
+#      hooks:
+#      -   id: pylint
+#          entry: pylint --rcfile=./pyproject.toml
+#          name: pylint
+#          language: system
+#          types: [python]
+#          exclude: "^tests/.*"

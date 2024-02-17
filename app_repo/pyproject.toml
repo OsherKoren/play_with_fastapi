@@ -1,0 +1,63 @@
+[tool.poetry]
+name = "app"
+version = "0.1.0"
+description = "A demo of an app service running llm on user text messages"
+authors = ["Osher Koren"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = {extras = ["email"], version = "^2.5.2"}
+fastapi = "^0.105.0"
+uvicorn = "^0.25.0"
+databases = {extras = ["postgresql"], version = "^0.8.0"}
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.0"
+asyncio = "^3.4.3"
+aiokafka = "^0.10.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.4"
+pytest-cov = "^4.1.0"
+asgi_lifespan = "^2.0.1"
+httpx = "^0.26.0"
+anyio = {version=">=3.7.1,<4.0.0", extras = ["asyncio"]}  # fastapi restriction of anyio for now
+
+
+[tool.pytest.ini_options]
+addopts = "-vv app_repo/tests --cov=app_repo/tests --cov-report=term-missing --cov-fail-under=80"
+
+
+[tool.poetry.group.quality.dependencies]
+black = "^24.1.1"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+pylint = "^3.0.3"
+pre-commit = "^3.6.0"
+
+
+[tool.isort]
+profile = "black"
+src_paths = ["app"]
+honor_noqa = true
+
+
+[tool.mypy]
+ignore_missing_imports = true
+
+
+[tool.pylint]
+ignore-paths = './tests/*'
+fail-under = '9.0'
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.messages_control]
+disable = ["too-few-public-methods"]
+
+
+[build-system]
+requires = ["poetry-core>=1.7.1"]
+build-backend = "poetry.core.masonry.api"
