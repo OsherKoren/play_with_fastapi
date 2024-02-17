@@ -14,11 +14,10 @@ from fastapi.responses import JSONResponse
 
 from db import db_manager
 from kafka import producer
+from logger import log
 from mock_external import mock_authentication as authentication
 
 from . import schemas
-from logger import log
-
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 health_router = APIRouter(prefix="/health", tags=["health"])
@@ -56,7 +55,7 @@ async def get_messages():
 async def send_message(
     payload: schemas.MessageIn,
     account: dict = Depends(authentication.get_current_user),
-    producer: AIOKafkaProducer = Depends(producer.get_producer)
+    producer: AIOKafkaProducer = Depends(producer.get_producer),
 ) -> JSONResponse:
     """
     Store the user message in the database and send it to the Kafka topic.
@@ -82,7 +81,9 @@ async def send_message(
         "created_at": created_at,
     }
 
-    message_serialized = json.dumps(kafka_message, default=pydantic_core.to_jsonable_python).encode("utf-8")
+    message_serialized = json.dumps(
+        kafka_message, default=pydantic_core.to_jsonable_python
+    ).encode("utf-8")
     try:
         await producer.send_and_wait("evt.user_message", value=message_serialized)
         log.info(f"Message sent to topic evt.user_message: {kafka_message}")

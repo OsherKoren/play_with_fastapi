@@ -10,7 +10,6 @@ from fastapi import FastAPI
 
 from lifecycle import lifespan
 
-
 app = FastAPI(title="Message Processor App", version="1.0", lifespan=lifespan)
 
 

@@ -16,7 +16,6 @@ from sqlalchemy import (
     func,
 )
 
-
 metadata = MetaData()
 
 accounts_table = Table(
@@ -56,4 +55,3 @@ messages_predictions_table = Table(
         "predicted_at", DateTime, default=func.now()
     ),  # Timestamp for when the prediction was made
 )
-

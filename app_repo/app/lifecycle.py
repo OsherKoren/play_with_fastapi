@@ -35,4 +35,3 @@ async def lifespan(app: FastAPI):  # pylint: disable=unused-argument
         yield
     finally:
         await db_connection.shutdown_database()
-

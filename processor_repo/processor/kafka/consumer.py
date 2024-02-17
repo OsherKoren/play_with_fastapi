@@ -11,7 +11,6 @@ from db import db_manager
 from kafka import producer
 from logger import log
 
-
 BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_CONSUMER: Optional[AIOKafkaConsumer] = None
 
@@ -20,7 +19,7 @@ KAFKA_CONSUMER: Optional[AIOKafkaConsumer] = None
 def setup_consumer() -> None:
     """
     Set up an AIOKafkaConsumer instance.
-   """
+    """
     global KAFKA_CONSUMER
 
     if KAFKA_CONSUMER is None:
@@ -55,9 +54,7 @@ async def start_consumer(retries: int = 3) -> None:
         except KafkaConnectionError as err:
             log.error(f"Failed to connect to Kafka: {err}")
             if i <= retries:
-                log.info(
-                    f"Retrying in 1 second... (Attempt {i} of {retries}"
-                )
+                log.info(f"Retrying in 1 second... (Attempt {i} of {retries}")
                 await asyncio.sleep(1)
             else:
                 raise ConnectionError(
@@ -131,7 +128,9 @@ async def consume_messages() -> None:
 
             message_dict["score"] = score
             message_serialized = json.dumps(message_dict, default=str).encode("utf-8")
-            await producer.KAFKA_PRODUCER.send_and_wait("evt.message_score", message_serialized)
+            await producer.KAFKA_PRODUCER.send_and_wait(
+                "evt.message_score", message_serialized
+            )
             log.info(f"Message sent to topic evt.message_score: {message_dict}")
 
             message_id = message_dict.get("message_id")

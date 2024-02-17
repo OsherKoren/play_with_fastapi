@@ -26,8 +26,10 @@ async def setup_topics():
         NewTopic("evt.message_score", num_partitions=1, replication_factor=1),
     ]
     try:
-         futures = await admin_client.create_topics(new_topics=topics, timeout_ms=10, validate_only=False)
-         for topic, f in futures.items():
+        futures = await admin_client.create_topics(
+            new_topics=topics, timeout_ms=10, validate_only=False
+        )
+        for topic, f in futures.items():
             try:
                 f.result()
                 log.info(f"Topic {topic} Created")
@@ -36,6 +38,6 @@ async def setup_topics():
             except IncompatibleBrokerVersion as ex:
                 log.error(f"Failed to create topic: {topic}, {ex}")
 
-         log.info(f"Topics {topics} created")
+        log.info(f"Topics {topics} created")
     finally:
         await admin_client.close()

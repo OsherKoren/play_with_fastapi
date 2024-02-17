@@ -6,8 +6,8 @@ This module is for querying the database tables
 and running sql statements on the database tables.
 """
 
-from .tables_metadata import messages_predictions_table
 from .connection import database
+from .tables_metadata import messages_predictions_table
 
 
 async def add_message_score(message_id: int, score: float) -> int:

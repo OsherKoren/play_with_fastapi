@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 
 from logger import log
 
-
 ENV_FILE = ".env.dev" if os.getenv("DEV_ENV") else ".env"
 load_dotenv(ENV_FILE)
 

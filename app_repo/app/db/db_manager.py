@@ -12,11 +12,7 @@ from databases.interfaces import Record
 from sqlalchemy import join, select
 
 from .connection import database
-from .tables_metadata import (
-    accounts_table,
-    messages_predictions_table,
-    messages_table,
-)
+from .tables_metadata import accounts_table, messages_predictions_table, messages_table
 
 
 async def get_all_messages() -> List[Record]:

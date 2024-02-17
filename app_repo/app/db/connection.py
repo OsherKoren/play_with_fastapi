@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 
 from logger import log
 
-
 ENV_FILE = ".env.dev" if os.getenv("DEV_ENV") else ".env"
 load_dotenv(ENV_FILE)
 
@@ -52,7 +51,9 @@ def get_database_url():
     port = os.getenv("PS_PORT")
 
     if None in (user, password, db_name, port):
-        raise ValueError("Some required environment variables are not set.".center(40, "="))
+        raise ValueError(
+            "Some required environment variables are not set.".center(40, "=")
+        )
 
     database_url = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
     log.debug(f"Database URL:\n {database_url}")

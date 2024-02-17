@@ -10,8 +10,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from kafka import consumer, producer
 from db import connection as db_connection
+from kafka import consumer, producer
 
 
 @asynccontextmanager
