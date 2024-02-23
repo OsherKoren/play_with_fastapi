@@ -68,6 +68,12 @@ jobs:
         python -m pip install poetry
         poetry install --no-root
 
+    - name: Format code with Black
+      run: poetry run black --check .
+
+    - name: Sort imports with isort
+      run: poetry run isort --check .
+
     - name: Run pylint
       run: |
        poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
