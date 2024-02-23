@@ -9,3 +9,4 @@ __pycache__/
 /app_repo/app/.pytest_cache/
 *.env
 /.env.dev
+**/poetry.lock

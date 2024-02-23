@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "play-with-fastapi"
 version = "0.1.0"
-description = "A demo project for playing with FastAPI using microservices"
+description = "A demo project with FastAPI using microservices"
 authors = ["Osher Koren <oshrats@gmail.com>"]
 readme = "README.md"
 
@@ -15,6 +15,7 @@ databases = {extras = ["postgresql"], version = "^0.8.0"}
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.1"
 asyncio = "^3.4.3"
+tomli = { version = "^1.2.1", python = "3.10" }
 
 
 #[tool.poetry.group.test.dependencies]
