@@ -17,20 +17,18 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
+        cache: poetry
+        cache-dependency-path: poetry.lock
 
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+    - name: Set Poetry environment
+      run: |
+        poetry env use 3.11
 
     - name: Install dependencies
       run: |
@@ -46,22 +44,13 @@ jobs:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup Python
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/poetry.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
-    - name: Analyze code with pylint
+    - name: Run pylint
       run: |
-#        source $HOME/.poetry/env
-        pylint $(git ls-files '*.py' | grep -v '/tests/')
+       poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
