@@ -62,14 +62,14 @@ jobs:
         key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ hashFiles('pyproject.toml') }}-quality
 
     - name: Install dependencies
-      if: steps.cache.outputs.cache-hit != 'true'
+#      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         python -m pip install --upgrade pip
         python -m pip install poetry
         poetry install --no-root
 
     - name: Format code with Black
-      run: poetry run black .
+      run: poetry run black --check .
 
     - name: Sort imports with isort
       run: poetry run isort --check .
