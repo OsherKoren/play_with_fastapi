@@ -31,6 +31,6 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: pylint
+        entry: poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
         language: system
         types: [python]
