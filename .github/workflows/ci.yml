@@ -20,18 +20,16 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Setup Python
-      run: |
-        python -m pip install --upgrade pip
-        pipx install poetry
-      uses: actions/setup-python@v4
-
-
-    - name: Install dependencies
       uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'poetry'
-      run: poetry install --no-root
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pipx install poetry
+        poetry install --no-root
 
   quality:
     needs: install-dependencies
