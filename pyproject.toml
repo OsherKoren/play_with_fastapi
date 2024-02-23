@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "play-with-fastapi"
+version = "0.1.0"
+description = "A demo project for playing with FastAPI using microservices"
+authors = ["Osher Koren <oshrats@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<4.0"
+aiokafka = "^0.10.0"
+fastapi = "^0.109.2"
+pydantic = {extras = ["email"], version = "^2.6.1"}
+uvicorn = "^0.27.0.post1"
+databases = {extras = ["postgresql"], version = "^0.8.0"}
+psycopg2-binary = "^2.9.9"
+python-dotenv = "^1.0.1"
+asyncio = "^3.4.3"
+
+
+#[tool.poetry.group.test.dependencies]
+#pytest = "^8.0.0"
+#pytest-cov = "^4.1.0"
+#asgi-lifespan = "^2.1.0"
+#httpx = "^0.26.0"
+#anyio = {extras = ["asyncio"], version = "^4.2.0"}
+
+
+[tool.poetry.group.quality.dependencies]
+black = "^24.1.1"
+isort = "^5.13.2"
+mypy = "^1.8.0"
+pylint = "^3.0.3"
+pre-commit = "^4.5.0"
+
+
+#[tool.pytest.ini_options]
+#addopts = "-vv play-with-fastapi/tests --cov=play-with-fastapi --cov-report=term-missing --cov-fail-under=80"
+
+
+[tool.isort]
+profile = "black"
+src_paths = ["play-with-fastap"]
+honor_noqa = true
+
+
+[tool.pylint]
+ignore-paths = "./app_repo/tests"
+fail-under = '9.0'
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.pylint.messages_control]
+disable = [
+    "too-few-public-methods",
+    "import-error"
+]
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

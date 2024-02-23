@@ -48,10 +48,10 @@ services:
 
   app:
     build:
-      context: ./app
+      context: ./app_repo
       dockerfile: Dockerfile
     volumes:
-      - ./app:/app
+      - ./app_repo/app:/app
     ports:
       - "80:80"
     depends_on:
