@@ -54,7 +54,8 @@ max-line-length = 100
 [tool.pylint.messages_control]
 disable = [
     "too-few-public-methods",
-    "import-error"
+    "import-error",
+    "R0801"  # R0801: Similar lines in 2 files
 ]
 
 
