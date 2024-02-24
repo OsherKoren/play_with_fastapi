@@ -5,8 +5,6 @@ This module is for querying the database tables
 and running sql statements on the database tables.
 """
 
-from typing import List, Optional
-
 from databases.interfaces import Record
 from sqlalchemy import join, select
 

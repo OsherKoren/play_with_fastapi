@@ -2,7 +2,7 @@
 
 """This module is for setting and validating schemas for the API endpoints."""
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import BaseModel, EmailStr, Field  # model_validator,
 

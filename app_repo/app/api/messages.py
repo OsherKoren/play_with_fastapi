@@ -3,7 +3,7 @@
 """Module for API endpoints"""
 import json
 from datetime import datetime
-from typing import Annotated, Any, Dict
+from typing import Annotated, Any
 
 import pydantic_core
 from aiokafka import AIOKafkaProducer
