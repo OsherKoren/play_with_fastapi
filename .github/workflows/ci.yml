@@ -72,7 +72,10 @@ jobs:
       run: poetry run black --check .
 
     - name: Sort imports with isort
-      run: poetry run isort --check .
+      uses: isort/isort-action@v1
+      with:
+        requirements-file: pyproject.toml
+        check-only: true
 
     - name: Run pylint
       run: |
