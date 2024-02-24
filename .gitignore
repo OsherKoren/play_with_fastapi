@@ -10,3 +10,4 @@ __pycache__/
 *.env
 /.env.dev
 **/poetry.lock
+/.pytest_cache/
