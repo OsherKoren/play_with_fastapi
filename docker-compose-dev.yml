@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   dev-db:
@@ -61,7 +61,7 @@ services:
       dev-kafka:
         condition: service_healthy
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-/.env.dev}
     environment:
       DEV_ENV: "true"
     healthcheck:
@@ -81,7 +81,7 @@ services:
       dev-app:
         condition: service_healthy
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-/.env.dev}
     environment:
         DEV_ENV: "true"
 
