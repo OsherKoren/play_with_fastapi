@@ -41,7 +41,7 @@ jsonschema = "^4.21.1"
 
 [tool.isort]
 profile = "black"
-src_paths = ["play_with_fastapi"]
+src_paths = ["play_with_fastapi/app_repo", "play_with_fastapi/processor_repo"]
 honor_noqa = true
 
 

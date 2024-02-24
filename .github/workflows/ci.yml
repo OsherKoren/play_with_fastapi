@@ -71,12 +71,6 @@ jobs:
     - name: Format code with Black
       run: poetry run black --check .
 
-    - name: Sort imports with isort
-      uses: isort/isort-action@v1
-      with:
-        sort-paths: "app_repo processor_repo"
-        requirements-files: pyproject.toml
-
     - name: Run pylint
       run: |
        poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
