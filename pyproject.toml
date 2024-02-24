@@ -33,6 +33,7 @@ mypy = "^1.8.0"
 pylint = "^3.0.3"
 pre-commit = "^3.6.0"
 jsonschema = "^4.21.1"
+sqlalchemy-stubs = "^0.4"
 
 
 #[tool.pytest.ini_options]
@@ -44,6 +45,12 @@ profile = "black"
 src_paths = ["play_with_fastapi/app_repo", "play_with_fastapi/processor_repo"]
 honor_noqa = true
 
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    "WORKSPACE",
+    "venv"
+]
 
 [tool.pylint]
 ignore-paths = "./app_repo/tests"
