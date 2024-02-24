@@ -7,7 +7,7 @@ services:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
     env_file:
-      - .env.dev
+      - ${ENV_FILE:-/.env.dev}
     environment:
       POSTGRES_USER: ${PS_USER:-postgres}
       POSTGRES_PASSWORD: ${PS_PASSWORD:-}
