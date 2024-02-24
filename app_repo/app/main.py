@@ -10,13 +10,6 @@ from fastapi import FastAPI
 from api import messages
 from lifecycle import lifespan
 
-# import logging
-# from contextlib import asynccontextmanager
-# import asyncio
-# import os
-# from aiokafka.admin import AIOKafkaAdminClient, NewTopic
-# from aiokafka.errors import IncompatibleBrokerVersion, TopicAlreadyExistsError
-
 app = FastAPI(title="Message Gateway App", version="1.0", lifespan=lifespan)
 
 app.include_router(messages.health_router, prefix="/api/v1", tags=["health"])

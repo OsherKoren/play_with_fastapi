@@ -1,8 +1,8 @@
 # !/usr/bin/env python
 
 """This module mocks authentication and authorization. Not implemented yet in this project."""
+
 import random
-from typing import Optional
 
 from databases.interfaces import Record
 

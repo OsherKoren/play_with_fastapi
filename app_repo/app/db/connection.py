@@ -2,7 +2,6 @@
 
 """This module sets up the database connection"""
 
-
 import os
 
 from databases import Database
