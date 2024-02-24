@@ -71,6 +71,9 @@ jobs:
     - name: Format code with Black
       run: poetry run black --check .
 
+    - name: Run mypy
+      run: poetry run mypy .
+
     - name: Run pylint
       run: |
        poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
