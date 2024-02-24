@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """
@@ -15,7 +14,7 @@ from .connection import database
 from .tables_metadata import accounts_table, messages_predictions_table, messages_table
 
 
-async def get_all_messages() -> List[Record]:
+async def get_all_messages() -> list[Record]:
     """
     Retrieves all messages from the messages table.
 
@@ -45,7 +44,7 @@ async def get_all_messages() -> List[Record]:
     return await database.fetch_all(query=query)
 
 
-async def get_account(account_id: int) -> Optional[Record]:
+async def get_account(account_id: int) -> Record | None:
     """
     Retrieves a single account by its ID.
 
@@ -59,7 +58,7 @@ async def get_account(account_id: int) -> Optional[Record]:
     return await database.fetch_one(query=query)
 
 
-async def get_message(msg_id: int) -> Optional[Record]:
+async def get_message(msg_id: int) -> Record | None:
     """
     Retrieves a single message by its ID.
 
@@ -115,7 +114,7 @@ async def add_message(account_id: int, message: str) -> int:
     return await database.execute(query=query)
 
 
-async def get_message_score(msg_id: int) -> Optional[Record]:
+async def get_message_score(msg_id: int) -> Record | None:
     """
     Retrieves the score of a specific message by its message ID.
 
@@ -158,7 +157,7 @@ async def get_message_score(msg_id: int) -> Optional[Record]:
     return await database.fetch_one(query=query)
 
 
-async def get_messages_scores() -> List[Record]:
+async def get_messages_scores() -> list[Record]:
     """
     Retrieves all messages with scores and account details.
 
@@ -194,7 +193,7 @@ async def get_messages_scores() -> List[Record]:
     return await database.fetch_all(query=query)
 
 
-async def filter_messages_scores(threshold: float) -> List[Record]:
+async def filter_messages_scores(threshold: float) -> list[Record]:
     """
     Retrieve records with scores equal to or greater than the specified threshold
     along with associated message and account details.

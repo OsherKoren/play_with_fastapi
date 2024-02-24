@@ -9,11 +9,11 @@ import pydantic_core
 from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, Depends, Path
 from fastapi.responses import JSONResponse
+from mock_external import mock_authentication as authentication
 
 from db import db_manager
 from kafka import producer
 from logger import log
-from mock_external import mock_authentication as authentication
 
 from . import schemas
 

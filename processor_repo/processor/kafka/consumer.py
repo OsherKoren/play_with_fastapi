@@ -8,11 +8,11 @@ import os
 
 from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaConnectionError
-from mock_ml import predict
 
 from db import db_manager
 from kafka import producer
 from logger import log
+from mock_ml import predict
 
 BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_CONSUMER: AIOKafkaConsumer | None = None

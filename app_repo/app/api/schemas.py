@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """This module is for setting and validating schemas for the API endpoints."""
@@ -31,7 +30,7 @@ class MessageIn(BaseModel):
         ),
     ]
     email: Annotated[
-        Optional[EmailStr],
+        EmailStr | None,
         Field(
             default=None,
             description="The email associated with the message",
@@ -40,7 +39,7 @@ class MessageIn(BaseModel):
         ),
     ]
     phone: Annotated[
-        Optional[str],
+        str | None,
         Field(
             default=None,
             description="The phone number associated with the message",

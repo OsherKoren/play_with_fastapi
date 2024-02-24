@@ -1,6 +1,6 @@
 # This workflow will install Python dependencies, run tests and with 3 versions of Python
 
-name: FastApi application on Docker container. Test and Build.
+name: FastApi application on Docker container. Test. Lint. Format.
 
 on:
   push:
@@ -74,8 +74,8 @@ jobs:
     - name: Sort imports with isort
       uses: isort/isort-action@v1
       with:
-        requirements-file: pyproject.toml
-        check-only: true
+        sort-paths: "app_repo processor_repo"
+        requirements-files: pyproject.toml
 
     - name: Run pylint
       run: |
