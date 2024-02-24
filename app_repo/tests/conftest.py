@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """pytest fixtures for the Messages API endpoints tests"""

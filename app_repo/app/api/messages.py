@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """Module for API endpoints"""
@@ -106,7 +105,7 @@ async def get_scores():
 
 
 @router.get("/{msg_id}/score", status_code=200)
-async def get_message_score(msg_id: int) -> Dict[str, Any]:
+async def get_message_score(msg_id: int) -> dict[str, Any]:
     """
     Retrieves the score of a specific message by its message ID.
 

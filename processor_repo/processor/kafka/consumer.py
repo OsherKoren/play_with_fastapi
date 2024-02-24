@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """kafka consumer module."""
@@ -17,7 +16,7 @@ from logger import log
 from mock_ml import predict
 
 BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
-KAFKA_CONSUMER: Optional[AIOKafkaConsumer] = None
+KAFKA_CONSUMER: AIOKafkaConsumer | None = None
 
 
 # singleton pattern - Not needed if the connection is set in the app lifespan

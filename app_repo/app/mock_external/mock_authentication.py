@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # !/usr/bin/env python
 
 """This module mocks authentication and authorization. Not implemented yet in this project."""
@@ -10,7 +9,7 @@ from databases.interfaces import Record
 from db import db_manager
 
 
-async def get_current_user() -> Optional[Record]:
+async def get_current_user() -> Record | None:
     """
     Retrieves a mock current user.
 
