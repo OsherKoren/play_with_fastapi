@@ -4,7 +4,6 @@
 
 import asyncio
 import os
-from typing import Optional
 
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError
