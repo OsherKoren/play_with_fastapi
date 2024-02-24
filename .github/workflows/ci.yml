@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests and with 3 versions of Python
+# This workflow will install Python dependencies, run tests with 3 versions of Python
 
 name: FastApi application on Docker container. Test. Lint. Format.
 
@@ -80,3 +80,22 @@ jobs:
     - name: Run pylint
       run: |
        poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
+
+  tests:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start services with Docker Compose
+        run: docker-compose -f docker-compose-dev.yml up -d
+
+      - name: Wait for services to be healthy
+        run: docker-compose -f docker-compose-dev.yml ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
+
+      - name: List Docker containers
+        run: docker ps
+
+      - name: Run tests
+        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
