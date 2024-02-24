@@ -97,7 +97,7 @@ jobs:
           echo "DB_NAME_DEV: ${{ vars.DB_NAME_DEV }}"
 
       - name: Start services with Docker Compose
-        run: docker-compose -f docker-compose-dev.yml --env-file .env.ci up -d
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d
 
       - name: Wait for services to be healthy
         run: docker-compose -f docker-compose-dev.yml ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
