@@ -88,9 +88,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Print contents of .env.ci file
-        run: cat .env.ci
-
       - name: Print real values of secrets and variables
         run: |
           echo "PS_USER: ${{ secrets.PS_USER }}"
@@ -98,10 +95,6 @@ jobs:
           echo "PS_HOST_DEV: ${{ vars.PS_HOST_DEV }}"
           echo "PS_PORT: ${{ vars.PS_PORT }}"
           echo "DB_NAME_DEV: ${{ vars.DB_NAME_DEV }}"
-          echo "PS_HOST_DEV: ${{ env.PS_HOST_DEV }}"
-          echo "PS_PORT: ${{ env.PS_PORT }}"
-          echo "DB_NAME_DEV: ${{ env.DB_NAME_DEV }}"
-
 
       - name: Start services with Docker Compose
         run: docker-compose -f docker-compose-dev.yml --env-file .env.ci up -d
