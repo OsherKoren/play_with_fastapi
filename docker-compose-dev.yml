@@ -40,7 +40,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://dev-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: /tmp/kafka-logs-dev
-      DEV_ENV: true
+      DEV_ENV: "true"
     healthcheck:
       test: [ "CMD", "nc", "-zv","dev-kafka", "29092" ]
       interval: 30s
@@ -63,7 +63,7 @@ services:
     env_file:
       - .env.dev
     environment:
-      DEV_ENV: true
+      DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read().decode()"]
@@ -83,7 +83,7 @@ services:
     env_file:
       - .env.dev
     environment:
-        DEV_ENV: true
+        DEV_ENV: "true"
 
 volumes:
   postgres_data_dev:
