@@ -105,7 +105,7 @@ jobs:
 #        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs
 
       - name: Log dev-app service output
-        if: steps.start_services.outcome != 'success'
+        if: always()
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
 
       - name: Log dev-processor service output
