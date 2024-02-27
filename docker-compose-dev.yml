@@ -47,29 +47,29 @@ services:
       timeout: 10s
       retries: 3
 
-  dev-app:
-    build:
-      context: ./app_repo
-      dockerfile: Dockerfile.dev
-    volumes:
-      - ./app_repo/app:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      dev-db:
-        condition: service_healthy
-      dev-kafka:
-        condition: service_healthy
-    env_file:
-      - ${ENV_FILE:-./.env.dev}
-    environment:
-      DEV_ENV: "true"
-    healthcheck:
-      test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://dev-app:8000/api/v1/health').read().decode()"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+#  dev-app:
+#    build:
+#      context: ./app_repo
+#      dockerfile: Dockerfile.dev
+#    volumes:
+#      - ./app_repo/app:/app
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      dev-db:
+#        condition: service_healthy
+#      dev-kafka:
+#        condition: service_healthy
+#    env_file:
+#      - ${ENV_FILE:-./.env.dev}
+#    environment:
+#      DEV_ENV: "true"
+#    healthcheck:
+#      test: ["CMD", "python", "-c",
+#             "import urllib.request; urllib.request.urlopen('http://dev-app:8000/api/v1/health').read().decode()"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
 
 #  dev-processor:
 #    build:
