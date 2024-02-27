@@ -101,7 +101,7 @@ jobs:
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci --verbose up -d
 
       - name: Log dev-app service output
-        if: ${{ steps.start_services.outcome == 'failure' }}
+        if: ${{ steps.start_services.outcome != 'success' }}
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
 
 
@@ -117,9 +117,9 @@ jobs:
         if: steps.start_services.outcome == 'success'
         run: docker ps
 
-      - name: Log dev-app service output
-        if: steps.start_services.outcome == 'failure'
-        run: docker-compose -f docker-compose-dev.yml logs -f dev-app
+#      - name: Log dev-app service output
+#        if: steps.start_services.outcome == 'failure'
+#        run: docker-compose -f docker-compose-dev.yml logs -f dev-app
 
 #      - name: Run tests
 #        if: steps.start_services.outcome == 'success'
