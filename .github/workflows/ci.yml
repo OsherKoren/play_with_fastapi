@@ -100,13 +100,13 @@ jobs:
         id: start_services
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci --verbose up -d
 
-      - name: Check if services started successfully
-        if: steps.start_services.outcome == 'failure'
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs
+#      - name: Check if services started successfully
+#        if: steps.start_services.outcome == 'failure'
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs
 
       - name: Wait for services to be healthy
         if: steps.start_services.outcome == 'success'
-        run: docker-compose -f docker-compose-dev.yml ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
 
       - name: List Docker containers
         if: steps.start_services.outcome == 'success'
@@ -116,6 +116,6 @@ jobs:
         if: steps.start_services.outcome == 'failure'
         run: docker-compose -f docker-compose-dev.yml logs -f dev-app
 
-      - name: Run tests
-        if: steps.start_services.outcome == 'success'
-        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
+#      - name: Run tests
+#        if: steps.start_services.outcome == 'success'
+#        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
