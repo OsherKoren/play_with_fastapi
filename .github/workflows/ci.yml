@@ -106,11 +106,11 @@ jobs:
 
       - name: Log dev-app service output
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+        run: docker logs play_with_fastapi-dev-app-1
 
       - name: Log dev-processor service output
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
+        run: docker logs play_with_fastapi-dev-processor-1
 
       - name: Wait for services to be healthy
         if: always()
