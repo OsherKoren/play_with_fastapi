@@ -98,24 +98,39 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci --verbose up -d
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d
 
-      - name: Log dev-app service output
-        if: ${{ steps.start_services.outcome != 'success' }}
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
-
-
-      #      - name: Check if services started successfully
-#        if: steps.start_services.outcome == 'failure'
+#      - name: Log if services started with errors
+#        if: steps.start_services.outcome != 'success'
 #        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs
 
+      - name: Log dev-app service output
+        if: steps.start_services.outcome != 'success'
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+
+      - name: Log dev-processor service output
+        if: steps.start_services.outcome != 'success'
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
+
       - name: Wait for services to be healthy
-        if: steps.start_services.outcome == 'success'
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
 
       - name: List Docker containers
-        if: steps.start_services.outcome == 'success'
+        if: always()
         run: docker ps
+
+#      - name: Log dev-db service output on failure
+#        if: failure()
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-db
+#
+#      - name: Log dev-app service output on failure
+#        if: failure()
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+#
+#      - name: Wait for services to be healthy
+#        if: always()
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci ps -q | xargs docker inspect --format='{{.State.Health.Status}}' | grep -q healthy
+
 
 #      - name: Log dev-app service output
 #        if: steps.start_services.outcome == 'failure'
