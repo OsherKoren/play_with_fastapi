@@ -106,11 +106,11 @@ jobs:
 
       - name: Log dev-app service output
         if: always()
-        run: docker logs pplay_with_fastapi_dev-app-1
+        run: docker-compose logs dev-app
 
       - name: Log dev-processor service output
         if: always()
-        run: docker logs play_with_fastapi_dev-processor-1
+        run: docker-compose logs dev-processor
 
       - name: Wait for services to be healthy
         if: always()
