@@ -7,12 +7,12 @@ services:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
     env_file:
-      - ${ENV_FILE:-/.env.dev}
+      - ${ENV_FILE:-./.env.dev}
     environment:
       POSTGRES_USER: ${PS_USER:-postgres}
       POSTGRES_PASSWORD: ${PS_PASSWORD:-}
       POSTGRES_DB: ${DB_NAME:-postgres}
-      POSTGRES_HOST: ${PS_HOST:-localhost}
+      POSTGRES_HOST: ${PS_HOST:-dev-db}
 #      POSTGRES_PORT: ${PS_PORT:-5432}
     ports:
       - "5433:5432"
@@ -61,12 +61,12 @@ services:
       dev-kafka:
         condition: service_healthy
     env_file:
-      - ${ENV_FILE:-/.env.dev}
+      - ${ENV_FILE:-./.env.dev}
     environment:
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read().decode()"]
+             "import urllib.request; urllib.request.urlopen('http://dev-app:8000/api/v1/health').read().decode()"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -81,7 +81,7 @@ services:
       dev-app:
         condition: service_healthy
     env_file:
-      - ${ENV_FILE:-/.env.dev}
+      - ${ENV_FILE:-./.env.dev}
     environment:
         DEV_ENV: "true"
 

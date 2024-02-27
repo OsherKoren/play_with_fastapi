@@ -25,7 +25,7 @@ FROM python:3.11-slim as final
 
 WORKDIR /app
 
-COPY --from=builder /app_repo/app/requirements.txt .
+COPY --from=builder /app/requirements.txt .
 
 RUN set -ex \
     # Security - Upgrade the package index and install security upgrades
@@ -40,6 +40,6 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY processor .
+COPY ./processor .
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "debug"]

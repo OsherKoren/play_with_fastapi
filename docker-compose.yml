@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   db:
@@ -7,15 +7,15 @@ services:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - .env
+      - ${ENV_FILE:-./.env}
     environment:
       POSTGRES_USER: ${PS_USER:-postgres}
       POSTGRES_PASSWORD: ${PS_PASSWORD:-}
       POSTGRES_DB: ${DB_NAME:-postgres}
-      POSTGRES_HOST: ${PS_HOST:-localhost}
-      POSTGRES_PORT: ${PS_PORT:-5432}
+      POSTGRES_HOST: ${PS_HOST:-db}
+#      POSTGRES_PORT: ${PS_PORT:-5432}
     ports:
-      - "${PS_PORT}:${PS_PORT}"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "psql -U postgres -d ${DB_NAME} -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
@@ -60,23 +60,25 @@ services:
       kafka:
         condition: service_healthy
     env_file:
-      - .env
+      - ${ENV_FILE:-./.env}
     healthcheck:
       test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://localhost:80/api/v1/health').read().decode()"]
+             "import urllib.request; urllib.request.urlopen('http://app:80/api/v1/health').read().decode()"]
       interval: 30s
       timeout: 10s
       retries: 3
 
   processor:
     build:
-      context: kafka
+      context: ./processor_repo
       dockerfile: Dockerfile
     depends_on:
       kafka:
         condition: service_healthy
       app:
         condition: service_healthy
+    env_file:
+      - ${ENV_FILE:-./.env}
 
 volumes:
   postgres_data:
