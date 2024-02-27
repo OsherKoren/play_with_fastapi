@@ -71,19 +71,19 @@ services:
       timeout: 10s
       retries: 3
 
-  dev-processor:
-    build:
-      context: ./processor_repo
-      dockerfile: Dockerfile.dev
-    depends_on:
-      dev-kafka:
-        condition: service_healthy
-      dev-app:
-        condition: service_healthy
-    env_file:
-      - ${ENV_FILE:-./.env.dev}
-    environment:
-        DEV_ENV: "true"
+#  dev-processor:
+#    build:
+#      context: ./processor_repo
+#      dockerfile: Dockerfile.dev
+#    depends_on:
+#      dev-kafka:
+#        condition: service_healthy
+#      dev-app:
+#        condition: service_healthy
+#    env_file:
+#      - ${ENV_FILE:-./.env.dev}
+#    environment:
+#        DEV_ENV: "true"
 
 volumes:
   postgres_data_dev:
