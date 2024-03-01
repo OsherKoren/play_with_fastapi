@@ -1,6 +1,6 @@
 # !/usr/bin/env python
 
-"""Utility functions for Kafka"""
+"""Log configuration."""
 import logging
 
 log = logging.getLogger(__name__)

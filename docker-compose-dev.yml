@@ -9,11 +9,11 @@ services:
     env_file:
       - ${ENV_FILE:-./.env.dev}
     environment:
-      POSTGRES_USER: ${PS_USER:-postgres}
-      POSTGRES_PASSWORD: ${PS_PASSWORD:-}
-      POSTGRES_DB: ${DB_NAME:-postgres}
-      POSTGRES_HOST: ${PS_HOST:-dev-db}
-#      POSTGRES_PORT: ${PS_PORT:-5432}
+      PS_USER: ${PS_USER:-postgres}
+      PS_PASSWORD: ${PS_PASSWORD:-}
+      PS_HOST: ${PS_HOST:-dev-db}
+      DB_NAME: ${DB_NAME:-postgres}
+#      PS_PORT: ${PS_PORT:-5432}
     ports:
       - "5433:5432"
     healthcheck:
