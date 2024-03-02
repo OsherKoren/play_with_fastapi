@@ -45,7 +45,7 @@ def get_database_url():
     user = os.getenv("PS_USER")
     password = os.getenv("PS_PASSWORD")
     host = os.getenv("PS_HOST", "localhost")
-    port = os.getenv("PS_PORT")
+    port = os.getenv("PS_PORT", 5432)
     db_name = os.getenv("PS_DB")
 
     if None in (user, password, db_name, port):
