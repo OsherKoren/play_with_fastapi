@@ -132,7 +132,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Print real values of secrets and variables
+      - name: Print env variables
         run: |
           echo "PS_USER: ${{ secrets.PS_USER }}"
           echo "PS_PASSWORD: ${{ secrets.PS_PASSWORD }}"
@@ -188,4 +188,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: docker-compose -f "docker-compose-dev.yml" down
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci down

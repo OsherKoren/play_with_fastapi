@@ -4,6 +4,7 @@
 
 
 import os
+import urllib
 
 from databases import Database
 from dotenv import load_dotenv
@@ -46,13 +47,14 @@ def get_database_url():
     user = os.getenv("PS_USER", "postgres")
     password = os.getenv("PS_PASSWORD", "")
     host = os.getenv("PS_HOST", "localhost")
-    port = os.getenv("PS_PORT", 5432)
+    port = os.getenv("PS_PORT", "5432")
     db_name = os.getenv("PS_DB", "postgres")
 
     if None in (user, password, db_name, port):
         raise ValueError("Some required environment variables are not set.")
 
-    database_url = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+    url = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+    database_url = urllib.parse.quote(url)
     log.debug(f"Database URL:\n{database_url}")
     return database_url
 
