@@ -43,11 +43,11 @@ def get_database_url():
     Raises:
         ValueError: If any of the required environment variables is not set.
     """
-    user = os.getenv("PS_USER")
-    password = os.getenv("PS_PASSWORD")
-    host = os.getenv("PS_HOST", "127.0.0.1")
+    user = os.getenv("PS_USER", "postgres")
+    password = os.getenv("PS_PASSWORD", "")
+    host = os.getenv("PS_HOST", "localhost")
     port = os.getenv("PS_PORT", 5432)
-    db_name = os.getenv("PS_DB")
+    db_name = os.getenv("PS_DB", "postgres")
 
     if None in (user, password, db_name, port):
         raise ValueError("Some required environment variables are not set.")

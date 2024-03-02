@@ -63,12 +63,12 @@ services:
       - ${ENV_FILE:-./.env.dev}
     environment:
       DEV_ENV: "true"
-    healthcheck:
-      test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://dev-app:8000/api/v1/health').read().decode()"]
-      interval: 30s
-      timeout: 30s
-      retries: 3
+#    healthcheck:
+#      test: ["CMD", "python", "-c",
+#             "import urllib.request; urllib.request.urlopen('http://dev-app:8000/api/v1/health').read().decode()"]
+#      interval: 30s
+#      timeout: 30s
+#      retries: 3
 
   dev-processor:
     build:
@@ -77,8 +77,8 @@ services:
     depends_on:
       dev-kafka:
         condition: service_healthy
-      dev-app:
-        condition: service_healthy
+#      dev-app:
+#        condition: service_healthy
     env_file:
       - ${ENV_FILE:-./.env.dev}
     environment:

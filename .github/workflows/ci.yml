@@ -136,9 +136,9 @@ jobs:
         run: |
           echo "PS_USER: ${{ secrets.PS_USER }}"
           echo "PS_PASSWORD: ${{ secrets.PS_PASSWORD }}"
-          echo "PS_HOST_DEV: ${{ vars.PS_HOST_DEV }}"
+          echo "PS_HOST: ${{ vars.PS_HOST_DEV }}"
           echo "PS_PORT: ${{ vars.PS_PORT_DEV }}"
-          echo "PS_DB_DEV: ${{ vars.PS_DB_DEV }}"
+          echo "PS_DB: ${{ vars.PS_DB_DEV }}"
 
       - name: Start services with Docker Compose
         id: start_services
@@ -185,3 +185,7 @@ jobs:
       - name: Run tests
         if: steps.start_services.outcome == 'success'
         run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
+
+      - name: Stop services
+        if: always()
+        run: docker-compose -f "docker-compose-dev.yml" down
