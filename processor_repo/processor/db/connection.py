@@ -19,13 +19,13 @@ def get_database_url():
     Construct and return the PostgreSQL database URL based on environment variables.
 
     This function uses the following environment variables:
-    - PS_HOST: PostgreSQL server host address (default is "localhost")
     - PS_USER: PostgreSQL username (required)
     - PS_PASSWORD: PostgreSQL password (required)
-    - DB_NAME: PostgreSQL database name (required)
+    - PS_HOST: PostgreSQL server host address (default is "localhost")
     - PS_PORT: PostgreSQL server port (required)
+    - PS_DB: PostgreSQL database name (required)
 
-    If any of the required environment variables (PS_USER, PS_PASSWORD, DB_NAME, PS_PORT)
+    If any of the required environment variables (PS_USER, PS_PASSWORD, PS_HOST, PS_PORT, PS_DB)
      is not set, a ValueError is raised.
 
     Example:
@@ -43,11 +43,11 @@ def get_database_url():
     Raises:
         ValueError: If any of the required environment variables is not set.
     """
-    host = os.getenv("PS_HOST", "localhost")
     user = os.getenv("PS_USER")
     password = os.getenv("PS_PASSWORD")
-    db_name = os.getenv("DB_NAME")
+    host = os.getenv("PS_HOST", "localhost")
     port = os.getenv("PS_PORT")
+    db_name = os.getenv("PS_DB")
 
     if None in (user, password, db_name, port):
         raise ValueError("Some required environment variables are not set.")
