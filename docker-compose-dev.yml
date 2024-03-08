@@ -60,6 +60,10 @@ services:
     env_file:
       - .env.ci
     environment:
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-}
+      PGHOST: ${PGHOST:-dev-db}
+      PGDATABASE: ${PGDATABASE:-postgres}
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
