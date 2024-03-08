@@ -25,11 +25,11 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --wait-timeout 60
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d
 
       - name: Wait for healthchecks
         if: always()
-        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 2; done'
+        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
 
       - name: Log dev-app service output
         if: always()
