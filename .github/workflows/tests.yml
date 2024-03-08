@@ -27,10 +27,6 @@ jobs:
         id: start_services
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d
 
-      - name: Wait for healthchecks
-        if: always()
-        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
-
       - name: Log dev-app service output
         if: always()
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
@@ -39,12 +35,27 @@ jobs:
         if: always()
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
 
+      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
+        run: |
+          until docker ps -f "status=unhealthy" --filter "name=play_with_fastapi_dev-app" --format '{{.Status}}' | grep -q 'unhealthy'; do
+            echo "Waiting for container to be unhealthy..."
+            sleep 10
+          done
+
+      - name: Retrieve logs for dev-app service  # New step to retrieve logs for the dev-app service
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+
+#      - name: Wait for healthchecks
+#        id: wait_for_healthchecks
+#        if: always()
+#        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
+
       - name: List Docker containers
         if: always()
         run: docker ps
 
       - name: Run tests
-        if: steps.start_services.outcome == 'success'
+        if: steps.wait_for_healthchecks.outcome == 'success'
         run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
 
       - name: Stop services
