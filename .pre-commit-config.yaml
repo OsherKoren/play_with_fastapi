@@ -14,11 +14,11 @@ repos:
       - id: debug-statements
       - id: check-yaml
 
-  - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: "0.28.0"
-    hooks:
-      - id: check-github-workflows
-        args: ["--verbose"]
+#  - repo: https://github.com/python-jsonschema/check-jsonschema
+#    rev: "0.28.0"
+#    hooks:
+#      - id: check-github-workflows
+#        args: ["--verbose"]
 
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.15.1

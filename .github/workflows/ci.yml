@@ -133,20 +133,25 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Print env variables
+        environment: dev
         run: |
-          echo "PS_USER: ${{ secrets.PS_USER }}"
-          echo "PS_PASSWORD: ${{ secrets.PS_PASSWORD }}"
-          echo "PS_HOST: ${{ vars.PS_HOST_DEV }}"
-          echo "PS_PORT: ${{ vars.PS_PORT_DEV }}"
-          echo "PS_DB: ${{ vars.PS_DB_DEV }}"
+          echo "PGUSER: ${{ secrets.PGUSER }}"
+          echo "PGPASSWORD: ${{ secrets.PGPASSWORD }}"
+          echo "PGHOST: ${{ vars.PGHOST }}"
+          echo "PGPORT: ${{ vars.PGPORT }}"
+          echo "PGDATABASE: ${{ vars.PGDATABASE }}"
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --wait-timeout 60
 
 #      - name: Log if services started with errors
 #        if: steps.start_services.outcome != 'success'
 #        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs
+      - name: Wait for healthchecks
+        if: always()
+        run: |
+          timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 2; done'
 
       - name: Log dev-app service output
         if: always()
@@ -156,10 +161,10 @@ jobs:
         if: always()
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
 
-      - name: Wait for services to be healthy
-        if: always()
-        run: |
-          docker-compose -f docker-compose-dev.yml --env-file ./.env.ci ps -q | xargs docker inspect --format='{{.State.Health.Status}}'
+#      - name: Wait for services to be healthy
+#        if: always()
+#        run: |
+#          docker-compose -f docker-compose-dev.yml --env-file ./.env.ci ps -q | xargs docker inspect --format='{{.State.Health.Status}}'
 
       - name: List Docker containers
         if: always()

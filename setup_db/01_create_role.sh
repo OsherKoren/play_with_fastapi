@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Create postgres role based on environment variable
-if psql -U postgres -c "SELECT rolname FROM pg_roles" | grep -qw "$PS_USER"; then
-  echo "Role $PS_USER already exists"
+if psql -U postgres -c "SELECT rolname FROM pg_roles" | grep -qw "$PGUSER"; then
+  echo "Role $PGUSER already exists"
 else
-  psql -U postgres -c "CREATE ROLE $PS_USER WITH LOGIN PASSWORD '$PS_PASSWORD';"
-  echo "Role $PS_USER created successfully"
+  psql -U postgres -c "CREATE ROLE $PGUSER WITH LOGIN PASSWORD '$PGPASSWORD';"
+  echo "Role $PGUSER created successfully"
 fi

@@ -19,13 +19,13 @@ def get_database_url():
     Construct and return the PostgreSQL database URL based on environment variables.
 
     This function uses the following environment variables:
-    - PS_USER: PostgreSQL username (required)
-    - PS_PASSWORD: PostgreSQL password (required)
-    - PS_HOST: PostgreSQL server host address (default is "localhost")
-    - PS_PORT: PostgreSQL server port (required)
-    - PS_DB: PostgreSQL database name (required)
+    - PGUSER: PostgreSQL username (required)
+    - PGPASSWORD: PostgreSQL password (required)
+    - PGHOST: PostgreSQL server host address (default is "localhost")
+    - PGPORT: PostgreSQL server port (required)
+    - PGDATABASE: PostgreSQL database name (required)
 
-    If any of the required environment variables (PS_USER, PS_PASSWORD, PS_HOST, PS_PORT, PS_DB)
+    If any of the required environment variables (PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE)
      is not set, a ValueError is raised.
 
     Example:
@@ -43,23 +43,22 @@ def get_database_url():
     Raises:
         ValueError: If any of the required environment variables is not set.
     """
-    user = os.getenv("PS_USER", "postgres")
-    password = os.getenv("PS_PASSWORD", "")
-    host = os.getenv("PS_HOST", "localhost")
-    port = os.getenv("PS_PORT", "5432")
-    db_name = os.getenv("PS_DB", "postgres")
+    user = os.getenv("PGUSER")
+    password = os.getenv("PGPASSWORD")
+    hostname = os.getenv("PGHOST", "localhost")
+    port = os.getenv("PGPORT")
+    db_name = os.getenv("PGDATABASE")
 
-    if None in (user, password, db_name, port):
+    if None in (user, password, port, db_name):
         raise ValueError("Some required environment variables are not set.")
 
-    url = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
-    database_url = urllib.parse.quote(url)
+    database_url = f"postgresql://{user}:{password}@{hostname}:{port}/{db_name}"
     log.debug(f"Database URL:\n{database_url}")
     return database_url
 
 
-db_url = get_database_url()
-database = Database(db_url)
+DB_URL: str = get_database_url()
+database = Database(DB_URL)
 
 
 async def start_database():
