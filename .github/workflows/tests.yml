@@ -1,0 +1,54 @@
+# Run tests
+
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Print env variables
+        run: |
+          echo "PGUSER: ${{ secrets.PGUSER }}"
+          echo "PGPASSWORD: ${{ secrets.PGPASSWORD }}"
+          echo "PGHOST: ${{ secrets.PGHOST }}"
+          echo "PGPORT: ${{ secrets.PGPORT }}"
+          echo "PGDATABASE: ${{ secrets.PGDATABASE }}"
+
+      - name: Start services with Docker Compose
+        id: start_services
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --wait-timeout 60
+
+      - name: Wait for healthchecks
+        if: always()
+        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 2; done'
+
+      - name: Log dev-app service output
+        if: always()
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+
+      - name: Log dev-processor service output
+        if: always()
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
+
+      - name: List Docker containers
+        if: always()
+        run: docker ps
+
+      - name: Run tests
+        if: steps.start_services.outcome == 'success'
+        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
+
+      - name: Stop services
+        if: always()
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci down

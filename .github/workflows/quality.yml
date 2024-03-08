@@ -1,0 +1,51 @@
+# This workflow will install Python dependencies, run tests with 3 versions of Python
+
+name: Quality. Lint. Format.
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  quality:
+    needs: install-dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache-dependency-path: pyproject.toml
+
+    - run: python -m pip install --upgrade pip
+
+    - name: Install Poetry
+      uses: abatilo/actions-poetry@v3
+
+    - uses: actions/cache@v4
+      id: cache
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ runner.os }}-python-${{ env.pythonLocation }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
+
+    - name: Install dependencies
+      run: poetry install # --no-root
+
+    - name: Format code with Black
+      run: poetry run black --check .
+
+    - name: Run mypy
+      run: poetry run mypy app_repo processor_repo
+
+    - name: Run pylint
+      run: |
+       poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
