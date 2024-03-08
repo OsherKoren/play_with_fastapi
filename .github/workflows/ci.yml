@@ -4,7 +4,7 @@ name: FastApi application on Docker container. Test. Lint. Format.
 
 on:
   push:
-    branches: [ "dev", "main" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
