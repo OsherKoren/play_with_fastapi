@@ -32,6 +32,12 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
+        env:
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGHOST: ${{ vars.PGHOST }}
+          PGPORT: ${{ vars.PGPORT }}
+          PGDATABASE: ${{ vars.PGDATABASE }}
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --build
 
       - name: Log dev-app service output
