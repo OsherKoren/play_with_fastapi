@@ -50,6 +50,9 @@ def get_database_url():
     db_name = os.getenv("PGDATABASE")
 
     if None in (user, password, port, db_name):
+        log.debug(
+            f"user: {user}\n,password: {password}\n,hostname: {hostname}\n,port: {port}\n,db_name: {db_name}"
+        )
         raise ValueError("Some required environment variables are not set.")
 
     database_url = f"postgresql://{user}:{password}@{hostname}:{port}/{db_name}"
