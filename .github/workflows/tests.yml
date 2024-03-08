@@ -10,18 +10,25 @@ on:
 
 jobs:
   tests:
+    environment: dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Print env variables
+        env:
+          PGUSER: ${{ secrets.PGUSER }}
+          PGPASSWORD: ${{ secrets.PGPASSWORD }}
+          PGHOST: ${{ vars.PGHOST }}
+          PGPORT: ${{ vars.PGPORT }}
+          PGDATABASE: ${{ vars.PGDATABASE }}
         run: |
           echo "PGUSER: ${{ secrets.PGUSER }}"
           echo "PGPASSWORD: ${{ secrets.PGPASSWORD }}"
-          echo "PGHOST: ${{ secrets.PGHOST }}"
-          echo "PGPORT: ${{ secrets.PGPORT }}"
-          echo "PGDATABASE: ${{ secrets.PGDATABASE }}"
+          echo "PGHOST: ${{ vars.PGHOST }}"
+          echo "PGPORT: ${{ vars.PGPORT }}"
+          echo "PGDATABASE: ${{ vars.PGDATABASE }}"
 
       - name: Start services with Docker Compose
         id: start_services

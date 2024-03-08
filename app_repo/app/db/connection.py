@@ -51,7 +51,7 @@ def get_database_url():
 
     if None in (user, password, port, db_name):
         log.debug(
-            f"user: {user}\n,password: {password}\n,hostname: {hostname}\n,port: {port}\n,db_name: {db_name}"
+            f"\nuser: {user}\npassword: {password}\nhostname: {hostname}\nport: {port}\ndb_name: {db_name}"
         )
         raise ValueError("Some required environment variables are not set.")
 
