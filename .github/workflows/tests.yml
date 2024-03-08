@@ -16,20 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Print env variables
-        env:
-          PGUSER: ${{ secrets.PGUSER }}
-          PGPASSWORD: ${{ secrets.PGPASSWORD }}
-          PGHOST: ${{ vars.PGHOST }}
-          PGPORT: ${{ vars.PGPORT }}
-          PGDATABASE: ${{ vars.PGDATABASE }}
-        run: |
-          echo "PGUSER: ${{ secrets.PGUSER }}"
-          echo "PGPASSWORD: ${{ secrets.PGPASSWORD }}"
-          echo "PGHOST: ${{ vars.PGHOST }}"
-          echo "PGPORT: ${{ vars.PGPORT }}"
-          echo "PGDATABASE: ${{ vars.PGDATABASE }}"
-
       - name: Start services with Docker Compose
         id: start_services
         env:
