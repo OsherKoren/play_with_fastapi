@@ -39,6 +39,7 @@ jobs:
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-processor
 
       - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
+        if: always()
         run: |
           until docker ps -f "status=unhealthy" --filter "name=play_with_fastapi_dev-app" --format '{{.Status}}' | grep -q 'unhealthy'; do
             echo "Waiting for container to be unhealthy..."
