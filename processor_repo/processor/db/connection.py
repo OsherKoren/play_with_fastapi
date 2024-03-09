@@ -6,12 +6,8 @@
 import os
 
 from databases import Database
-from dotenv import load_dotenv
 
 from logger import log
-
-ENV_FILE = os.getenv("ENV_FILE", ".env")
-load_dotenv(ENV_FILE)
 
 
 def get_database_url():

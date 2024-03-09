@@ -6,14 +6,12 @@ services:
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
-    env_file:
-      - ${ENV_FILE:-.env.dev}
     environment:
       PGUSER: ${PGUSER:-postgres}
       PGPASSWORD: ${PGPASSWORD:-}
       PGHOST: ${PGHOST:-dev-db}
+      PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
-      DEV_ENV: "true"
     ports:
       - "5433:5432"
     healthcheck:
@@ -60,9 +58,12 @@ services:
         condition: service_healthy
       dev-kafka:
         condition: service_healthy
-    env_file:
-      - ${ENV_FILE:-.env.dev}
     environment:
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-}
+      PGHOST: ${PGHOST:-dev-db}
+      PGPORT: ${PGPORT:-5432}
+      PGDATABASE: ${PGDATABASE:-postgres}
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
@@ -80,10 +81,13 @@ services:
         condition: service_healthy
       dev-app:
         condition: service_healthy
-    env_file:
-      - ${ENV_FILE:-.env.dev}
     environment:
-        DEV_ENV: "true"
+      PGUSER: ${PGUSER:-postgres}
+      PGPASSWORD: ${PGPASSWORD:-}
+      PGHOST: ${PGHOST:-dev-db}
+      PGPORT: ${PGPORT:-5432}
+      PGDATABASE: ${PGDATABASE:-postgres}
+      DEV_ENV: "true"
 
 volumes:
   postgres_data_dev:
