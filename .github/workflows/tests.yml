@@ -46,6 +46,7 @@ jobs:
 #          done
 
       - name: Sleep for 1 minutes
+        if: steps.start_services.outcome != 'success'
         run: sleep 60s
         shell: bash
 
@@ -62,7 +63,7 @@ jobs:
         run: docker ps
 
       - name: Run tests
-        if: steps.wait_for_healthchecks.outcome == 'success'
+        if: steps.start_services.outcome == 'success'
         run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
 
       - name: Stop services
