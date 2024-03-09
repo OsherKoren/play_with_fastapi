@@ -47,6 +47,9 @@ jobs:
         shell: bash
 
       - name: Log dev-app service output
+        run: docker logs -f play_with_fastapi_dev-app_1
+
+      - name: Log dev-app service output
         if: always()
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
 
