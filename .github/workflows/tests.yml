@@ -63,7 +63,7 @@ jobs:
 
       - name: List Docker containers
         if: always()
-        run: docker ps
+        run: docker ps -a
 
       - name: Run tests
         if: steps.start_services.outcome == 'success'
