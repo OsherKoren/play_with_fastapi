@@ -16,27 +16,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: 'Create .env.ci file'
+      - name: 'Create .env.dev file'
         run: |
-          touch .env.ci
-          echo PGUSER=${{ secrets.PGUSER }} >> .env.ci
-          echo PGPASSWORD=${{ secrets.PGPASSWORD }} >> .env.ci
-          echo PGHOST=${{ vars.PGHOST }} >> .env.ci
-          echo PGPORT=${{ vars.PGPORT }} >> .env.ci
-          echo PGDATABASE=${{ vars.PGDATABASE }} >> .env.ci
-          cat .env.ci
+          touch .env.dev
+          echo PGUSER=${{ secrets.PGUSER }} >> .env.dev
+          echo PGPASSWORD=${{ secrets.PGPASSWORD }} >> .env.dev
+          echo PGHOST=${{ vars.PGHOST }} >> .env.dev
+          echo PGPORT=${{ vars.PGPORT }} >> .env.dev
+          echo PGDATABASE=${{ vars.PGDATABASE }} >> .env.dev
+          cat .env.dev
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --build
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
       - name: Log dev-app service output
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
 
       - name: Log dev-processor service output
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-processor
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-processor
 
       - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
         run: |
@@ -46,7 +46,7 @@ jobs:
           done
 
       - name: Retrieve logs for dev-app service  # New step to retrieve logs for the dev-app service
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci logs dev-app
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
 
 #      - name: Wait for healthchecks
 #        id: wait_for_healthchecks
@@ -63,4 +63,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci down
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev down
