@@ -39,12 +39,18 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up
+        run: |
+          docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up --build > build_and_run_logs.txt 2>&1
 
-      - name: Sleep for 30 seconds
+      - name: Display build and run logs
         if: always()
-        run: sleep 30s
-        shell: bash
+        run: |
+          cat build_and_run_logs.txt
+        # Display the contents of the build_and_run_logs.txt file
+
+      - name: Display Docker container logs
+        run: |
+          docker-compose -f docker-compose.yml logs >> build_and_run_logs.txt
 
       - name: Log dev-app service output
         if: always()
