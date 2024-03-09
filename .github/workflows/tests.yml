@@ -44,13 +44,14 @@ jobs:
         id: start_services
         run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
-      - name: List contents of the directory in Docker container
-        run: docker exec play_with_fastapi_dev-app_1 ls -la
-
       - name: Display Docker container logs
         if: always()
         run: |
           docker-compose -f  docker-compose-dev.yml logs
+
+
+      - name: List contents of the directory in Docker container
+        run: docker exec play_with_fastapi_dev-app_1 ls -la
 
       - name: Log dev-app service output
         if: always()
