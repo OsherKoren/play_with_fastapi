@@ -47,15 +47,19 @@ jobs:
         shell: bash
 
       - name: Log dev-app service output
+        if: always()
         run: docker logs -f play_with_fastapi_dev-app_1
 
       - name: Log dev-app service output
+        if: always()
         run: docker logs -f play_with_fastapi_dev-processor_1
 
       - name: Show Docker network configuration
+        if: always()
         run: docker network inspect
 
       - name: Show DNS configuration
+        if: always()
         run: cat /etc/resolv.conf
 #
 #      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
