@@ -24,6 +24,7 @@ jobs:
           echo PGHOST=${{ vars.PGHOST }} >> .env.dev
           echo PGPORT=${{ vars.PGPORT }} >> .env.dev
           echo PGDATABASE=${{ vars.PGDATABASE }} >> .env.dev
+          ls -al  # Add this command to list files in the current directory
           cat .env.dev
 
       - name: Start services with Docker Compose
