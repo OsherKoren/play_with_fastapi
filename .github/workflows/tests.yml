@@ -13,6 +13,7 @@ jobs:
     environment: dev
     runs-on: ubuntu-latest
     env:
+      ENV_FILE: .env.dev
       PGUSER: ${{ secrets.PGUSER }}
       PGPASSWORD: ${{ secrets.PGPASSWORD }}
       PGHOST: ${{ vars.PGHOST }}
