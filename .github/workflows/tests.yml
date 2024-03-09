@@ -11,7 +11,11 @@ on:
 jobs:
   tests:
     environment: dev
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
     env:
       PGUSER: ${{ secrets.PGUSER }}
       PGPASSWORD: ${{ secrets.PGPASSWORD }}
