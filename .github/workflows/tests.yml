@@ -42,15 +42,10 @@ jobs:
         run: |
           docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up --build > build_and_run_logs.txt 2>&1
 
-      - name: Display build and run logs
+      - name: Display Docker container logs
         if: always()
         run: |
-          cat build_and_run_logs.txt
-        # Display the contents of the build_and_run_logs.txt file
-
-      - name: Display Docker container logs
-        run: |
-          docker-compose -f docker-compose.yml logs >> build_and_run_logs.txt
+          docker-compose -f  docker-compose-dev.yml logs
 
       - name: Log dev-app service output
         if: always()
