@@ -30,21 +30,24 @@ jobs:
         id: start_services
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
-      - name: Log dev-app service output
-        if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
+#      - name: Log dev-app service output
+#        if: always()
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
+#
+#      - name: Log dev-processor service output
+#        if: always()
+#        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-processor
+#
+#      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
+#        run: |
+#          until docker ps -f "status=unhealthy" --filter "name=play_with_fastapi_dev-app" --format '{{.Status}}' | grep -q 'unhealthy'; do
+#            echo "Waiting for container to be unhealthy..."
+#            sleep 10
+#          done
 
-      - name: Log dev-processor service output
-        if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-processor
-
-      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
-        if: always()
-        run: |
-          until docker ps -f "status=unhealthy" --filter "name=play_with_fastapi_dev-app" --format '{{.Status}}' | grep -q 'unhealthy'; do
-            echo "Waiting for container to be unhealthy..."
-            sleep 10
-          done
+      - name: Sleep for 1 minutes
+        run: sleep 60s
+        shell: bash
 
       - name: Retrieve logs for dev-app service  # New step to retrieve logs for the dev-app service
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
