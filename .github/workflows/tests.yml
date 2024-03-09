@@ -39,11 +39,11 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up --build
 
-      - name: Sleep for 1 minutes
+      - name: Sleep for 30 seconds
         if: always()
-        run: sleep 60s
+        run: sleep 30s
         shell: bash
 
       - name: Log dev-app service output
@@ -54,13 +54,13 @@ jobs:
         if: always()
         run: docker logs -f play_with_fastapi_dev-processor_1
 
-      - name: Show Docker network configuration
-        if: always()
-        run: docker network inspect bridge
-
-      - name: Show DNS configuration
-        if: always()
-        run: cat /etc/resolv.conf
+#      - name: Show Docker network configuration
+#        if: always()
+#        run: docker network inspect bridge
+#
+#      - name: Show DNS configuration
+#        if: always()
+#        run: cat /etc/resolv.conf
 #
 #      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
 #        run: |
