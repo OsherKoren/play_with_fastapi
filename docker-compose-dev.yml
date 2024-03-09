@@ -13,7 +13,7 @@ services:
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
     ports:
-      - "${PGPORT}:5432"
+      - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL", "psql -U ${PGUSER} -d ${PGDATABASE} -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
@@ -50,7 +50,8 @@ services:
       context: .
       dockerfile: app_repo/Dockerfile.dev
     volumes:
-      - ./app_repo/app:/app
+      - ./:/app
+#      - ./app_repo/app:/app
     ports:
       - "8000:8000"
     depends_on:
