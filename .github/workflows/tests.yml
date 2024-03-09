@@ -48,11 +48,11 @@ jobs:
 
       - name: Log dev-app service output
         if: always()
-        run: docker logs -f play_with_fastapi_dev-app_1
+        run: docker logs play_with_fastapi_dev-app_1
 
       - name: Log dev-processor service output
         if: always()
-        run: docker logs -f play_with_fastapi_dev-processor_1
+        run: docker logs play_with_fastapi_dev-processor_1
 
 #      - name: Show Docker network configuration
 #        if: always()
