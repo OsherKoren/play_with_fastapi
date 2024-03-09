@@ -12,6 +12,13 @@ jobs:
   tests:
     environment: dev
     runs-on: ubuntu-latest
+    env:
+      PGUSER: ${{ secrets.PGUSER }}
+      PGPASSWORD: ${{ secrets.PGPASSWORD }}
+      PGHOST: ${{ vars.PGHOST }}
+      PGPORT: ${{ vars.PGPORT }}
+      PGDATABASE: ${{ vars.PGDATABASE }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
