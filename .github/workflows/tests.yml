@@ -50,12 +50,13 @@ jobs:
         run: docker logs -f play_with_fastapi_dev-app_1
 
       - name: Log dev-app service output
-        if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-app
+        run: docker logs -f play_with_fastapi_dev-processor_1
 
-      - name: Log dev-processor service output
-        if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev logs dev-processor
+      - name: Show Docker network configuration
+        run: docker network inspect
+
+      - name: Show DNS configuration
+        run: cat /etc/resolv.conf
 #
 #      - name: Wait for container to be unhealthy  # New step to wait for the container to be unhealthy
 #        run: |
