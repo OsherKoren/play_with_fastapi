@@ -39,7 +39,7 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d
+        run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
       - name: Display Docker container logs
         if: always()
