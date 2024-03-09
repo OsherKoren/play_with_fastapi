@@ -23,10 +23,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install PostgreSQL client
+      - name: Update APT package manager and install postgresql-client
         run: |
-          apt-get update
-          apt-get install --yes postgresql-client
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+        shell: bash
 
       - name: 'Create .env.dev file'
         run: |
