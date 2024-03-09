@@ -38,7 +38,7 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY ./app .
+COPY ./app_repo/app .
 
 EXPOSE 80
 

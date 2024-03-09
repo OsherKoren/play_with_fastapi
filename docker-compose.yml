@@ -6,6 +6,8 @@ services:
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - ${ENV_FILE:-.env}
     environment:
       PGUSER: ${PGUSER:-postgres}
       PGPASSWORD: ${PGPASSWORD:-}
@@ -45,8 +47,8 @@ services:
 
   app:
     build:
-      context: ./app_repo
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: app_repo/Dockerfile
     volumes:
       - ./app_repo/app:/app
     ports:
@@ -56,6 +58,8 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+    env_file:
+      - ${ENV_FILE:-.env}
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://app:80/api/v1/health').read().decode()"]
@@ -65,13 +69,15 @@ services:
 
   processor:
     build:
-      context: ./processor_repo
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: processor_repo/Dockerfile
     depends_on:
       kafka:
         condition: service_healthy
       app:
         condition: service_healthy
+    env_file:
+      - ${ENV_FILE:-.env}
 
 volumes:
   postgres_data:

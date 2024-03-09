@@ -40,7 +40,7 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY ./processor .
+COPY ./processor_repo/processor .
 
 EXPOSE 8001
 

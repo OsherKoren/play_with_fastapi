@@ -16,14 +16,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: 'Create .env.ci file'
+        run: |
+          touch .env.ci
+          echo PGUSER=${{ secrets.PGUSER }} >> .env.ci
+          echo PGPASSWORD=${{ secrets.PGPASSWORD }} >> .env.ci
+          echo PGHOST=${{ vars.PGHOST }} >> .env.ci
+          echo PGPORT=${{ vars.PGPORT }} >> .env.ci
+          echo PGDATABASE=${{ vars.PGDATABASE }} >> .env.ci
+          cat .env.ci
+
       - name: Start services with Docker Compose
         id: start_services
-        env:
-          PGUSER: ${{ secrets.PGUSER }}
-          PGPASSWORD: ${{ secrets.PGPASSWORD }}
-          PGHOST: ${{ vars.PGHOST }}
-          PGPORT: ${{ vars.PGPORT }}
-          PGDATABASE: ${{ vars.PGDATABASE }}
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.ci up -d --build
 
       - name: Log dev-app service output
