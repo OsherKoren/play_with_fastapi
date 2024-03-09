@@ -35,7 +35,7 @@ jobs:
         run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
       - name: Sleep for 1 minutes
-        if: steps.start_services.outcome != 'success'
+        if: always()
         run: sleep 60s
         shell: bash
 
