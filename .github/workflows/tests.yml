@@ -50,13 +50,13 @@ jobs:
         if: always()
         run: docker logs -f play_with_fastapi_dev-app_1
 
-      - name: Log dev-app service output
+      - name: Log dev-processor service output
         if: always()
         run: docker logs -f play_with_fastapi_dev-processor_1
 
       - name: Show Docker network configuration
         if: always()
-        run: docker network inspect
+        run: docker network inspect bridge
 
       - name: Show DNS configuration
         if: always()
