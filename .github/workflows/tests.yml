@@ -97,6 +97,10 @@ jobs:
         if: always()
         run: docker ps -a
 
+      - name: Check if dev-db service started successfully
+        if: steps.start_services.outcome == 'success'
+        run: docker ps -f "name=play_with_fastapi_dev-db_1" --format '{{.Status}}'
+
       - name: Run tests
         if: steps.start_services.outcome == 'success'
         run: docker exec play_with_fastapi-dev-app-1 pytest --skip-auth
