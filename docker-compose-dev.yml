@@ -18,7 +18,7 @@ services:
       - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL",
-             "psql -U ${PGUSER} -h 127.0.0.1 -d ${PGDATABASE} -c 'SELECT 1 FROM accounts LIMIT 1'"]
+             "psql -U ${PGUSER} -h localhost -d ${PGDATABASE} -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -64,6 +64,7 @@ services:
     env_file:
       - ./.env.dev
     environment:
+      POSTGRES_PASSWORD: ${PGPASSWORD:-}
       PGUSER: ${PGUSER:-postgres}
       PGPASSWORD: ${PGPASSWORD:-}
       PGHOST: ${PGHOST:-dev-db}
@@ -72,7 +73,7 @@ services:
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health').read().decode()"]
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health').read().decode()"]
       interval: 30s
       timeout: 30s
       retries: 3
