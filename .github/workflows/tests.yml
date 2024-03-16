@@ -59,6 +59,10 @@ jobs:
       - name: List contents of the directory in Docker container
         run: docker exec play_with_fastapi_dev-app_1 ls -la
 
+      - name: Log dev-db service output
+        if: always()
+        run: docker logs play_with_fastapi_dev-db_1
+
       - name: Log dev-app service output
         if: always()
         run: docker logs play_with_fastapi_dev-app_1
