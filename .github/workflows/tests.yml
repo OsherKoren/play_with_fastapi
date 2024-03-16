@@ -48,7 +48,7 @@ jobs:
 
       - name: Display app Docker container status
         if: always()
-        run: docker exec play_with_fastapi_dev-app_1 curl localhost/status
+        run: docker exec play_with_fastapi_dev-app_1 curl dev-db/status
 
       - name: Display Docker container logs
         if: always()
