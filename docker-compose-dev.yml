@@ -49,6 +49,7 @@ services:
       retries: 3
 
   dev-app:
+    restart: always
     build:
       context: .
       dockerfile: app_repo/Dockerfile.dev
