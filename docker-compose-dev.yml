@@ -9,9 +9,8 @@ services:
     env_file:
       - ./.env.dev
     environment:
-      POSTGRES_PASSWORD: ${PGPASSWORD:-}
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGHOST: ${PGHOST:-dev-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
@@ -65,9 +64,8 @@ services:
     env_file:
       - ./.env.dev
     environment:
-      POSTGRES_PASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
       PGHOST: ${PGHOST:-dev-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
@@ -91,9 +89,8 @@ services:
     env_file:
       - ./.env.dev
     environment:
-      POSTGRES_PASSWORD: ${PGPASSWORD:-}
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGHOST: ${PGHOST:-dev-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}

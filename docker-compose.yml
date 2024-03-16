@@ -8,7 +8,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGHOST: ${PGHOST:-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
@@ -59,7 +59,7 @@ services:
         condition: service_healthy
     environment:
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGHOST: ${PGHOST:-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
@@ -81,7 +81,7 @@ services:
         condition: service_healthy
     environment:
       PGUSER: ${PGUSER:-postgres}
-      PGPASSWORD: ${PGPASSWORD:-}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       PGHOST: ${PGHOST:-db}
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}

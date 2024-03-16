@@ -39,7 +39,7 @@ def get_database_url():
         ValueError: If any of the required environment variables is not set.
     """
     user = os.getenv("PGUSER")
-    password = os.getenv("PGPASSWORD")
+    password = os.getenv("POSTGRES_PASSWORD")
     hostname = os.getenv("PGHOST", "localhost")
     port = os.getenv("PGPORT")
     db_name = os.getenv("PGDATABASE")
