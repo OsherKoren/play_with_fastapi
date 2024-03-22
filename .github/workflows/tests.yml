@@ -103,7 +103,14 @@ jobs:
 
       - name: Health check
         if: always()
-        run: psql -U ${{ secrets.PGUSER }} -h ${{ vars.PGHOST }} -d ${{ vars.PGDATABASE }} -c 'SELECT 1 FROM accounts LIMIT 1'
+#        run: PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${{ secrets.PGUSER }} -h ${{ vars.PGHOST }} -d ${{ vars.PGDATABASE }} -c 'SELECT 1 FROM accounts LIMIT 1'
+        run: |
+          set -e
+          PGPASSWORD="${{ secrets.POSTGRES_PASSWORD }}"
+          if ! psql -U "${{ secrets.PGUSER }}" -h "${{ vars.PGHOST }}" -d "${{ vars.PGDATABASE }}" -c 'SELECT 1 FROM accounts LIMIT 1'; then
+            echo "Health check failed"
+            exit 1
+          fi
 
       - name: Run tests
         if: steps.start_services.outcome == 'success'
