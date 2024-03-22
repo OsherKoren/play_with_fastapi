@@ -18,7 +18,7 @@ services:
       - "5433:5432"
     healthcheck:
       test: ["CMD-SHELL",
-             "psql -U ${PGUSER} -h ${PGHOST} -d ${PGDATABASE} -c 'SELECT 1 FROM accounts LIMIT 1'"]
+             "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${PGUSER} -h ${PGHOST} -d ${PGDATABASE} -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
       timeout: 10s
       retries: 3
