@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   dev-db:
-    image: postgres:16-alpine3.19
+    image: postgres:16-alpine
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
@@ -23,16 +23,14 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - dev-network
+
 
   dev-zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - dev-network
+
 
   dev-kafka:
     image: confluentinc/cp-kafka:7.5.1
@@ -52,8 +50,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    networks:
-      - dev-network
+
 
   dev-app:
     restart: always
@@ -84,8 +81,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
-    networks:
-      - dev-network
+
 
   dev-processor:
     build:
@@ -105,12 +101,7 @@ services:
       PGPORT: ${PGPORT:-5432}
       PGDATABASE: ${PGDATABASE:-postgres}
       DEV_ENV: "true"
-    networks:
-      - dev-network
+
 
 volumes:
   postgres_data_dev:
-
-networks:
-  dev-network:
-    driver: bridge
