@@ -68,6 +68,9 @@ jobs:
         if: always()
         run: docker ps -a
 
+      - name: Print dev-app installed packages
+        run: docker exec play_with_fastapi_dev-app_1 pip list
+
       - name: Run tests
         if: steps.start_services.outcome == 'success'
         run: docker exec play_with_fastapi_dev-app_1 pytest tests/ --skip-auth
