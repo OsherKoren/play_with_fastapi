@@ -43,6 +43,7 @@ jobs:
         run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
       - name: Inspect dev-db Docker container
+        if: always()
         run: docker inspect play_with_fastapi-dev-db-1
 
 
