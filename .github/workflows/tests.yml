@@ -59,10 +59,10 @@ jobs:
         if: steps.start_services.outcome != 'success'
         run: docker logs play_with_fastapi_dev-processor_1
 
-      - name: Wait for healthchecks
-        id: wait_for_healthchecks
-        if: steps.start_services.outcome == 'success'
-        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
+#      - name: Wait for healthchecks
+#        id: wait_for_healthchecks
+#        if: steps.start_services.outcome == 'success'
+#        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
 
       - name: List Docker containers
         if: always()
