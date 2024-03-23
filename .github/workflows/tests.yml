@@ -70,7 +70,7 @@ jobs:
 
       - name: Run tests
         if: steps.start_services.outcome == 'success'
-        run: docker exec play_with_fastapi-dev-app-1 pytest tests/ --skip-auth
+        run: docker exec play_with_fastapi_dev-app_1 pytest tests/ --skip-auth
 #        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
 
       - name: Stop services
