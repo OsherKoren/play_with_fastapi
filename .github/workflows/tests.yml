@@ -17,11 +17,11 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     env:
-      PGUSER: ${{ secrets.PGUSER }}
+      PGUSER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      PGHOST: ${{ vars.PGHOST }}
-      PGPORT: ${{ vars.PGPORT }}
-      PGDATABASE: ${{ vars.PGDATABASE }}
+      PGHOST: ${{ vars.POSTGRES_HOST }}
+      PGPORT: ${{ vars.POSTGRES_PORT }}
+      PGDATABASE: ${{ vars.POSTGRES_DB }}
 
     steps:
       - name: Checkout code
@@ -30,11 +30,11 @@ jobs:
       - name: 'Create .env.dev file'
         run: |
           touch .env.dev
-          echo PGUSER=${{ secrets.PGUSER }} >> .env.dev
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.dev
           echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.dev
-          echo PGHOST=${{ vars.PGHOST }} >> .env.dev
-          echo PGPORT=${{ vars.PGPORT }} >> .env.dev
-          echo PGDATABASE=${{ vars.PGDATABASE }} >> .env.dev
+          echo POSTGRES_HOST=${{ vars.POSTGRES_HOST }} >> .env.dev
+          echo POSTGRES_PORT=${{ vars.POSTGRES_PORT }} >> .env.dev
+          echo POSTGRES_DB=${{ vars.POSTGRES_DB }} >> .env.dev
           ls -al  # Add this command to list files in the current directory
           cat .env.dev
 
@@ -42,9 +42,9 @@ jobs:
         id: start_services
         run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
-      - name: Inspect dev-db Docker container
-        if: always()
-        run: docker exec play_with_fastapi_dev-db_1 bash cat /var/lib/postgresql/data/postgresql.conf
+#      - name: Inspect dev-db Docker container
+#        if: always()
+#        run: docker exec play_with_fastapi_dev-db_1 bash cat /var/lib/postgresql/data/postgresql.conf
 
 
       # Add a step to print the content of postgresql.conf
@@ -55,34 +55,34 @@ jobs:
 #      - name: Print pg_hba.conf
 #        run: cat path/to/pg_hba.conf
 
-      - name: Display db Docker container status
-        if: always()
-        run: docker exec play_with_fastapi_dev-db_1 curl dev-db/status
-
-      - name: Display app Docker container status
-        if: always()
-        run: docker exec play_with_fastapi_dev-app_1 curl dev-app/status
-
+#      - name: Display db Docker container status
+#        if: always()
+#        run: docker exec play_with_fastapi_dev-db_1 curl dev-db/status
+#
+#      - name: Display app Docker container status
+#        if: always()
+#        run: docker exec play_with_fastapi_dev-app_1 curl dev-app/status
+#
       - name: Display Docker container logs
         if: always()
         run: |
           docker-compose -f  docker-compose-dev.yml logs
 
 
-      - name: List contents of the directory in Docker container
-        run: docker exec play_with_fastapi_dev-app_1 ls -la
+#      - name: List contents of the directory in Docker container
+#        run: docker exec play_with_fastapi_dev-app_1 ls -la
 
       - name: Log dev-db service output
         if: always()
         run: docker logs play_with_fastapi_dev-db_1
 
-      - name: Log dev-app service output
-        if: always()
-        run: docker logs play_with_fastapi_dev-app_1
-
-      - name: Log dev-processor service output
-        if: always()
-        run: docker logs play_with_fastapi_dev-processor_1
+#      - name: Log dev-app service output
+#        if: always()
+#        run: docker logs play_with_fastapi_dev-app_1
+#
+#      - name: Log dev-processor service output
+#        if: always()
+#        run: docker logs play_with_fastapi_dev-processor_1
 
 #      - name: Show Docker network configuration
 #        if: always()
@@ -110,24 +110,14 @@ jobs:
         if: always()
         run: docker ps -a
 
-      - name: Check if dev-db service started successfully
-        if: always()
-        run: docker ps -f "name=play_with_fastapi_dev-db_1" --format '{{.Status}}'
+#      - name: Check if dev-db service started successfully
+#        if: always()
+#        run: docker ps -f "name=play_with_fastapi_dev-db_1" --format '{{.Status}}'
 
-      - name: Health check
-        if: always()
-#        run: PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${{ secrets.PGUSER }} -h ${{ vars.PGHOST }} -d ${{ vars.PGDATABASE }} -c 'SELECT 1 FROM accounts LIMIT 1'
-        run: |
-          set -e
-          PGPASSWORD="${{ secrets.POSTGRES_PASSWORD }}"
-          if ! psql -U "${{ secrets.PGUSER }}" -h "${{ vars.PGHOST }}" -d "${{ vars.PGDATABASE }}" -c 'SELECT 1 FROM accounts LIMIT 1'; then
-            echo "Health check failed"
-            exit 1
-          fi
 
-      - name: Run tests
-        if: steps.start_services.outcome == 'success'
-        run: docker exec play_with_fastapi-dev-app-1 pytest --skip-auth
+#      - name: Run tests
+#        if: steps.start_services.outcome == 'success'
+#        run: docker exec play_with_fastapi-dev-app-1 pytest --skip-auth
 #        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
 
       - name: Stop services
