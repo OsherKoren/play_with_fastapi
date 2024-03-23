@@ -17,11 +17,11 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.os }}
     env:
-      PGUSER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
       POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      PGHOST: ${{ vars.POSTGRES_HOST }}
-      PGPORT: ${{ vars.POSTGRES_PORT }}
-      PGDATABASE: ${{ vars.POSTGRES_DB }}
+      POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
 
     steps:
       - name: Checkout code
