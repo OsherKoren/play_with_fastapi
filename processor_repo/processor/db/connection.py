@@ -15,13 +15,14 @@ def get_database_url():
     Construct and return the PostgreSQL database URL based on environment variables.
 
     This function uses the following environment variables:
-    - PGUSER: PostgreSQL username (required)
-    - PGPASSWORD: PostgreSQL password (required)
-    - PGHOST: PostgreSQL server host address (default is "localhost")
-    - PGPORT: PostgreSQL server port (required)
-    - PGDATABASE: PostgreSQL database name (required)
+    - POSTGRES_USER: PostgreSQL username (required)
+    - POSTGRES_PASSWORD: PostgreSQL password (required)
+    - POSTGRES_HOST: PostgreSQL server host address (default is "localhost")
+    - POSTGRES_PORT: PostgreSQL server port (required)
+    - POSTGRES_DB: PostgreSQL database name (required)
 
-    If any of the required environment variables (PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE)
+    If any of the required environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT,
+    POSTGRES_DB)
      is not set, a ValueError is raised.
 
     Example:
@@ -39,11 +40,11 @@ def get_database_url():
     Raises:
         ValueError: If any of the required environment variables is not set.
     """
-    user = os.getenv("PGUSER")
+    user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
-    hostname = os.getenv("PGHOST", "localhost")
-    port = os.getenv("PGPORT")
-    db_name = os.getenv("PGDATABASE")
+    hostname = os.getenv("POSTGRES_HOST", "localhost")
+    port = os.getenv("POSTGRES_PORT")
+    db_name = os.getenv("POSTGRES_DB")
 
     if None in (user, password, port, db_name):
         log.debug(

@@ -9,16 +9,16 @@ services:
     env_file:
       - ./.env.dev
     environment:
-      PGUSER: ${PGUSER:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-      PGHOST: ${PGHOST:-dev-db}
-      PGPORT: ${PGPORT:-5432}
-      PGDATABASE: ${PGDATABASE:-postgres}
+      POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     ports:
       - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL",
-             "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${PGUSER} -h ${PGHOST} -d ${PGDATABASE} \
+             "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -d ${POSTGRES_DB} \
              -c 'SELECT 1 FROM accounts LIMIT 1'"]
       interval: 30s
       timeout: 10s
@@ -69,11 +69,11 @@ services:
     env_file:
       - ./.env.dev
     environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-      PGUSER: ${PGUSER:-postgres}
-      PGHOST: ${PGHOST:-dev-db}
-      PGPORT: ${PGPORT:-5432}
-      PGDATABASE: ${PGDATABASE:-postgres}
+      POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
@@ -95,11 +95,11 @@ services:
     env_file:
       - ./.env.dev
     environment:
-      PGUSER: ${PGUSER:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-      PGHOST: ${PGHOST:-dev-db}
-      PGPORT: ${PGPORT:-5432}
-      PGDATABASE: ${PGDATABASE:-postgres}
+      POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       DEV_ENV: "true"
 
 
