@@ -44,7 +44,7 @@ jobs:
 
       - name: Inspect dev-db Docker container
         if: always()
-        run: docker inspect play_with_fastapi_dev-db_1
+        run: docker exec play_with_fastapi_dev-db_1 bash cat /var/lib/postgresql/data/postgresql.conf
 
 
       # Add a step to print the content of postgresql.conf
