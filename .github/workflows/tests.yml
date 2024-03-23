@@ -48,15 +48,15 @@ jobs:
           docker-compose -f  docker-compose-dev.yml logs
 
       - name: Log dev-db service output
-        if: steps.start_services.outcome != 'success'
+        if: steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-db_1
 
       - name: Log dev-app service output
-        if: steps.start_services.outcome != 'success'
+        if: steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-app_1
 
       - name: Log dev-processor service output
-        if: steps.start_services.outcome != 'success'
+        if: steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-processor_1
 
 #      - name: Wait for healthchecks
