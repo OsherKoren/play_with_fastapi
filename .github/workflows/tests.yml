@@ -42,6 +42,14 @@ jobs:
         id: start_services
         run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
+      # Add a step to print the content of postgresql.conf
+      - name: Print postgresql.conf
+        run: cat path/to/postgresql.conf
+
+      # Add a step to print the content of pg_hba.conf
+      - name: Print pg_hba.conf
+        run: cat path/to/pg_hba.conf
+
       - name: Display db Docker container status
         if: always()
         run: docker exec play_with_fastapi_dev-db_1 curl dev-db/status
