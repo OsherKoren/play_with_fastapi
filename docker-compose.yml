@@ -51,7 +51,7 @@ services:
       context: .
       dockerfile: app_repo/Dockerfile
     volumes:
-      - ./app_repo/app:/app
+      - ./app_repo/app:/src/app
     ports:
       - "80:80"
     depends_on:

@@ -10,7 +10,7 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
 
 ARG POETRY_VERSION=1.7.1
 
-WORKDIR /app
+WORKDIR /src
 
 COPY app_repo/pyproject.toml .
 
@@ -22,9 +22,9 @@ RUN pip install "poetry==$POETRY_VERSION" \
 
 FROM python:3.11-slim as final
 
-WORKDIR /app
+WORKDIR /src
 
-COPY --from=builder /app/requirements.txt .
+COPY --from=builder /src/requirements.txt .
 
 RUN set -ex \
     # Security - Upgrade the package index and install security upgrades
@@ -38,10 +38,10 @@ RUN set -ex \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PYTHONPATH=/app
+ENV PYTHONPATH=/src
 
-COPY ./app_repo/app .
+COPY ./app_repo/app ./app
 
 EXPOSE 80
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
