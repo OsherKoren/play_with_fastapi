@@ -2,4 +2,4 @@
 
 """Initializes the app package."""
 
-from . import api, db, main, mock_external
+from app import api, db, main, mock_external

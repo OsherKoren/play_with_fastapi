@@ -8,7 +8,7 @@ import os
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError
 
-from logger import log
+from app.logger import log
 
 BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_PRODUCER: AIOKafkaProducer | None = None

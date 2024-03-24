@@ -6,7 +6,7 @@ import os
 
 from databases import Database
 
-from logger import log
+from app.logger import log
 
 
 def get_database_url():

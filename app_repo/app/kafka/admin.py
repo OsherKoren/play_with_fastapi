@@ -6,7 +6,7 @@ import os
 from aiokafka.admin import AIOKafkaAdminClient, NewTopic
 from aiokafka.errors import IncompatibleBrokerVersion, TopicAlreadyExistsError
 
-from logger import log
+from app.logger import log
 
 BOOTSTRAP_SERVERS = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 

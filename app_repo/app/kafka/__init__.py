@@ -2,4 +2,4 @@
 
 """Initializes Kafka"""
 
-from . import admin, producer
+from app.kafka import admin, producer

@@ -2,4 +2,4 @@
 
 """A sub-folder for managing the database tables"""
 
-from . import connection, db_manager, tables_metadata
+from app.db import connection, db_manager, tables_metadata

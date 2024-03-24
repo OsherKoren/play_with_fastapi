@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from db import connection as db_connection
+from app.db import connection as db_connection
 
 
 @asynccontextmanager

@@ -6,7 +6,7 @@ import random
 
 from databases.interfaces import Record
 
-from db import db_manager
+from app.db import db_manager
 
 
 async def get_current_user() -> Record | None:

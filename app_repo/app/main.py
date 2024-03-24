@@ -7,8 +7,8 @@ and performing startup and shutdown actions.
 
 from fastapi import FastAPI
 
-from api import messages
-from lifecycle import lifespan
+from app.api import messages
+from app.lifecycle import lifespan
 
 app = FastAPI(title="Message Gateway App", version="1.0", lifespan=lifespan)
 

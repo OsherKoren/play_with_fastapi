@@ -10,10 +10,10 @@ from aiokafka import AIOKafkaProducer
 from fastapi import APIRouter, Depends, Path
 from fastapi.responses import JSONResponse
 
-from db import db_manager
-from kafka import producer
-from logger import log
-from mock_external import mock_authentication as authentication
+from app.db import db_manager
+from app.kafka import producer
+from app.logger import log
+from app.mock_external import mock_authentication as authentication
 
 from . import schemas
 

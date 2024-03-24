@@ -2,4 +2,4 @@
 
 """A sub-folder for API services and endpoints"""
 
-from . import messages, schemas
+from app.api import messages, schemas
