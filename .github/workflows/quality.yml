@@ -43,7 +43,7 @@ jobs:
       run: poetry run black --check .
 
     - name: Run mypy
-      run: poetry run mypy app_repo processor_repo
+      run: poetry run mypy app processor
 
     - name: Run pylint
       run: |

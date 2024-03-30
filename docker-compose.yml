@@ -49,9 +49,9 @@ services:
   app:
     build:
       context: .
-      dockerfile: app_repo/Dockerfile
+      dockerfile: app/Dockerfile
     volumes:
-      - ./app_repo/app:/src/app
+      - ./app/src:/app/src
     ports:
       - "80:80"
     depends_on:
@@ -75,7 +75,9 @@ services:
   processor:
     build:
       context: .
-      dockerfile: processor_repo/Dockerfile
+      dockerfile: processor/Dockerfile
+    volumes:
+        - ./processor/src:/app/src
     depends_on:
       kafka:
         condition: service_healthy

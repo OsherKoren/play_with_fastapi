@@ -56,9 +56,10 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: app_repo/Dockerfile.dev
+      dockerfile: app/Dockerfile.dev
     volumes:
-      - ./app_repo:/src
+      - ./app/src:/app/src
+      - ./app/tests:/app/tests
     ports:
       - "8000:8000"
     depends_on:
@@ -86,7 +87,9 @@ services:
   dev-processor:
     build:
       context: .
-      dockerfile: processor_repo/Dockerfile.dev
+      dockerfile: processor/Dockerfile.dev
+    volumes:
+      - ./processor/src:/app/src
     depends_on:
       dev-kafka:
         condition: service_healthy

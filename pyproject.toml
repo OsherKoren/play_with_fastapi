@@ -47,10 +47,13 @@ honor_noqa = true
 
 [tool.mypy]
 ignore_missing_imports = true
+explicit_package_bases = true
+
 exclude = [
     "WORKSPACE",
     "venv"
 ]
+
 
 [tool.pylint]
 ignore-paths = "./app_repo/tests"

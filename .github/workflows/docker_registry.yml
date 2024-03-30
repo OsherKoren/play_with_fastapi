@@ -25,32 +25,32 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: App Docker metadata (tags, labels)
-        id: app-meta
+        id: src-meta
         uses: docker/metadata-action@v5
         with:
-          images: osherkoren/fastapi-app
+          images: osherkoren/fastapi-src
 
       - name: Build and push App Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app_repo
-          file: ./app_repo/Dockerfile
+          context: ./app
+          file: ./app/Dockerfile
 #          push: true
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.app-meta.outputs.tags }}
-          labels: ${{ steps.app-meta.outputs.labels }}
+          tags: ${{ steps.src-meta.outputs.tags }}
+          labels: ${{ steps.src-meta.outputs.labels }}
 
       - name: Processor Docker metadata (tags, labels)
-        id: processor-meta
+        id: src-meta
         uses: docker/metadata-action@v5
         with:
-          images: osherkoren/kafka-processor
+          images: osherkoren/kafka-src
 
       - name: Build and push Processor Docker image
         uses: docker/build-push-action@v5
         with:
-            context: ./processor_repo
-            file: ./processor_repo/Dockerfile
+            context: ./processor
+            file: ./processor/Dockerfile
             push: ${{ github.event_name != 'pull_request' }}
-            tags: ${{ steps.processor-meta.outputs.tags }}
-            labels: ${{ steps.processor-meta.outputs.labels }}
+            tags: ${{ steps.src-meta.outputs.tags }}
+            labels: ${{ steps.src-meta.outputs.labels }}
