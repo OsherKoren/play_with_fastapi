@@ -13,36 +13,37 @@ on:
 
 jobs:
   pipeline:
-      runs-on: ubuntu-latest
-
-      steps:
-#        - name: Checkout code
-#          uses: actions/checkout@v4
-
-        - name: Run set env
-          uses: actions/github-script@v5
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            script: |
-              const workflows = await github.actions.listRepoWorkflows({
-                owner: context.repo.owner,
-                repo: context.repo.repo
-              });
-
-              console.log('Workflows:', workflows); // Add this line for debugging
-
-              const setEnvWorkflow = workflows.data.workflows.find(workflow => workflow.name === 'set_env');
-              if (setEnvWorkflow) {
-                console.log('Found set_env workflow:', setEnvWorkflow); // Add this line for debugging
-
-                await github.actions.createWorkflowDispatch({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  workflow_id: setEnvWorkflow.id
-                });
-              } else {
-                console.log('set_env workflow not found'); // Add this line for debugging
-              }
+    uses: ./.github/workflows/set_env.yml
+#      runs-on: ubuntu-latest
+#
+#      steps:
+##        - name: Checkout code
+##          uses: actions/checkout@v4
+#
+#        - name: Run set env
+#          uses: actions/github-script@v5
+#          with:
+#            github-token: ${{ secrets.GITHUB_TOKEN }}
+#            script: |
+#              const workflows = await github.actions.listRepoWorkflows({
+#                owner: context.repo.owner,
+#                repo: context.repo.repo
+#              });
+#
+#              console.log('Workflows:', workflows); // Add this line for debugging
+#
+#              const setEnvWorkflow = workflows.data.workflows.find(workflow => workflow.name === 'set_env');
+#              if (setEnvWorkflow) {
+#                console.log('Found set_env workflow:', setEnvWorkflow); // Add this line for debugging
+#
+#                await github.actions.createWorkflowDispatch({
+#                  owner: context.repo.owner,
+#                  repo: context.repo.repo,
+#                  workflow_id: setEnvWorkflow.id
+#                });
+#              } else {
+#                console.log('set_env workflow not found'); // Add this line for debugging
+#              }
 
 #          uses: ./.github/workflows/set_env.yml
 #
