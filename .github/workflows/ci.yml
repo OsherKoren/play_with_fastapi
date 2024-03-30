@@ -3,8 +3,8 @@
 name: CI
 
 on:
-  workflow_run:
-    workflows: [ set_env, quality, test ]
+#  workflow_run:
+#    workflows: [ set_env, quality, test ]
   push:
     branches: [ "dev", "main" ]
   pull_request:
@@ -16,20 +16,14 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-        - name: Checkout set env
+        - name: Checkout code
           uses: actions/checkout@v4
 
         - name: Run set env
           uses: ./.github/workflows/set_env.yml
 
-        - name: Checkout quality
-          uses: actions/checkout@v4
-
         - name: Run quality
           uses: ./.github/workflows/quality.yml
-
-        - name: Checkout tests
-          uses: actions/checkout@v4
 
         - name: Run tests
           uses: ./.github/workflows/tests.yml
