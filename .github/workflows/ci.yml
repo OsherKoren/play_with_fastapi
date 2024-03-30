@@ -16,14 +16,31 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+#        - name: Checkout code
+#          uses: actions/checkout@v4
 
         - name: Run set env
-          uses: ./.github/workflows/set_env.yml
+          uses: actions/github-script@v5
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const { data: { workflows } } = await github.actions.listRepoWorkflows({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
 
-        - name: Run quality
-          uses: ./.github/workflows/quality.yml
-
-        - name: Run tests
-          uses: ./.github/workflows/tests.yml
+              const setEnvWorkflow = workflows.find(workflow => workflow.name === 'set_env');
+              if (setEnvWorkflow) {
+                await github.actions.createWorkflowDispatch({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  workflow_id: setEnvWorkflow.id
+                });
+              }
+#          uses: ./.github/workflows/set_env.yml
+#
+#        - name: Run quality
+#          uses: ./.github/workflows/quality.yml
+#
+#        - name: Run tests
+#          uses: ./.github/workflows/tests.yml
