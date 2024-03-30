@@ -3,7 +3,10 @@
 name: Tests
 
 on:
-  workflow_dispatch:  # Will not trigger independently
+  push:
+    branches: [ "dev", "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   tests:
