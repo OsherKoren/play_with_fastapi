@@ -18,16 +18,17 @@ jobs:
       steps:
         - name: Checkout code
           uses: actions/checkout@v4
+#          path: ${{ env.WORK_DIR }}/play_with_fastapi
 
         - name: Copy files
           working-directory: ${{ env.WORK_DIR }}/play_with_fastapi
           run: cp -r .github "$GITHUB_WORKSPACE/"
 
         - name: Run set env
-          uses: ./.github/workflows/set_env.yml
+          uses: ./${{ env.WORK_DIR }}/play_with_fastapi/.github/workflows/set_env.yml
 
         - name: Run quality
-          uses: ./.github/workflows/quality.yml
+          uses: ./${{ env.WORK_DIR }}/play_with_fastapi/.github/workflows/quality.yml
 
         - name: Run tests
-          uses: ./.github/workflows/tests.yml
+          uses: ./${{ env.WORK_DIR }}/play_with_fastapi/.github/workflows/tests.yml
