@@ -5,7 +5,7 @@ name: Build and register Docker images.
 
 on:
   push:
-    branches: [ "dev", "main" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 

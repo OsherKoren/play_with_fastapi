@@ -11,7 +11,6 @@ on:
 
 jobs:
   quality:
-    needs: install-dependencies
     runs-on: ubuntu-latest
     strategy:
       matrix:
