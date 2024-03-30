@@ -3,6 +3,8 @@
 name: CI
 
 on:
+  workflow_run:
+    workflows: [ set_env, quality, test ]
   push:
     branches: [ "dev", "main" ]
   pull_request:
