@@ -3,12 +3,14 @@
 name: CI
 
 on:
+  workflow_call:
+    workflows: [ set_env, quality, test ]
 #  workflow_run:
 #    workflows: [ set_env, quality, test ]
-  push:
-    branches: [ "dev", "main" ]
-  pull_request:
-    branches: [ "main" ]
+#  push:
+#    branches: [ "dev", "main" ]
+#  pull_request:
+#    branches: [ "main" ]
 
 
 jobs:
