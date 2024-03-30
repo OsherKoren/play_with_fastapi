@@ -59,22 +59,13 @@ jobs:
         if: steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-processor_1
 
-#      - name: Wait for healthchecks
-#        id: wait_for_healthchecks
-#        if: steps.start_services.outcome == 'success'
-#        run: timeout 60s sh -c 'until docker ps | grep play_with_fastapi_dev-processor_1 | grep -q healthy; do echo "Waiting for container to be healthy..."; sleep 20; done'
-
       - name: List Docker containers
         if: always()
         run: docker ps -a
 
-#      - name: Print dev-app installed packages
-#        run: docker exec play_with_fastapi_dev-app_1 pip list
-
       - name: Run tests
         if: steps.start_services.outcome == 'success'
         run: docker exec play_with_fastapi_dev-app_1 pytest tests/
-#        run: docker-compose -f docker-compose-dev.yml exec play_with_fastapi-dev-app-1 pytest tests/
 
       - name: Stop services
         if: always()

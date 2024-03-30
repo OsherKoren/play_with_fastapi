@@ -4,7 +4,7 @@ name: Set env.
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "dev", "main" ]
   pull_request:
     branches: [ "main" ]
 
