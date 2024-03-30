@@ -19,15 +19,15 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v4
 
-#        - name: Copy files
+        #        - name: Copy files
 #          working-directory: ./play_with_fastapi
 #          run: cp -r .github "$GITHUB_WORKSPACE/"
 
         - name: Run set env
-          uses: ./play_with_fastapi/.github/workflows/set_env.yml
+          uses: ./.github/workflows/set_env.yml
 
         - name: Run quality
-          uses: ./play_with_fastapi/.github/workflows/quality.yml
+          uses: ./.github/workflows/quality.yml
 
         - name: Run tests
-          uses: ./play_with_fastapi/.github/workflows/tests.yml
+          uses: ./.github/workflows/tests.yml

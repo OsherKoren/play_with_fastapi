@@ -3,7 +3,7 @@
 name: Tests
 
 on:
-  workflow_dispatch:  # Dummy event to satisfy validation, will not trigger independently
+  workflow_dispatch:  # Will not trigger independently
 
 jobs:
   tests:
