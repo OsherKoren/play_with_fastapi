@@ -19,8 +19,8 @@ def get_database_url():
     - POSTGRES_PORT: PostgreSQL server port (required)
     - POSTGRES_DB: PostgreSQL database name (required)
 
-    If any of the required environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST, POSTGRES_PORT,
-    POSTGRES_DB)
+    If any of the required environment variables (POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_HOST,
+     POSTGRES_PORT, POSTGRES_DB)
      is not set, a ValueError is raised.
 
     Example:
@@ -46,7 +46,8 @@ def get_database_url():
 
     if None in (user, password, port, db_name):
         log.debug(
-            f"\nuser: {user}\npassword: {password}\nhostname: {hostname}\nport: {port}\ndb_name: {db_name}"
+            f"\nuser: {user}\npassword: {password}\nhostname: {hostname}\nport: {port}"
+            f"\ndb_name: {db_name}"
         )
         raise ValueError("Some required environment variables are not set.")
 

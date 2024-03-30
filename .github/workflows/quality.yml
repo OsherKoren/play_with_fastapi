@@ -45,6 +45,8 @@ jobs:
     - name: Run mypy
       run: poetry run mypy app processor
 
-    - name: Run pylint
-      run: |
-       poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
+    - name: Run pylint on app
+      run: poetry run pylint app
+
+    - name: Run pylint on processor
+      run: poetry run pylint processor
