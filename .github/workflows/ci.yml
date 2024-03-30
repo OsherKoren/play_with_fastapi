@@ -16,6 +16,13 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Copy files
+          working-directory: ${{ env.WORK_DIR }}/local_checkout
+          run: cp -r .github "$GITHUB_WORKSPACE/"
+
         - name: Run set env
           uses: ./.github/workflows/set_env.yml
 
