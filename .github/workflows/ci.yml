@@ -24,10 +24,11 @@ jobs:
 #          run: cp -r .github "$GITHUB_WORKSPACE/"
 
         - name: Run set env
-          uses: ./.github/workflows/set_env.yml
+#          uses: ./.github/workflows/set_env.yml
+          uses: /home/runner/work/play_with_fastapi/.github/workflows/set_env.yml
 
         - name: Run quality
-          uses: ./.github/workflows/quality.yml
+          uses: /home/runner/work/play_with_fastapi/.github/workflows/quality.yml
 
         - name: Run tests
-          uses: ./.github/workflows/tests.yml
+          uses: /home/runner/work/play_with_fastapi/.github/workflows/tests.yml
