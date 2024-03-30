@@ -20,7 +20,7 @@ jobs:
           uses: actions/checkout@v4
 
         - name: Copy files
-          working-directory: ${{ env.WORK_DIR }}/local_checkout
+          working-directory: ${{ env.WORK_DIR }}/play_with_fastapi
           run: cp -r .github "$GITHUB_WORKSPACE/"
 
         - name: Run set env
