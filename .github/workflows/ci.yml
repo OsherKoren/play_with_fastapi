@@ -24,14 +24,14 @@ jobs:
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             script: |
-              const { data: { workflows } } = await github.actions.listRepoWorkflows({
+              const workflows = await github.actions.listRepoWorkflows({
                 owner: context.repo.owner,
                 repo: context.repo.repo
               });
 
               console.log('Workflows:', workflows); // Add this line for debugging
 
-              const setEnvWorkflow = workflows.find(workflow => workflow.name === 'set_env');
+              const setEnvWorkflow = workflows.data.workflows.find(workflow => workflow.name === 'set_env');
               if (setEnvWorkflow) {
                 console.log('Found set_env workflow:', setEnvWorkflow); // Add this line for debugging
 
