@@ -1,9 +1,11 @@
 #!/bin/bash
 
 # Create the database based on environment variable
-if psql -U postgres -lqt | cut -d \| -f 1 | grep -qw "V"; then
-  echo "Database $DB_NAME already exists"
+echo "Checking if database $POSTGRES_DB exists"
+if psql -U "$POSTGRES_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" | grep -q 1; then
+  echo "Database $POSTGRES_DB already exists"
 else
-  psql -U postgres -c "CREATE DATABASE $DB_NAME;"
-  echo "Database $DB_NAME created successfully"
+  echo "Creating database $POSTGRES_DB"
+  psql -U "$POSTGRES_USER" -c "CREATE DATABASE $POSTGRES_DB;"
+  echo "Database $POSTGRES_DB created successfully"
 fi

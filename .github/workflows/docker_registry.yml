@@ -1,0 +1,60 @@
+# Register Docker images in Docker Hub
+
+name: Register Docker images.
+
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  docker_registry:
+    name: Push Docker images to Docker Hub
+    runs-on: ubuntu-latest
+    needs:
+      - set_env
+      - sanity
+      - tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: App Docker metadata (tags, labels)
+        id: src-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: osherkoren/fastapi-src
+
+      - name: Build and push App Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+#          push: true
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.src-meta.outputs.tags }}
+          labels: ${{ steps.src-meta.outputs.labels }}
+
+      - name: Processor Docker metadata (tags, labels)
+        id: src-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: osherkoren/kafka-src
+
+      - name: Build and push Processor Docker image
+        uses: docker/build-push-action@v5
+        with:
+            context: ./processor
+            file: ./processor/Dockerfile
+            push: ${{ github.event_name != 'pull_request' }}
+            tags: ${{ steps.src-meta.outputs.tags }}
+            labels: ${{ steps.src-meta.outputs.labels }}

@@ -1,0 +1,72 @@
+# Run unit tests
+
+name: Tests
+
+on:
+  push:
+    branches: [ "dev", "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  tests:
+    environment: dev
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+      fail-fast: false
+    runs-on: ${{ matrix.os }}
+    env:
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: 'Create .env.dev file'
+        run: |
+          touch .env.dev
+          echo POSTGRES_USER=${{ secrets.POSTGRES_USER }} >> .env.dev
+          echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env.dev
+          echo POSTGRES_HOST=${{ vars.POSTGRES_HOST }} >> .env.dev
+          echo POSTGRES_PORT=${{ vars.POSTGRES_PORT }} >> .env.dev
+          echo POSTGRES_DB=${{ vars.POSTGRES_DB }} >> .env.dev
+          ls -al  # Add this command to list files in the current directory
+          cat .env.dev
+
+      - name: Start services with Docker Compose
+        id: start_services
+        run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d
+
+      - name: Display Docker container logs
+        if: always()
+        run: |
+          docker-compose -f  docker-compose-dev.yml logs
+
+      - name: Log dev-db service output
+        if: failure() && steps.start_services.outcome == 'failure'
+        run: docker logs play_with_fastapi_dev-db_1
+
+      - name: Log dev-src service output
+        if: failure() && steps.start_services.outcome == 'failure'
+        run: docker logs play_with_fastapi_dev-app_1
+
+      - name: Log dev-src service output
+        if: failure() && steps.start_services.outcome == 'failure'
+        run: docker logs play_with_fastapi_dev-processor_1
+
+      - name: List Docker containers
+        if: always()
+        run: docker ps -a
+
+      - name: Run tests
+        if: steps.start_services.outcome == 'success'
+        run: docker exec play_with_fastapi_dev-app_1 pytest tests/
+
+      - name: Stop services
+        if: always()
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev down

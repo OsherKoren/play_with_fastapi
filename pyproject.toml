@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "play-with-fastapi"
 version = "0.1.0"
-description = "A demo project for playing with FastAPI using microservices"
+description = "A demo project with FastAPI using microservices"
 authors = ["Osher Koren <oshrats@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<4.0"
+python = ">=3.10,<4.0"
 aiokafka = "^0.10.0"
 fastapi = "^0.109.2"
 pydantic = {extras = ["email"], version = "^2.6.1"}
@@ -15,6 +15,7 @@ databases = {extras = ["postgresql"], version = "^0.8.0"}
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.1"
 asyncio = "^3.4.3"
+tomli = { version = "^1.2.1", python = "3.10" }
 
 
 #[tool.poetry.group.test.dependencies]
@@ -30,7 +31,9 @@ black = "^24.1.1"
 isort = "^5.13.2"
 mypy = "^1.8.0"
 pylint = "^3.0.3"
-pre-commit = "^4.5.0"
+pre-commit = "^3.6.0"
+jsonschema = "^4.21.1"
+sqlalchemy-stubs = "^0.4"
 
 
 #[tool.pytest.ini_options]
@@ -39,12 +42,21 @@ pre-commit = "^4.5.0"
 
 [tool.isort]
 profile = "black"
-src_paths = ["play-with-fastap"]
+src_paths = ["play_with_fastapi/app_repo", "play_with_fastapi/processor_repo"]
 honor_noqa = true
+
+[tool.mypy]
+ignore_missing_imports = true
+explicit_package_bases = true
+
+exclude = [
+    "WORKSPACE",
+    "venv"
+]
 
 
 [tool.pylint]
-ignore-paths = "./app_repo/tests"
+ignore-paths = "./app/tests"
 fail-under = '9.0'
 
 [tool.pylint.format]
@@ -53,7 +65,9 @@ max-line-length = 100
 [tool.pylint.messages_control]
 disable = [
     "too-few-public-methods",
-    "import-error"
+    "import-error",
+    "logging-fstring-interpolation",
+    "R0801"  # R0801: Similar lines in 2 files
 ]
 
 

@@ -1,4 +1,3 @@
-**/poetry.lock
 /WORKSPACE/
 /venv/
 /docs/
@@ -7,6 +6,8 @@ __pycache__/
 .idea/
 *.pyc
 /.mypy_cache/
-/app_repo/app/.pytest_cache/
+/app/src/.pytest_cache/
 *.env
 /.env.dev
+**/poetry.lock
+/.pytest_cache/

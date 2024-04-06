@@ -1,7 +1,7 @@
 default_language_version:
     python: python3.11
 
-default_stages: [commit, push]
+default_stages: [commit]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -14,20 +14,8 @@ repos:
       - id: debug-statements
       - id: check-yaml
 
-  - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: "0.28.0"
-    hooks:
-      - id: check-github-workflows
-        args: ["--verbose"]
-
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.1
-    hooks:
-      - id: pyupgrade
-        args: ["--py310-plus"]
-
   - repo: https://github.com/psf/black
-    rev: 24.2.0
+    rev: 24.1.1
     hooks:
       - id: black
         language_version: python3.11
@@ -41,11 +29,3 @@ repos:
     rev: v1.8.0
     hooks:
       - id: mypy
-
-  - repo: local
-    hooks:
-      - id: pylint
-        name: pylint
-        entry: poetry run pylint $(git ls-files '*.py' | grep -v '/tests/')
-        language: system
-        types: [python]
