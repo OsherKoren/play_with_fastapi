@@ -1,6 +1,6 @@
 # Set env for 3 versions of Python
 
-name: Set env.
+name: Set env
 
 on:
   push:
