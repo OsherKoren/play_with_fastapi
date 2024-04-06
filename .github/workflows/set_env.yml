@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests with 3 versions of Python
+# Set env for 3 versions of Python
 
 name: Set env.
 

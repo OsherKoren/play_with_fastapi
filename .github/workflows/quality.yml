@@ -1,4 +1,4 @@
-# This workflow will install Python dependencies, run tests with 3 versions of Python
+# Test the quality of the code
 
 name: Quality. Lint. Format.
 
