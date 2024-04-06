@@ -27,7 +27,7 @@ jobs:
         id: app-meta
         uses: docker/metadata-action@v5
         with:
-          images: osherkoren/fastapi-src
+          images: osherkoren/fastapi-app
 
       - name: Build and push App Docker image
         uses: docker/build-push-action@v5
@@ -42,7 +42,7 @@ jobs:
         id: processor-meta
         uses: docker/metadata-action@v5
         with:
-          images: osherkoren/kafka-src
+          images: osherkoren/kafka-processor
 
       - name: Build and push Processor Docker image
         uses: docker/build-push-action@v5
