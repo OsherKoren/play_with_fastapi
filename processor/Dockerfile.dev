@@ -43,6 +43,6 @@ ENV PYTHONPATH=/app
 
 COPY ./processor/src ./src
 
-EXPOSE 8001
+EXPOSE 8081
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8001", "--log-level", "debug"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8081", "--log-level", "debug"]

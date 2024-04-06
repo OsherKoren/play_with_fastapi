@@ -32,7 +32,7 @@ jobs:
       - name: Build and push App Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app
+          context: .
           file: ./app/Dockerfile
           push: true
           tags: ${{ steps.app-meta.outputs.tags }}
@@ -47,7 +47,7 @@ jobs:
       - name: Build and push Processor Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./processor
+          context: .
           file: ./processor/Dockerfile
           push: true
           tags: ${{ steps.processor-meta.outputs.tags }}
