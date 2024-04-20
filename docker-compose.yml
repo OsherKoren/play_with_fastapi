@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   db:
-    image: postgres:alpine
+    image: postgres:latest
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
@@ -29,7 +29,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:
@@ -72,12 +72,12 @@ services:
       timeout: 10s
       retries: 3
 
-  processor:
+  worker:
     build:
       context: .
-      dockerfile: processor/Dockerfile
+      dockerfile: worker/Dockerfile
     volumes:
-        - ./processor/src:/app/src
+        - ./worker/src:/app/src
     depends_on:
       kafka:
         condition: service_healthy

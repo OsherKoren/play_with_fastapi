@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   dev-db:
-    image: postgres:16-alpine
+    image: postgres:latest
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
@@ -33,7 +33,7 @@ services:
 
 
   dev-kafka:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - dev-zookeeper
     ports:
@@ -84,12 +84,12 @@ services:
       retries: 3
 
 
-  dev-processor:
+  dev-worker:
     build:
       context: .
-      dockerfile: processor/Dockerfile.dev
+      dockerfile: worker/Dockerfile.dev
     volumes:
-      - ./processor/src:/app/src
+      - ./worker/src:/app/src
     depends_on:
       dev-kafka:
         condition: service_healthy

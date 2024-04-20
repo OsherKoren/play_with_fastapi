@@ -42,7 +42,7 @@ sqlalchemy-stubs = "^0.4"
 
 [tool.isort]
 profile = "black"
-src_paths = ["play_with_fastapi/app_repo", "play_with_fastapi/processor_repo"]
+src_paths = ["play_with_fastapi/app", "play_with_fastapi/worker"]
 honor_noqa = true
 
 [tool.mypy]
