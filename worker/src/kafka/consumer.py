@@ -4,16 +4,14 @@
 
 import asyncio
 import json
-import os
 
 from aiokafka import AIOKafkaConsumer
 from aiokafka.errors import KafkaConnectionError
 from src.db import db_manager
-from src.kafka import producer
+from src.kafka import constants, producer
 from src.logger import log
 from src.mock_ml import predict
 
-BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_CONSUMER: AIOKafkaConsumer | None = None
 
 
@@ -27,7 +25,7 @@ def setup_consumer() -> None:
     if KAFKA_CONSUMER is None:
         KAFKA_CONSUMER = AIOKafkaConsumer(
             "evt.user_message",
-            bootstrap_servers=BOOTSTRAP_SERVERS,
+            bootstrap_servers=constants.BOOTSTRAP_SERVERS,
             group_id="MlEngineersGroup",
             auto_offset_reset="earliest",
         )

@@ -3,13 +3,12 @@
 """Kafka producer"""
 
 import asyncio
-import os
 
 from aiokafka import AIOKafkaProducer
 from aiokafka.errors import KafkaConnectionError
+from src.kafka import constants
 from src.logger import log
 
-BOOTSTRAP_SERVERS: str = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 KAFKA_PRODUCER: AIOKafkaProducer | None = None
 
 
@@ -27,7 +26,7 @@ def setup_producer() -> None:
     global KAFKA_PRODUCER  # pylint: disable=global-statement
 
     if KAFKA_PRODUCER is None:
-        KAFKA_PRODUCER = AIOKafkaProducer(bootstrap_servers=BOOTSTRAP_SERVERS)
+        KAFKA_PRODUCER = AIOKafkaProducer(bootstrap_servers=constants.BOOTSTRAP_SERVERS)
         log.info(" Instancing Kafka Producer ".center(40, "="))
 
 
