@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   db:
-    image: postgres:alpine
+    image: postgres:latest
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
@@ -29,7 +29,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - zookeeper
     ports:

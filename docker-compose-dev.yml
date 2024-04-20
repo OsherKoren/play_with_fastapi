@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   dev-db:
-    image: postgres:16-alpine
+    image: postgres:latest
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
@@ -17,7 +17,6 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-#      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
       test: ["CMD-SHELL",
              "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -d ${POSTGRES_DB} \
              -c 'SELECT 1 FROM accounts LIMIT 1'"]
@@ -34,7 +33,7 @@ services:
 
 
   dev-kafka:
-    image: confluentinc/cp-kafka:7.5.1
+    image: confluentinc/cp-kafka:latest
     depends_on:
       - dev-zookeeper
     ports:
