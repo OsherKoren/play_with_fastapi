@@ -1,0 +1,19 @@
+{
+  "AWSEBDockerrunVersion": "3",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "osherkoren/play_with_fastapi-app:latest",
+      "hostname": "app",
+      "essential": true,
+      "memory": 128
+    },
+    {
+      "name": "worker",
+      "image": "osherkoren/play_with_fastapi-worker:latest",
+      "hostname": "worker",
+      "essential": false,
+      "memory": 128
+    }
+  ]
+}
