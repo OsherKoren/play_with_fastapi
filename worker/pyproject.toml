@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "processor"
+name = "worker"
 version = "0.1.0"
 description = "Processing mocked llm on text data via kafka"
 authors = ["Osher Koren"]
@@ -27,7 +27,7 @@ sqlalchemy-stubs = "^0.4"
 
 [tool.isort]
 profile = "black"
-src_paths = ["processor"]
+src_paths = ["worker"]
 honor_noqa = true
 
 [tool.mypy]

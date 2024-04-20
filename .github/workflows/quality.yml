@@ -43,10 +43,10 @@ jobs:
       run: poetry run black --check .
 
     - name: Run mypy
-      run: poetry run mypy app processor
+      run: poetry run mypy app worker
 
     - name: Run pylint on app
       run: poetry run pylint app
 
-    - name: Run pylint on processor
-      run: poetry run pylint processor
+    - name: Run pylint on worker
+      run: poetry run pylint worker

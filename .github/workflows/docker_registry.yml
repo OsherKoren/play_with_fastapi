@@ -38,17 +38,17 @@ jobs:
           tags: ${{ steps.app-meta.outputs.tags }}
           labels: ${{ steps.app-meta.outputs.labels }}
 
-      - name: Processor Docker metadata (tags, labels)
-        id: processor-meta
+      - name: worker Docker metadata (tags, labels)
+        id: worker-meta
         uses: docker/metadata-action@v5
         with:
-          images: osherkoren/kafka-processor
+          images: osherkoren/kafka-worker
 
-      - name: Build and push Processor Docker image
+      - name: Build and push worker Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./processor/Dockerfile
+          file: ./worker/Dockerfile
           push: true
-          tags: ${{ steps.processor-meta.outputs.tags }}
-          labels: ${{ steps.processor-meta.outputs.labels }}
+          tags: ${{ steps.worker-meta.outputs.tags }}
+          labels: ${{ steps.worker-meta.outputs.labels }}

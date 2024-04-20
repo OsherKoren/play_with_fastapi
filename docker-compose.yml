@@ -72,12 +72,12 @@ services:
       timeout: 10s
       retries: 3
 
-  processor:
+  worker:
     build:
       context: .
-      dockerfile: processor/Dockerfile
+      dockerfile: worker/Dockerfile
     volumes:
-        - ./processor/src:/app/src
+        - ./worker/src:/app/src
     depends_on:
       kafka:
         condition: service_healthy
