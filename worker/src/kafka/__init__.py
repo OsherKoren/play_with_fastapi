@@ -2,4 +2,4 @@
 
 """Initialize Kafka"""
 
-from . import consumer, producer
+from . import constants, consumer, producer

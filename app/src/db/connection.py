@@ -5,7 +5,11 @@
 import os
 
 from databases import Database
+from dotenv import load_dotenv
 from src.logger import log
+
+ENV_FILE = ".env.dev" if os.getenv("DEV_ENV") else ".env"
+load_dotenv(ENV_FILE)
 
 
 def get_database_url():

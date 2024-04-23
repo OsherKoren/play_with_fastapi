@@ -1,13 +1,11 @@
 # !/usr/bin/env python
 
 """Set up Kafka topics."""
-import os
 
 from aiokafka.admin import AIOKafkaAdminClient, NewTopic
 from aiokafka.errors import IncompatibleBrokerVersion, TopicAlreadyExistsError
+from src.kafka import constants
 from src.logger import log
-
-BOOTSTRAP_SERVERS = "dev-kafka:29092" if os.getenv("DEV_ENV") else "kafka:9092"
 
 
 async def setup_topics():
@@ -18,7 +16,7 @@ async def setup_topics():
         TopicAlreadyExistsError: If the Kafka topic already exists.
         IncompatibleBrokerVersion: If there's an issue with the Kafka broker version.
     """
-    admin_client = AIOKafkaAdminClient(bootstrap_servers=BOOTSTRAP_SERVERS)
+    admin_client = AIOKafkaAdminClient(bootstrap_servers=constants.BOOTSTRAP_SERVERS)
     topics = [
         NewTopic("evt.user_message", num_partitions=1, replication_factor=1),
         NewTopic("evt.message_score", num_partitions=1, replication_factor=1),

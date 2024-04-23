@@ -22,6 +22,7 @@ jobs:
       POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
       POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
       POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+      DEV_ENV: "true"
 
     steps:
       - name: Checkout code
@@ -40,22 +41,22 @@ jobs:
 
       - name: Start services with Docker Compose
         id: start_services
-        run: docker-compose -f  docker-compose-dev.yml --env-file ./.env.dev up -d
+        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev up -d --build
 
       - name: Display Docker container logs
         if: always()
         run: |
-          docker-compose -f  docker-compose-dev.yml logs
+          docker-compose logs
 
-      - name: Log dev-db service output
+      - name: Log db service output
         if: failure() && steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-db_1
 
-      - name: Log dev-src service output
+      - name: Log app service output
         if: failure() && steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-app_1
 
-      - name: Log dev-src service output
+      - name: Log worker service output
         if: failure() && steps.start_services.outcome == 'failure'
         run: docker logs play_with_fastapi_dev-worker_1
 

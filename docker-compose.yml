@@ -49,11 +49,11 @@ services:
   app:
     build:
       context: .
-      dockerfile: app/Dockerfile
+      dockerfile: app/Dockerfile.dev
     volumes:
       - ./app/src:/app/src
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -67,7 +67,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
     healthcheck:
       test: ["CMD", "python", "-c",
-             "import urllib.request; urllib.request.urlopen('http://app:80/api/v1/health').read().decode()"]
+             "import urllib.request; urllib.request.urlopen('http://app:8000/api/v1/health').read().decode()"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -75,7 +75,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: worker/Dockerfile
+      dockerfile: worker/Dockerfile.dev
     volumes:
         - ./worker/src:/app/src
     depends_on:
