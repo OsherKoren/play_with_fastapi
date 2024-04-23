@@ -46,7 +46,7 @@ jobs:
       - name: Display Docker container logs
         if: always()
         run: |
-          docker-compose-dev.yml logs
+          docker-compose logs
 
       - name: Log db service output
         if: failure() && steps.start_services.outcome == 'failure'
