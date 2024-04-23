@@ -46,19 +46,19 @@ jobs:
       - name: Display Docker container logs
         if: always()
         run: |
-          docker-compose.yml logs
+          docker-compose-dev.yml logs
 
       - name: Log db service output
         if: failure() && steps.start_services.outcome == 'failure'
-        run: docker logs play_with_fastapi-db_1
+        run: docker logs play_with_fastapi_dev-db_1
 
       - name: Log app service output
         if: failure() && steps.start_services.outcome == 'failure'
-        run: docker logs play_with_fastapi-app_1
+        run: docker logs play_with_fastapi_dev-app_1
 
       - name: Log worker service output
         if: failure() && steps.start_services.outcome == 'failure'
-        run: docker logs play_with_fastapi-worker_1
+        run: docker logs play_with_fastapi_dev-worker_1
 
       - name: List Docker containers
         if: always()
@@ -66,7 +66,7 @@ jobs:
 
       - name: Run tests
         if: steps.start_services.outcome == 'success'
-        run: docker exec play_with_fastapi-app_1 pytest tests/
+        run: docker exec play_with_fastapi_dev-app_1 pytest tests/
 
       - name: Stop services
         if: always()
