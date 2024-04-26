@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate deployment package
-        run: zip -r deploy.zip . -x '*.git*'
+        run: zip -r msg_preds_app.zip . -x '*.git*'
 
       - name: Deploy to dev server
         uses: einaregilsson/beanstalk-deploy@v22
@@ -29,8 +29,8 @@ jobs:
           application_name: 'msg-preds'
           environment_name: 'Msg-preds-env'
           existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
-          version_label: "v1"
-          deployment_package: deploy.zip
+          version_label: "v-${{ github.sha }}"
+          deployment_package: msg_preds_app.zip
           use_existing_version_if_available: true
           wait_for_environment_recovery: 60
 

@@ -1,27 +1,6 @@
 version: '3.9'
 
 services:
-  db:
-    image: postgres:latest
-    volumes:
-      - ./setup_db:/docker-entrypoint-initdb.d
-      - postgres_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
-      POSTGRES_HOST: ${POSTGRES_HOST:-db}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL",
-             "PGPASSWORD=${POSTGRES_PASSWORD} psql -U ${POSTGRES_USER} -h ${POSTGRES_HOST} -d ${POSTGRES_DB} \
-             -c 'SELECT 1 FROM accounts LIMIT 1'"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -47,9 +26,7 @@ services:
       retries: 3
 
   app:
-    build:
-      context: .
-      dockerfile: app/Dockerfile.dev
+    image: osherkoren/fastapi-app:latest
     volumes:
       - ./app/src:/app/src
     ports:
@@ -73,9 +50,7 @@ services:
       retries: 3
 
   worker:
-    build:
-      context: .
-      dockerfile: worker/Dockerfile.dev
+    image: osherkoren/kafka-worker:latest
     volumes:
         - ./worker/src:/app/src
     depends_on:
