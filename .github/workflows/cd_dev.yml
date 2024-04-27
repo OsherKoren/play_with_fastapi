@@ -29,8 +29,8 @@ jobs:
           application_name: 'msg-preds'
           environment_name: 'Msg-preds-env'
           existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
-          version_label: "v-${{ github.sha }}"
-          deployment_package: msg_preds_app.zip
+          version_label: "v-${{ github.run_number }}"
+          deployment_package: docker-compose.yml
           use_existing_version_if_available: true
           wait_for_environment_recovery: 60
 
