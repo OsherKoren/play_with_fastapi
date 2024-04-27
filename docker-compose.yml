@@ -26,7 +26,7 @@ services:
       retries: 3
 
   app:
-    image: osherkoren/fastapi-app:main
+    image: osherkoren/fastapi-app:latest
     volumes:
       - ./app/src:/app/src
     ports:
@@ -48,7 +48,7 @@ services:
       retries: 3
 
   worker:
-    image: osherkoren/kafka-worker:main
+    image: osherkoren/kafka-worker:latest
     volumes:
         - ./worker/src:/app/src
     depends_on:
@@ -62,6 +62,3 @@ services:
       POSTGRES_HOST: ${POSTGRES_HOST:-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
       POSTGRES_DB: ${POSTGRES_DB:-postgres}
-
-volumes:
-  postgres_data:
