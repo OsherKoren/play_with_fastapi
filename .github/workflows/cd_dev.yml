@@ -3,10 +3,10 @@
 name: Deploy main to dev
 
 on:
-  pull_request:
-    types: [ closed ]
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Register Docker images"]
+    types:
+      - completed
 
 jobs:
   deploy:
