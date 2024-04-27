@@ -26,7 +26,7 @@ services:
       retries: 3
 
   app:
-    image: osherkoren/fastapi-app:latest
+    image: osherkoren/fastapi-app:main
     volumes:
       - ./app/src:/app/src
     ports:
@@ -48,7 +48,7 @@ services:
       retries: 3
 
   worker:
-    image: osherkoren/kafka-worker:latest
+    image: osherkoren/kafka-worker:main
     volumes:
         - ./worker/src:/app/src
     depends_on:
