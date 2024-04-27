@@ -35,7 +35,7 @@ jobs:
           context: .
           file: ./app/Dockerfile
           push: true
-          tags: latest
+          tags: ${{ steps.app-meta.outputs.tags }}
           labels: ${{ steps.app-meta.outputs.labels }}
 
       - name: worker Docker metadata (tags, labels)
@@ -50,5 +50,5 @@ jobs:
           context: .
           file: ./worker/Dockerfile
           push: true
-          tags: latest
+          tags: ${{ steps.worker-meta.outputs.tags }}
           labels: ${{ steps.worker-meta.outputs.labels }}
