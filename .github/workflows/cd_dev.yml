@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Generate deployment package
-        run: zip -r msg_preds_app.zip . -x '*.git*' -x '.dockerignore' -x 'app/src/Dockerfile' -x 'worker/src/Dockerfile' -x 'app/src/Dockerfile.dev' -x -x 'worker/src/Dockerfile.dev' -x '.env.example' -x '.env.dev' -x '.env.prod' -x '.env.test' -x '.github/*' -x 'docker-compose*' -x '.env.dev.example'
+        run: zip -r msg_preds_app.zip . -x '*.git*'
 
       - name: Deploy to dev server
         uses: einaregilsson/beanstalk-deploy@v22
@@ -34,7 +34,8 @@ jobs:
           use_existing_version_if_available: true
           wait_for_environment_recovery: 60
 
-      - name: elastic benstalk logs
+      - name: elastic beanstalk logs
+        if: failure()
         run: |
           eb logs
 
