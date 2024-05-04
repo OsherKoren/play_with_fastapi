@@ -58,6 +58,7 @@ jobs:
           wait_for_environment_recovery: 60
 
       - name: Deploy worker to dev server
+        if: always()
         uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
