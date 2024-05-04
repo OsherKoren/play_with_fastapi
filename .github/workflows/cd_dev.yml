@@ -51,7 +51,7 @@ jobs:
           region: 'eu-west-3'
           application_name: 'msg-preds'
           environment_name: 'Msg-preds-env'
-          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235/msg_preds'
+          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
           version_label: "msg_preds_app-v${{ github.run_number }}"
           deployment_package: msg_preds_app.zip
           use_existing_version_if_available: true
@@ -65,7 +65,7 @@ jobs:
           region: 'eu-west-3'
           application_name: 'msg-preds-worker'
           environment_name: 'Msg-preds-worker-env'
-          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235/msg_preds'
+          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
           version_label: "msg_preds_worker-v${{ github.run_number }}"
           deployment_package: msg_preds_worker.zip
           use_existing_version_if_available: true
