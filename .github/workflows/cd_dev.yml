@@ -18,30 +18,30 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Package app code
-        run: cd app && zip -r ../msg_preds_app.zip . -x '*.git*'
+        run: cd app && zip -r msg_preds_app.zip . -x '*.git*'
 
       - name: Package worker code
-        run: cd worker && zip -r ../msg_preds_worker.zip . -x '*.git*'
+        run: cd worker && zip -r msg_preds_worker.zip . -x '*.git*'
 
-      - name: Upload app package to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read
-        env:
-          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
-          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
-          SOURCE_DIR: msg_preds_app.zip
-
-      - name: Upload worker package to S3
-        uses: jakejarvis/s3-sync-action@master
-        with:
-          args: --acl public-read
-        env:
-          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
-          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
-          SOURCE_DIR: msg_preds_worker.zip
+#      - name: Upload app package to S3
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read
+#        env:
+#          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
+#          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+#          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
+#          SOURCE_DIR: msg_preds_app.zip
+#
+#      - name: Upload worker package to S3
+#        uses: jakejarvis/s3-sync-action@master
+#        with:
+#          args: --acl public-read
+#        env:
+#          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
+#          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+#          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
+#          SOURCE_DIR: msg_preds_worker.zip
 
       - name: Deploy to dev server
         uses: einaregilsson/beanstalk-deploy@v22
