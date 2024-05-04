@@ -34,10 +34,5 @@ jobs:
           use_existing_version_if_available: true
           wait_for_environment_recovery: 60
 
-      - name: elastic beanstalk logs
-        if: failure()
-        run: |
-          eb logs
-
       - name: "Successfully run CD pipeline"
         run: echo "CD part completed successfully"
