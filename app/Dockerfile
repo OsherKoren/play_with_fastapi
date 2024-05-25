@@ -12,7 +12,7 @@ ARG POETRY_VERSION=1.7.1
 
 WORKDIR /app
 
-COPY app/pyproject.toml .
+COPY pyproject.toml .
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
@@ -40,7 +40,7 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY ./app/src ./src
+COPY ./src ./src
 
 EXPOSE 80
 
