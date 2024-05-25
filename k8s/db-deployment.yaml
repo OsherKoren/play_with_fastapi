@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
+    kompose.version: 1.33.0 (3ce457399)
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
+        kompose.version: 1.33.0 (3ce457399)
+      labels:
+        io.kompose.network/play-with-fastapi-default: "true"
+        io.kompose.service: db
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: accounts_db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: pguser
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: pgpassword
+
+          image: postgres:latest
+          livenessProbe:
+            exec:
+              command:
+                - PGPASSWORD= psql -U  -h  -d  -c 'SELECT 1 FROM accounts LIMIT 1'
+            failureThreshold: 3
+            periodSeconds: 30
+            timeoutSeconds: 10
+          name: db
+          ports:
+            - containerPort: 5432
+              hostPort: 5432
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /docker-entrypoint-initdb.d
+              name: db-cm0
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: db-cm0
+          name: db-cm0
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data

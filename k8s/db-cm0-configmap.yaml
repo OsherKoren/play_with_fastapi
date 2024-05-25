@@ -1,0 +1,77 @@
+apiVersion: v1
+data:
+  01_create_role.sh: |
+    #!/bin/bash
+
+    # Create postgres role based on environment variable
+    if psql -U postgres -c "SELECT rolname FROM pg_roles" | grep -qw "$POSTGRES_USER"; then
+      echo "Role $POSTGRES_USER already exists"
+    else
+      psql -U postgres -c "CREATE ROLE $POSTGRES_USER WITH LOGIN PASSWORD '$POSTGRES_PASSWORD';"
+      echo "Role $POSTGRES_USER created successfully"
+    fi
+  02_create_db.sh: |
+    #!/bin/bash
+
+    # Create the database based on environment variable
+    echo "Checking if database $POSTGRES_DB exists"
+    if psql -U "$POSTGRES_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='$POSTGRES_DB'" | grep -q 1; then
+      echo "Database $POSTGRES_DB already exists"
+    else
+      echo "Creating database $POSTGRES_DB"
+      psql -U "$POSTGRES_USER" -c "CREATE DATABASE $POSTGRES_DB;"
+      echo "Database $POSTGRES_DB created successfully"
+    fi
+  03_create_tables.sql: |
+    -- accounts table
+    CREATE TABLE IF NOT EXISTS accounts (
+        account_id SERIAL PRIMARY KEY,
+        first_name VARCHAR(20),
+        surname VARCHAR(20),
+        email VARCHAR(50),
+        phone VARCHAR(15),
+        birthday TIMESTAMP,
+        gender VARCHAR(10)
+    );
+
+    -- messages table
+    CREATE TABLE IF NOT EXISTS messages (
+        message_id SERIAL PRIMARY KEY,
+        account_id INTEGER REFERENCES accounts(account_id),
+        message VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- messages_predictions table
+    CREATE TABLE IF NOT EXISTS messages_predictions (
+        prediction_id SERIAL PRIMARY KEY,
+        message_id INTEGER REFERENCES messages(message_id) UNIQUE,
+        score FLOAT,
+        predicted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  04_insert_into_accounts.sql: |
+    -- Check if the accounts table is empty
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1 FROM accounts LIMIT 1
+        )
+        THEN
+            -- Insert accounts data
+            INSERT INTO accounts (first_name, surname, email, phone, birthday, gender)
+            VALUES
+                ('Alice', 'Smith', 'alice.smith@example.com', '001456789000', '1992-03-15', 'Female'),
+                ('Bob', 'Johnson', 'bob.johnson@example.com', '972765432101', '1988-07-22', 'Male'),
+                ('Charlie', 'Brown', 'charlie.brown@example.com', '001233445588', '1990-05-30', 'Male'),
+                ('Diana', 'Williams', 'diana.williams@example.com', '972528877665', '1995-01-10', 'Female'),
+                ('Ethan', 'Davis', 'ethan.davis@example.com', '972535432105', '1989-11-05', 'Male');
+            RAISE NOTICE 'Accounts inserted successfully.';
+        ELSE
+            RAISE NOTICE 'Accounts table already contains data. No need to insert.';
+        END IF;
+    END $$;
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: db
+  name: db-cm0
