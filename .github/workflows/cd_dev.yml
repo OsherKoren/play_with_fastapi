@@ -12,65 +12,45 @@ jobs:
   deploy:
     environment: dev
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Package app code
-        run: cd app && zip -r ../msg_preds_app.zip . -x '*.git*'
-
-      - name: Package worker code
-        run: cd worker && zip -r ../msg_preds_worker.zip . -x '*.git*'
-
-#      - name: Upload app package to S3
-#        uses: jakejarvis/s3-sync-action@master
-#        with:
-#          args: --acl public-read
-#        env:
-#          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
-#          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-#          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
-#          SOURCE_DIR: msg_preds_app.zip
 #
-#      - name: Upload worker package to S3
-#        uses: jakejarvis/s3-sync-action@master
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Package app code
+#        run: cd app && zip -r ../msg_preds_app.zip . -x '*.git*'
+#
+#      - name: Package worker code
+#        run: cd worker && zip -r ../msg_preds_worker.zip . -x '*.git*'
+#
+#      - name: Deploy to dev server
+#        uses: einaregilsson/beanstalk-deploy@v22
 #        with:
-#          args: --acl public-read
-#        env:
-#          AWS_S3_BUCKET: 'elasticbeanstalk-eu-west-3-727864369235'
-#          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-#          AWS_SECRET_ACCESS: ${{ secrets.AWS_SECRET_KEY }}
-#          SOURCE_DIR: msg_preds_worker.zip
-
-      - name: Deploy to dev server
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          region: 'eu-west-3'
-          application_name: 'msg-preds'
-          environment_name: 'Msg-preds-env'
-          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
-          version_label: "msg_preds_app-v${{ github.run_number }}"
-          deployment_package: msg_preds_app.zip
-          use_existing_version_if_available: true
-          wait_for_environment_recovery: 60
-
-      - name: Deploy worker to dev server
-        if: always()
-        uses: einaregilsson/beanstalk-deploy@v22
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
-          region: 'eu-west-3'
-          application_name: 'msg-preds-worker'
-          environment_name: 'Msg-preds-worker-env'
-          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
-          version_label: "msg_preds_worker-v${{ github.run_number }}"
-          deployment_package: msg_preds_worker.zip
-          use_existing_version_if_available: true
-          wait_for_environment_recovery: 60
-
-      - name: "Successfully run CD pipeline"
-        run: echo "CD part completed successfully"
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+#          region: 'eu-west-3'
+#          application_name: 'msg-preds'
+#          environment_name: 'Msg-preds-env'
+#          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
+#          version_label: "msg_preds_app-v${{ github.run_number }}"
+#          deployment_package: msg_preds_app.zip
+#          use_existing_version_if_available: true
+#          wait_for_environment_recovery: 60
+#
+#      - name: Deploy worker to dev server
+#        if: always()
+#        uses: einaregilsson/beanstalk-deploy@v22
+#        with:
+#          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+#          aws_secret_key: ${{ secrets.AWS_SECRET_KEY }}
+#          region: 'eu-west-3'
+#          application_name: 'msg-preds-worker'
+#          environment_name: 'Msg-preds-worker-env'
+#          existing_bucket_name: 'elasticbeanstalk-eu-west-3-727864369235'
+#          version_label: "msg_preds_worker-v${{ github.run_number }}"
+#          deployment_package: msg_preds_worker.zip
+#          use_existing_version_if_available: true
+#          wait_for_environment_recovery: 60
+#
+#      - name: "Successfully run CD pipeline"
+#        run: echo "CD part completed successfully"
