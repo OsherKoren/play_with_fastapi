@@ -48,8 +48,8 @@ services:
 
   app:
     build:
-      context: .
-      dockerfile: ./app/Dockerfile
+      context: ./app
+      dockerfile: Dockerfile
     volumes:
       - ./app/src:/app/src
     ports:
@@ -74,8 +74,8 @@ services:
 
   worker:
     build:
-      context: .
-      dockerfile: ./worker/Dockerfile
+      context: ./worker
+      dockerfile: Dockerfile
     volumes:
         - ./worker/src:/app/src
     depends_on:

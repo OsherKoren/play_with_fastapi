@@ -36,7 +36,7 @@ spec:
               value: "5432"
             - name: POSTGRES_USER
               value: postgres
-          image: osherkoren/kafka-worker:v1.34
+          image: osherkoren/kafka-worker:1.36
           name: worker
           volumeMounts:
             - mountPath: /app/src
