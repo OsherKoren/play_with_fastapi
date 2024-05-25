@@ -41,7 +41,7 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY ./src ./src
+COPY src ./src
 
 EXPOSE 81
 
