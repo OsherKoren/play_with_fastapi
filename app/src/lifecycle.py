@@ -8,7 +8,8 @@ and performing startup and shutdown actions.
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from src.db import connection as db_connection
+
+from .db import connection as db_connection
 
 
 @asynccontextmanager

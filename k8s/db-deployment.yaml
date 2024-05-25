@@ -38,7 +38,7 @@ spec:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
 
-          image: postgres:latest
+          image: postgres:alpine3.20
           livenessProbe:
             exec:
               command:
