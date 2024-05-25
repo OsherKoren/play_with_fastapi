@@ -32,8 +32,8 @@ jobs:
       - name: Build and push App Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./app
-          file: Dockerfile
+          context: .
+          file: ./app/Dockerfile
           push: true
           tags: >
               ${{ secrets.DOCKER_USERNAME }}/fastapi-app:1.${{github.run_number}},
@@ -49,8 +49,8 @@ jobs:
       - name: Build and push worker Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./worker
-          file: Dockerfile
+          context: .
+          file: ./worker/Dockerfile
           push: true
           tags: >
             ${{ secrets.DOCKER_USERNAME }}/kafka-worker:1.${{github.run_number}},
