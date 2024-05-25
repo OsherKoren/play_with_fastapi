@@ -42,8 +42,8 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY app/src /app/src
-COPY app/tests /app/tests
+COPY src ./src
+COPY tests ./tests
 
 EXPOSE 8000
 
