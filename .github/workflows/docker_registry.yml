@@ -36,7 +36,7 @@ jobs:
           file: ./app/Dockerfile
           push: true
           tags: >
-              ${{ secrets.DOCKER_USERNAME }}/fastapi-app:v1.${{github.run_number}},
+              ${{ secrets.DOCKER_USERNAME }}/fastapi-app:1.${{github.run_number}},
               ${{ secrets.DOCKER_USERNAME }}/fastapi-app:latest
           labels: ${{ steps.app-meta.outputs.labels }}
 
@@ -53,6 +53,6 @@ jobs:
           file: ./worker/Dockerfile
           push: true
           tags: >
-            ${{ secrets.DOCKER_USERNAME }}/kafka-worker:v1.${{github.run_number}},
+            ${{ secrets.DOCKER_USERNAME }}/kafka-worker:1.${{github.run_number}},
             ${{ secrets.DOCKER_USERNAME }}/kafka-worker:latest
           labels: ${{ steps.worker-meta.outputs.labels }}

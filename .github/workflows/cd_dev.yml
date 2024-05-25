@@ -12,10 +12,10 @@ jobs:
   deploy:
     environment: dev
     runs-on: ubuntu-latest
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v4
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 #
 #      - name: Package app code
 #        run: cd app && zip -r ../msg_preds_app.zip . -x '*.git*'
