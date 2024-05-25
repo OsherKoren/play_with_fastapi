@@ -41,7 +41,7 @@ RUN set -ex \
 
 ENV PYTHONPATH=/app
 
-COPY ./src /app/src
+COPY worker/src /app/src
 
 EXPOSE 8081
 
