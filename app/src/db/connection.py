@@ -45,7 +45,7 @@ def get_database_url():
     user = os.getenv("POSTGRES_USER")
     password = os.getenv("POSTGRES_PASSWORD")
     hostname = os.getenv("POSTGRES_HOST", "localhost")
-    port = os.getenv("POSTGRES_PORT")
+    port = os.getenv("POSTGRES_PORT", 5432)
     db_name = os.getenv("POSTGRES_DB")
 
     if None in (user, password, port, db_name):

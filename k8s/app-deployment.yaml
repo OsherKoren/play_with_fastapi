@@ -27,6 +27,10 @@ spec:
         - env:
             - name: PYTHONPATH
               value: /app
+            - name: POSTGRES_HOST
+              value: db
+            - name: POSTGRES_PORT
+              value: "5432"
             - name: POSTGRES_DB
               value: accounts_db
             - name: POSTGRES_USER
@@ -40,7 +44,7 @@ spec:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
 
-          image: osherkoren/fastapi-app:1.36
+          image: osherkoren/fastapi-app:1.40
           livenessProbe:
             exec:
               command:
@@ -55,11 +59,4 @@ spec:
             - containerPort: 80
               hostPort: 80
               protocol: TCP
-          volumeMounts:
-            - mountPath: /app/src
-              name: app-cm0
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: app-cm0
-          name: app-cm0
