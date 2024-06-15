@@ -47,11 +47,12 @@ services:
       retries: 3
 
   app:
-    build:
-      context: ./app
-      dockerfile: Dockerfile
-    volumes:
-      - ./app/src:/app/src
+    image: osherkoren/fastapi-app:1.40
+#    build:
+#      context: ./app
+#      dockerfile: Dockerfile
+#    volumes:
+#      - ./app/src:/app/src
     ports:
       - "80:80"
     depends_on:
@@ -73,11 +74,12 @@ services:
       retries: 3
 
   worker:
-    build:
-      context: ./worker
-      dockerfile: Dockerfile
-    volumes:
-        - ./worker/src:/app/src
+    image: osherkoren/kafka-worker:1.40
+#    build:
+#      context: ./worker
+#      dockerfile: Dockerfile
+#    volumes:
+#        - ./worker/src:/app/src
     depends_on:
       kafka:
         condition: service_healthy

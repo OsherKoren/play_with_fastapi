@@ -21,18 +21,27 @@ spec:
         io.kompose.network/play-with-fastapi-default: "true"
         io.kompose.service: kafka
     spec:
+      enableServiceLinks: false
       containers:
         - env:
             - name: KAFKA_ADVERTISED_LISTENERS
               value: PLAINTEXT://kafka:9092
             - name: KAFKA_BROKER_ID
               value: "1"
+            - name: KAFKA_ZOOKEEPER_CONNECT
+              value: zookeeper:2181
             - name: KAFKA_LOG_DIRS
               value: /tmp/kafka-logs
             - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
               value: "1"
-            - name: KAFKA_ZOOKEEPER_CONNECT
-              value: zookeeper:2181
+          resources:
+            requests:
+              memory: "512Mi"   # Request half a GB of memory
+              cpu: "0.5"        # Request 0.5 CPU cores
+            limits:
+              memory: "1Gi"     # Limit memory usage to 1 GB
+              cpu: "1"          # Limit CPU usage to 1 core
+
           image: confluentinc/cp-kafka:7.6.1
           livenessProbe:
             exec:

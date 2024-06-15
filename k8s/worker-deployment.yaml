@@ -27,22 +27,27 @@ spec:
         - env:
             - name: PYTHONPATH
               value: /app
-            - name: POSTGRES_DB
-              value: postgres
             - name: POSTGRES_HOST
               value: db
-            - name: POSTGRES_PASSWORD
             - name: POSTGRES_PORT
               value: "5432"
+            - name: POSTGRES_DB
+              value: accounts_db
             - name: POSTGRES_USER
-              value: postgres
-          image: osherkoren/kafka-worker:1.36
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_USER
+                  name: pguser
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: pgpassword
+
+          image: osherkoren/kafka-worker:1.40
           name: worker
-          volumeMounts:
-            - mountPath: /app/src
-              name: worker-cm0
+          ports:
+            - containerPort: 81
+              hostPort: 81
+              protocol: TCP
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: worker-cm0
-          name: worker-cm0
