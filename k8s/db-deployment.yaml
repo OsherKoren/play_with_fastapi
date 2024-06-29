@@ -24,7 +24,9 @@ spec:
         io.kompose.service: db
     spec:
       containers:
-        - env:
+        - name: db
+          image: postgres:alpine3.20
+          env:
             - name: POSTGRES_DB
               value: accounts_db
             - name: POSTGRES_USER
@@ -37,8 +39,14 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
+          resources:
+            requests:
+              memory: "512Mi"   # Request half a GB of memory
+              cpu: "0.5"        # Request 0.5 CPU cores
+            limits:
+              memory: "1Gi"     # Limit memory usage to 1 GB
+              cpu: "1"          # Limit CPU usage to 1 core
 
-          image: postgres:alpine3.20
           livenessProbe:
             exec:
               command:
@@ -46,21 +54,20 @@ spec:
             failureThreshold: 3
             periodSeconds: 30
             timeoutSeconds: 10
-          name: db
           ports:
             - containerPort: 5432
               hostPort: 5432
               protocol: TCP
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
-              name: db-cm0
+              name: db-init
             - mountPath: /var/lib/postgresql/data
               name: postgres-data
       restartPolicy: Always
       volumes:
-        - configMap:
-            name: db-cm0
-          name: db-cm0
+        - name: db-init
+          configMap:
+            name: db-init
         - name: postgres-data
           persistentVolumeClaim:
             claimName: postgres-data

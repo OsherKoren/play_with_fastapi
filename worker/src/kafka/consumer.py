@@ -27,13 +27,13 @@ def setup_consumer() -> None:
             "evt.user_message",
             bootstrap_servers=constants.BOOTSTRAP_SERVERS,
             group_id="MlEngineersGroup",
-            auto_offset_reset="earliest",
+            auto_offset_reset="latest",
         )
         log.info(" Instancing Kafka Consumer ".center(40, "="))
 
 
 # pylint: disable=R0801
-async def start_consumer(retries: int = 3) -> None:
+async def start_consumer() -> None:
     """
     Starts an AIOKafkaConsumer instance connection to the kafka broker.
 
@@ -46,22 +46,26 @@ async def start_consumer(retries: int = 3) -> None:
         ConnectionError: If failed to connect to Kafka after the specified number of retry attempts.
     """
     setup_consumer()
-
     assert KAFKA_CONSUMER
-    for i in range(1, retries + 1):
+
+    async def _connect_consumer(trials: int = 3):
         try:
             await KAFKA_CONSUMER.start()
             log.info(" Connected to Kafka ".center(40, "="))
-            return
+            return KAFKA_CONSUMER
         except KafkaConnectionError as err:
             log.error(f"Failed to connect to Kafka: {err}")
-            if i <= retries:
-                log.info(f"Retrying in 1 second... (Attempt {i} of {retries}")
+            trials -= 1
+            if trials > 0:
+                log.info(f"Retrying in 1 second... (Attempt {3 - trials} of 3")
                 await asyncio.sleep(1)
+                await _connect_consumer(trials)
             else:
                 raise ConnectionError(
-                    f"Failed to connect to Kafka after {retries} attempts."
+                    "Failed to connect to Kafka after 3 attempts."
                 ) from err
+
+    await _connect_consumer()
 
 
 async def shutdown_consumer() -> None:
@@ -73,44 +77,44 @@ async def shutdown_consumer() -> None:
         log.info(" Shutting Down Consumer ".center(40, "="))
 
 
-async def get_consumer() -> AIOKafkaConsumer:
-    """
-    Creates and starts an AIOKafkaConsumer instance.
-
-    Returns:
-        AIOKafkaConsumer: An instance of AIOKafkaConsumer connected to the specified Kafka
-        bootstrap servers.
-
-    Raises:
-        KafkaConnectionError: If failed to connect to Kafka
-        after the specified number of retry attempts.
-    """
-    setup_consumer()
-
-    assert KAFKA_CONSUMER
-
-    async def _connect_consumer():
-
-        for i in range(1, 4):
-            try:
-                await KAFKA_CONSUMER.start()
-                log.info(" Connected to Kafka ".center(40, "="))
-                return KAFKA_CONSUMER
-            except KafkaConnectionError as err:
-                log.error(f"Failed to connect to Kafka: {err}")
-                if i <= 3:
-                    log.info(f"Retrying in 1 second... (Attempt {i} of 3")
-                    await asyncio.sleep(1)
-                else:
-                    raise ConnectionError(
-                        "Failed to connect to Kafka after 3 attempts."
-                    ) from err
-
-    try:
-        yield await _connect_consumer()
-    finally:
-        await KAFKA_CONSUMER.stop()
-        log.info(" Producer Stopped ".center(40, "="))
+# async def get_consumer() -> AIOKafkaConsumer:
+#     """
+#     Creates and starts an AIOKafkaConsumer instance.
+#
+#     Returns:
+#         AIOKafkaConsumer: An instance of AIOKafkaConsumer connected to the specified Kafka
+#         bootstrap servers.
+#
+#     Raises:
+#         KafkaConnectionError: If failed to connect to Kafka
+#         after the specified number of retry attempts.
+#     """
+#     setup_consumer()
+#
+#     assert KAFKA_CONSUMER
+#
+#     async def _connect_consumer():
+#
+#         for i in range(1, 4):
+#             try:
+#                 await KAFKA_CONSUMER.start()
+#                 log.info(" Connected to Kafka ".center(40, "="))
+#                 return KAFKA_CONSUMER
+#             except KafkaConnectionError as err:
+#                 log.error(f"Failed to connect to Kafka: {err}")
+#                 if i <= 3:
+#                     log.info(f"Retrying in 1 second... (Attempt {i} of 3")
+#                     await asyncio.sleep(1)
+#                 else:
+#                     raise ConnectionError(
+#                         "Failed to connect to Kafka after 3 attempts."
+#                     ) from err
+#
+#     try:
+#         yield await _connect_consumer()
+#     finally:
+#         await KAFKA_CONSUMER.stop()
+#         log.info(" Producer Stopped ".center(40, "="))
 
 
 async def consume_messages() -> None:

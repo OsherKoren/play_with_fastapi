@@ -8,7 +8,7 @@ metadata:
     io.kompose.service: worker
   name: worker
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: worker
@@ -27,6 +27,10 @@ spec:
         - env:
             - name: PYTHONPATH
               value: /app
+            - name: KAFKA_HOST
+              value: "kafka"
+            - name: KAFKA_PORT
+              value: "9092"
             - name: POSTGRES_HOST
               value: db
             - name: POSTGRES_PORT
@@ -43,8 +47,15 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
+          resources:
+            requests:
+              memory: "512Mi"   # Request half a GB of memory
+              cpu: "0.5"        # Request 0.5 CPU cores
+            limits:
+              memory: "1Gi"     # Limit memory usage to 1 GB
+              cpu: "1"          # Limit CPU usage to 1 core
 
-          image: osherkoren/kafka-worker:1.40
+          image: osherkoren/kafka-worker:1.42
           name: worker
           ports:
             - containerPort: 81
