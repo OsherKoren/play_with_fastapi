@@ -1,16 +1,41 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/ingress-class: nginx
   name: app-ingress
+
 spec:
+  ingressClassName: nginx  # IngressClass name for nginx controller
   rules:
   - host: msg-preds.com
     http:
       paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: app
-            port:
-              number: 80
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: app
+              port:
+                number: 80
+        - path: /docs
+          pathType: Exact
+          backend:
+            service:
+              name: app
+              port:
+                number: 80
+        - path: /api/v1/health
+          pathType: Exact
+          backend:
+            service:
+              name: app
+              port:
+                number: 80
+        - path: /api/v1/messages
+          pathType: Prefix
+          backend:
+            service:
+              name: app
+              port:
+                number: 80
