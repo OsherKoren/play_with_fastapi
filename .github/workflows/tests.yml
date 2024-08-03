@@ -48,7 +48,7 @@ jobs:
       - name: Display Docker container logs
         if: always()
         run: |
-          docker-compose -f docker-compose-dev.yml logs
+          docker compose -f docker-compose-dev.yml logs
 
       - name: Log db service output
         if: failure() && steps.start_services.outcome == 'failure'
@@ -72,4 +72,4 @@ jobs:
 
       - name: Stop services
         if: always()
-        run: docker-compose -f docker-compose-dev.yml --env-file ./.env.dev down
+        run: docker compose -f docker-compose-dev.yml --env-file ./.env.dev down

@@ -48,7 +48,7 @@ spec:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
 
-          image: osherkoren/fastapi-app:1.42
+          image: osherkoren/fastapi-app:1.43
           livenessProbe:
             exec:
               command:

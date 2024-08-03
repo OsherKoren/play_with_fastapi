@@ -42,7 +42,7 @@ spec:
               memory: "1Gi"     # Limit memory usage to 1 GB
               cpu: "1"          # Limit CPU usage to 1 core
 
-          image: confluentinc/cp-kafka:7.6.1
+          image: confluentinc/cp-kafka:7.7.0
           livenessProbe:
             exec:
               command:
