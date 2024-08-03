@@ -43,6 +43,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: dev-zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://dev-kafka:29092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "false"
       KAFKA_LOG_DIRS: /tmp/kafka-logs-dev
       DEV_ENV: "true"
     healthcheck:
@@ -51,6 +53,35 @@ services:
       timeout: 10s
       retries: 3
 
+
+  dev-init-kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      dev-kafka:
+        condition: service_healthy
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      '
+      echo -e "Checking and creating Kafka topics if necessary"
+
+      # Function to create a topic if it does not exist
+      create_topic_if_not_exists() {
+        local topic_name=$1
+        if kafka-topics --bootstrap-server dev-kafka:29092 --list | grep -q "^${topic_name}$"; then
+          echo -e "Topic ${topic_name} already exists"
+        else
+          echo -e "Creating topic ${topic_name} ..."
+          kafka-topics --bootstrap-server dev-kafka:29092 --create --topic ${topic_name} --replication-factor 1 --partitions 1
+        fi
+      }
+      # Check and create topics
+      echo "Topic evt.userMessage"  # Debug statement
+      create_topic_if_not_exists evt.userMessage
+      echo "Topic evt.messageScore"  # Debug statement
+      create_topic_if_not_exists evt.messageScore
+
+      echo -e "Successfully checked and created topics as needed"
+      '
 
   dev-app:
     restart: always
@@ -67,6 +98,8 @@ services:
         condition: service_healthy
       dev-kafka:
         condition: service_healthy
+      dev-init-kafka:
+        condition: service_completed_successfully
     env_file:
       - .env.dev
     environment:

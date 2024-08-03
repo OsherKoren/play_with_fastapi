@@ -52,7 +52,6 @@ async def get_messages():
 async def send_message(
     payload: schemas.MessageIn,
     account: dict = Depends(authentication.get_current_user),
-    kafka_producer: AIOKafkaProducer = Depends(producer.get_producer),
 ) -> JSONResponse:
     """
     Store the user message in the database and send it to the Kafka topic.
@@ -60,7 +59,6 @@ async def send_message(
     Args:
         payload (schemas.MessageIn): The message payload.
         account (dict): The user account information obtained from authentication.
-        kafka_producer: AIOKafkaProducer: The Kafka producer instance connected to the broker.
 
     Returns:
         dict: A dictionary containing message details including the predicted score.
@@ -82,8 +80,10 @@ async def send_message(
         kafka_message, default=pydantic_core.to_jsonable_python
     ).encode("utf-8")
     try:
-        await kafka_producer.send_and_wait("evt.user_message", value=message_serialized)
-        log.info(f"Message sent to topic evt.user_message: {kafka_message}")
+        await producer.KAFKA_PRODUCER.send_and_wait(
+            "evt.userMessage", value=message_serialized
+        )
+        log.info(f"Message sent to topic evt.userMessage: {kafka_message}")
 
         job_id = f"{created_at.isoformat()}_{message_id}"
         return JSONResponse(

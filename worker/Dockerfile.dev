@@ -8,11 +8,11 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     # cache is useless in docker image, so disable to reduce image size
     PIP_NO_CACHE_DIR=1
 
-ARG POETRY_VERSION=1.7.1
+ARG POETRY_VERSION=1.8.3
 
 WORKDIR /app
 
-COPY pyproject.toml .
+COPY pyproject.toml ./pyproject.toml
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
@@ -45,4 +45,4 @@ COPY src ./src
 
 EXPOSE 8081
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8081", "--log-level", "debug", "--workers", "2"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8081", "--log-level", "debug"]

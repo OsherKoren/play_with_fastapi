@@ -10,6 +10,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from .db import connection as db_connection
+from .kafka import producer
 
 
 @asynccontextmanager
@@ -30,7 +31,9 @@ async def lifespan(app: FastAPI):  # pylint: disable=unused-argument
         Any exceptions raised during the setup, application execution, or teardown phases.
     """
     await db_connection.start_database()
+    await producer.start_producer()
     try:
         yield
     finally:
+        await producer.shutdown_producer()
         await db_connection.shutdown_database()

@@ -3,8 +3,6 @@
 """pytest fixtures for the Messages API endpoints tests"""
 
 import pytest
-from asgi_lifespan import LifespanManager
-from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from src import main
 
@@ -25,17 +23,8 @@ def base_url():
 
 
 @pytest.fixture
-def test_app():
-    """Create a FastAPI test client"""
-    with TestClient(main.app) as client:
-        print("Client is ready for testing - sync way")
-        yield client
-
-
-@pytest.fixture
 async def async_test_app(anyio_backend, base_url):
     """Create an AsyncAPI test client"""
-    async with LifespanManager(main.app):
-        async with AsyncClient(app=main.app, base_url=base_url) as async_client:
-            print("Async Client is ready for testing")
-            yield async_client
+    async with AsyncClient(app=main.app, base_url=base_url) as async_client:
+        print("Async Client is ready for testing")
+        yield async_client

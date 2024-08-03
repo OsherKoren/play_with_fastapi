@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-aiokafka = "^0.10.0"
+aiokafka = "^0.11.0"
 fastapi = "^0.109.2"
 pydantic = {extras = ["email"], version = "^2.6.1"}
 uvicorn = "^0.27.0.post1"
@@ -21,7 +21,6 @@ tomli = { version = "^1.2.1", python = "3.10" }
 #[tool.poetry.group.test.dependencies]
 #pytest = "^8.0.0"
 #pytest-cov = "^4.1.0"
-#asgi-lifespan = "^2.1.0"
 #httpx = "^0.26.0"
 #anyio = {extras = ["asyncio"], version = "^4.2.0"}
 

@@ -32,8 +32,7 @@ async def lifespan(app: FastAPI):  # pylint: disable=unused-argument
     """
     await db_connection.start_database()
     await producer.start_producer()
-    await consumer.start_consumer()
-    await consumer.consume_messages()
+    await consumer.start_workers()
     try:
         yield
     finally:
