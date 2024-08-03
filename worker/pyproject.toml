@@ -8,7 +8,7 @@ authors = ["Osher Koren"]
 [tool.poetry.dependencies]
 python = "^3.11"
 asyncio = "^3.4.3"
-aiokafka = "^0.10.0"
+aiokafka = "^0.11.0"
 databases = {extras = ["postgresql"], version = "^0.8.0"}
 psycopg2-binary = "^2.9.9"
 python-dotenv = "^1.0.0"

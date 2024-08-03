@@ -1,5 +1,4 @@
-## This is a project for playing with fastapi and docker for microservice app
-
+## This project is for experimenting with FastAPI, Docker, and Kubernetes for microservice applications
 
 ## How to run via docker-compose
 1. Install docker

@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-kafka
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-kafka
+        image: confluentinc/cp-kafka:latest
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo -e "Checking and creating Kafka topics if necessary"
+
+          # Function to create a topic if it does not exist
+          create_topic_if_not_exists() {
+            local topic_name=$1
+            if kafka-topics --bootstrap-server ${KAFKA_BOOTSTRAP_SERVERS} --list | grep -q "^${topic_name}$"; then
+              echo -e "Topic ${topic_name} already exists"
+            else
+              echo -e "Creating topic ${topic_name} ..."
+              kafka-topics --bootstrap-server ${KAFKA_BOOTSTRAP_SERVERS} --create --topic ${topic_name} --replication-factor 1 --partitions 1
+            fi
+          }
+          # Check and create topics
+          echo "Topic evt.userMessage"  # Debug statement
+          create_topic_if_not_exists evt.userMessage
+          echo "Topic evt.messageScore"  # Debug statement
+          create_topic_if_not_exists evt.messageScore
+
+          echo -e "Successfully checked and created topics as needed"
+      resources:
+        requests:
+          memory: "512Mi"
+          cpu: "0.5"
+        limits:
+          memory: "1Gi"
+          cpu: "1"
+      restartPolicy: OnFailure

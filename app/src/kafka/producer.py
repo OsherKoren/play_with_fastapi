@@ -26,17 +26,16 @@ def setup_producer() -> None:
     global KAFKA_PRODUCER  # pylint: disable=global-statement
 
     if KAFKA_PRODUCER is None:
-        KAFKA_PRODUCER = AIOKafkaProducer(bootstrap_servers=constants.BOOTSTRAP_SERVERS)
+        KAFKA_PRODUCER = AIOKafkaProducer(
+            bootstrap_servers=constants.BOOTSTRAP_SERVERS, api_version="2.8.1"
+        )
         log.info(" Instancing Kafka Producer ".center(40, "="))
 
 
-async def get_producer() -> AIOKafkaProducer:
+# pylint: disable=R0801
+async def start_producer() -> None:
     """
-    Creates and starts an AIOKafkaProducer instance.
-
-    Returns:
-        AIOKafkaProducer: An instance of AIOKafkaProducer connected to the specified Kafka
-        bootstrap servers.
+    Starts the AIOKafkaProducer instance connection.
 
     Raises:
         KafkaConnectionError: If failed to connect to Kafka
@@ -47,23 +46,28 @@ async def get_producer() -> AIOKafkaProducer:
 
     async def _connect_producer(trials: int = 3):
         try:
-            await KAFKA_PRODUCER.start()
-            log.info(" Connected to Kafka ".center(40, "="))
+            await KAFKA_PRODUCER.start()  # Start the producer
+            log.info(" Producer Connected to Kafka ".center(40, "="))
             return KAFKA_PRODUCER
         except KafkaConnectionError as err:
-            log.error(f"Failed to connect to Kafka: {err}")
+            log.error(f"Producer Failed to connect to Kafka: {err}")
             trials -= 1
             if trials > 0:
-                log.info(f"Retrying in 1 second... (Attempt {3 - trials} of 3")
+                log.info(f"Retrying in 1 second... (Attempts remaining: {trials})")
                 await asyncio.sleep(1)
                 await _connect_producer(trials)
             else:
-                raise ConnectionError(
-                    "Failed to connect to Kafka after 3 attempts."
+                raise KafkaConnectionError(
+                    f"Producer Failed to connect to Kafka after multiple attempts."
                 ) from err
 
-    try:
-        yield await _connect_producer()
-    finally:
+    await _connect_producer()
+
+
+async def shutdown_producer() -> None:
+    """
+    Shut down by disconnecting the producer connection to the kafka broker.
+    """
+    if KAFKA_PRODUCER:
         await KAFKA_PRODUCER.stop()
-        log.info(" Producer Stopped ".center(40, "="))
+        log.info(" Shutting down producer ".center(40, "="))

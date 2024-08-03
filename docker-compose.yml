@@ -46,6 +46,36 @@ services:
       timeout: 10s
       retries: 3
 
+
+  init-kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      dev-kafka:
+        condition: service_healthy
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      '
+      echo -e "Checking and creating Kafka topics if necessary"
+
+      # Function to create a topic if it does not exist
+      create_topic_if_not_exists() {
+        local topic_name=$1
+        if kafka-topics --bootstrap-server kafka:9092 --list | grep -q "^${topic_name}$"; then
+          echo -e "Topic ${topic_name} already exists"
+        else
+          echo -e "Creating topic ${topic_name} ..."
+          kafka-topics --bootstrap-server kafka:9092 --create --topic ${topic_name} --replication-factor 1 --partitions 1
+        fi
+      }
+      # Check and create topics
+      echo "Topic evt.userMessage"  # Debug statement
+      create_topic_if_not_exists evt.userMessage
+      echo "Topic evt.messageScore"  # Debug statement
+      create_topic_if_not_exists evt.messageScore
+
+      echo -e "Successfully checked and created topics as needed"
+      '
+
   app:
     image: osherkoren/fastapi-app:1.42
 #    build:

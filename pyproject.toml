@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
-aiokafka = "^0.10.0"
+aiokafka = "^0.11.0"
 fastapi = "^0.109.2"
 pydantic = {extras = ["email"], version = "^2.6.1"}
 uvicorn = "^0.27.0.post1"

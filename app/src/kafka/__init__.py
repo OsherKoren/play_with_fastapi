@@ -2,4 +2,4 @@
 
 """Initializes Kafka"""
 
-from . import admin, constants, producer
+from . import constants, producer
