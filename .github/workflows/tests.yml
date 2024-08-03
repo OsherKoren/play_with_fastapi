@@ -36,8 +36,8 @@ jobs:
           echo POSTGRES_HOST=${{ vars.POSTGRES_HOST }} >> .env.dev
           echo POSTGRES_PORT=${{ vars.POSTGRES_PORT }} >> .env.dev
           echo POSTGRES_DB=${{ vars.POSTGRES_DB }} >> .env.dev
-          echo POSTGRES_HOST=${{ vars.KAFKA_HOST }} >> .env.dev
-          echo POSTGRES_PORT=${{ vars.KAFKA_PORT }} >> .env.dev
+          echo KAFKA_HOST=${{ vars.KAFKA_HOST }} >> .env.dev
+          echo KAFKA_PORT=${{ vars.KAFKA_PORT }} >> .env.dev
           ls -al  # Add this command to list files in the current directory
           cat .env.dev
 
