@@ -8,11 +8,11 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     # cache is useless in docker image, so disable to reduce image size
     PIP_NO_CACHE_DIR=1
 
-ARG POETRY_VERSION=1.7.1
+ARG POETRY_VERSION=1.8.3
 
 WORKDIR /app
 
-COPY pyproject.toml .
+COPY pyproject.toml ./pyproject.toml
 
 RUN pip install "poetry==$POETRY_VERSION" \
     && poetry config virtualenvs.create false \
