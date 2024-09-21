@@ -2,16 +2,16 @@ version: '3.9'
 
 services:
   db:
-    image: postgres:alpine3.20
+    image: postgres:16-alpine
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-db}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-db}
     ports:
       - "5432:5432"
     healthcheck:
@@ -30,6 +30,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.7.0
+    command: [ "bash", "-c", "unset KAFKA_PORT; /etc/confluent/docker/run" ]
     depends_on:
       - zookeeper
     ports:
@@ -50,7 +51,7 @@ services:
   init-kafka:
     image: confluentinc/cp-kafka:7.7.0
     depends_on:
-      dev-kafka:
+      kafka:
         condition: service_healthy
     entrypoint: [ '/bin/sh', '-c' ]
     command: |
@@ -91,11 +92,11 @@ services:
       kafka:
         condition: service_healthy
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-db}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-db}
     healthcheck:
       test: ["CMD", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://app:80/api/v1/health').read().decode()"]
@@ -116,11 +117,11 @@ services:
       app:
         condition: service_healthy
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_USER: ${POSTGRES_USER:-db}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-db}
 
 volumes:
   postgres_data:

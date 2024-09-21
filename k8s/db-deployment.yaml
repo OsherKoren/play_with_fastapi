@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   annotations:
     kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
@@ -7,6 +8,7 @@ metadata:
   labels:
     io.kompose.service: db
   name: db
+
 spec:
   replicas: 1
   selector:
@@ -22,10 +24,12 @@ spec:
       labels:
         io.kompose.network/play-with-fastapi-default: "true"
         io.kompose.service: db
+
     spec:
       containers:
         - name: db
-          image: postgres:alpine3.20
+          image: db:16-alpine
+
           env:
             - name: POSTGRES_DB
               value: accounts_db
@@ -39,6 +43,12 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
+
+          ports:
+            - containerPort: 5432
+              hostPort: 5432
+              protocol: TCP
+
           resources:
             requests:
               memory: "512Mi"   # Request half a GB of memory
@@ -50,24 +60,30 @@ spec:
           livenessProbe:
             exec:
               command:
-                - PGPASSWORD= psql -U  -h  -d  -c 'SELECT 1 FROM accounts LIMIT 1'
+                - /bin/sh
+                - -c
+                - |
+                  PGPASSWORD=${POSTGRES_PASSWORD} \
+                  psql -U ${POSTGRES_USER} \
+                  -h ${POSTGRES_HOST} \
+                  -d ${POSTGRES_DB} \
+                  -c 'SELECT 1 FROM accounts LIMIT 1'
             failureThreshold: 3
             periodSeconds: 30
             timeoutSeconds: 10
-          ports:
-            - containerPort: 5432
-              hostPort: 5432
-              protocol: TCP
+
           volumeMounts:
             - mountPath: /docker-entrypoint-initdb.d
               name: db-init
             - mountPath: /var/lib/postgresql/data
-              name: postgres-data
-      restartPolicy: Always
+              name: db-data
+
       volumes:
         - name: db-init
           configMap:
             name: db-init
-        - name: postgres-data
+        - name: db-data
           persistentVolumeClaim:
-            claimName: postgres-data
+            claimName: db-data
+
+      restartPolicy: Always

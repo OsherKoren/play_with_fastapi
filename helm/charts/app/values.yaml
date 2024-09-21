@@ -1,0 +1,34 @@
+replicaCount: 1
+
+image:
+  repository: osherkoren/fastapi-app
+  tag: 1.43
+
+service:
+  port: 80
+  targetPort: 80
+  protocol: TCP
+
+env:
+  PYTHONPATH: /app
+  KAFKA_HOST: kafka
+  KAFKA_PORT: "9092"
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: accounts_db
+  POSTGRES_USER:
+    secretName: pguser
+    secretKey: POSTGRES_USER
+  POSTGRES_PASSWORD:
+    secretName: pgpassword
+    secretKey: POSTGRES_PASSWORD
+
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  periodSeconds: 30
+  timeoutSeconds: 10
+  failureThreshold: 3
+  httpGet:
+    path: /api/v1/health
+    port: 80

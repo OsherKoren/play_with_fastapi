@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace | default "msg-preds" }}
+  labels:
+    app: {{ .Release.Name }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+        network/play-with-fastapi-default: "true"
+
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          env:
+            - name: POSTGRES_HOST
+              value: "{{ .Values.env.POSTGRES_HOST }}"
+            - name: POSTGRES_DB
+              value: "{{ .Values.env.POSTGRES_DB }}"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.POSTGRES_USER.secretName }}
+                  key: {{ .Values.env.POSTGRES_USER.secretKey }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.env.POSTGRES_PASSWORD.secretName }}
+                  key: {{ .Values.env.POSTGRES_PASSWORD.secretKey }}
+
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+              hostPort: {{ .Values.service.port }}
+              protocol: {{ .Values.service.protocol }}
+
+          resources:
+            requests:
+              memory: {{ .Values.resources.requests.memory }}
+              cpu: {{ .Values.resources.requests.cpu }}
+            limits:
+              memory: {{ .Values.resources.limits.memory }}
+              cpu: {{ .Values.resources.limits.cpu }}
+
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  PGPASSWORD=${POSTGRES_PASSWORD} \
+                  psql -U ${POSTGRES_USER} \
+                  -h ${POSTGRES_HOST} \
+                  -d ${POSTGRES_DB} \
+                  -c 'SELECT 1 FROM accounts LIMIT 1'
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+
+          volumeMounts:
+          {{- range .Values.volumeMounts }}
+          - mountPath: {{ .mountPath }}
+            name: {{ .name }}
+          {{- end}}
+
+      volumes:
+        - name: {{ .Values.configMap.name }}
+          configMap:
+            name: {{ .Values.configMap.name }}
+        - name: {{ .Values.persistentVolumeClaim.claimName }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistentVolumeClaim.claimName}}
+
+      restartPolicy: {{ .Values.restartPolicy }}

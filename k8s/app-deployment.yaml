@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   annotations:
     kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
@@ -7,8 +8,9 @@ metadata:
   labels:
     io.kompose.service: app
   name: app
+
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: app
@@ -22,6 +24,7 @@ spec:
       labels:
         io.kompose.network/play-with-fastapi-default: "true"
         io.kompose.service: app
+
     spec:
       containers:
         - env:
@@ -49,6 +52,7 @@ spec:
                   name: pgpassword
 
           image: osherkoren/fastapi-app:1.43
+
           livenessProbe:
             exec:
               command:
@@ -58,6 +62,7 @@ spec:
             failureThreshold: 3
             periodSeconds: 30
             timeoutSeconds: 10
+
           name: app
           ports:
             - containerPort: 80

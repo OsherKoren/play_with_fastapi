@@ -1,12 +1,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
+
 metadata:
   annotations:
-    nginx.ingress.kubernetes.io/ingress-class: nginx
-  name: app-ingress
+    nginx.ingress.kubernetes.io/ingress-class: "nginx"
+  name: ingress
 
 spec:
-  ingressClassName: nginx  # IngressClass name for nginx controller
+  ingressClassName: nginx  # IngressClass name for ingress controller
   rules:
   - host: msg-preds.com
     http:

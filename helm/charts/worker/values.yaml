@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: osherkoren/kafka-worker
+  tag: 1.43
+
+service:
+  port: 81
+  targetPort: 81
+  protocol: TCP
+
+env:
+  PYTHONPATH: /app
+  KAFKA_HOST: kafka
+  KAFKA_PORT: "9092"
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: accounts_db
+  POSTGRES_USER:
+    secretName: pguser
+    secretKey: POSTGRES_USER
+  POSTGRES_PASSWORD:
+    secretName: pgpassword
+    secretKey: POSTGRES_PASSWORD
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "0.5"
+  limits:
+    memory: "1Gi"
+    cpu: "1"

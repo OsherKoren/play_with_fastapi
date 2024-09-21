@@ -1,0 +1,58 @@
+replicaCount: 1
+
+image:
+    repository: postgres
+    tag: 16-alpine
+    pullPolicy: IfNotPresent
+
+service:
+  port: 5432
+  targetPort: 5432
+  protocol: TCP
+
+env:
+  POSTGRES_HOST: db
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: accounts_db
+  POSTGRES_USER:
+    secretName: pguser
+    secretKey: POSTGRES_USER
+  POSTGRES_PASSWORD:
+    secretName: pgpassword
+    secretKey: POSTGRES_PASSWORD
+
+livenessProbe:
+  exec:
+    command:
+      - PGPASSWORD= psql -U  -h  -d  -c 'SELECT 1 FROM accounts LIMIT 1'
+  failureThreshold: 3
+  periodSeconds: 30
+  timeoutSeconds: 10
+
+resources:
+  requests:
+    cpu: "0.5"
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+
+volumeMounts:
+  - mountPath: /docker-entrypoint-initdb.d
+    name: db-init
+  - mountPath: /var/lib/postgresql/data
+    name: db-data
+
+configMap:
+  name: db-init
+
+persistentVolumeClaim:
+  claimName: db-data
+
+persistence:
+  enabled: true
+  accessModes:
+    - ReadWriteOnce
+  size: 100Mi
+
+restartPolicy: Always

@@ -1,0 +1,18 @@
+# service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: db  # service is named db and not dynamically based on the Helm release name.
+  namespace: {{ .Values.namespace | default "msg-preds" }}
+  labels:
+    app: {{ .Release.Name }}
+
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.service.port | default 5432 }}
+      targetPort: {{ .Values.service.targetPort | default 5432 }}
+      protocol: {{ .Values.service.protocol | default "TCP" }}
+  selector:
+    app: {{ .Release.Name }}
