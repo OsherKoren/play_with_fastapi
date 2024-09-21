@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: osherkoren/fastapi-app
-  tag: 1.43
+  tag: 1.44
 
 service:
   port: 80

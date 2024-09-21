@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: osherkoren/kafka-worker
-  tag: 1.43
+  tag: 1.44
 
 service:
   port: 81
