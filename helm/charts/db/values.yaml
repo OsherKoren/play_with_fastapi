@@ -4,6 +4,7 @@ image:
     repository: postgres
     tag: 16-alpine
     pullPolicy: IfNotPresent
+#    pullPolicy: Always
 
 service:
   port: 5432
@@ -22,9 +23,6 @@ env:
     secretKey: POSTGRES_PASSWORD
 
 livenessProbe:
-  exec:
-    command:
-      - PGPASSWORD= psql -U  -h  -d  -c 'SELECT 1 FROM accounts LIMIT 1'
   failureThreshold: 3
   periodSeconds: 30
   timeoutSeconds: 10
@@ -43,8 +41,8 @@ volumeMounts:
   - mountPath: /var/lib/postgresql/data
     name: db-data
 
-configMap:
-  name: db-init
+#configMap:
+#  name: db-init
 
 persistentVolumeClaim:
   claimName: db-data
@@ -54,5 +52,7 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 100Mi
+
+initdbScriptsConfigMap: db-init
 
 restartPolicy: Always

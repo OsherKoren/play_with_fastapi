@@ -2,30 +2,43 @@ apiVersion: v1
 kind: ConfigMap
 
 metadata:
-  name: {{ .Values.configMap.name }}
+  name: {{ .Values.initdbScriptsConfigMap }}
   namespace: {{ .Values.namespace | default "msg-preds" }}
   labels:
-    app: {{ .Values.configMap.name }}
+    app: {{ .Values.initdbScriptsConfigMap }}
 
 data:
-  01_create_role.sh: |
-    #!/bin/bash
-    if psql -U postgres -c "SELECT rolname FROM pg_roles" | grep -qw "{{ .Values.env.POSTGRES_USER.secretKey }}"; then
-      echo "Role {{ .Values.env.POSTGRES_USER.secretKey }} already exists"
-    else
-      psql -U postgres -c "CREATE ROLE {{ .Values.env.POSTGRES_USER.secretKey }} WITH LOGIN PASSWORD '{{ .Values.env.POSTGRES_PASSWORD.secretKey }}';"
-      echo "Role {{ .Values.env.POSTGRES_USER.secretKey }} created successfully"
-    fi
-  02_create_db.sh: |
-    echo "Checking if database {{ .Values.env.POSTGRES_DB }} exists"
-    if psql -U "{{ .Values.env.POSTGRES_USER.secretKey }}" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname='{{ .Values.env.POSTGRES_DB }}'" | grep -q 1; then
-      echo "Database {{ .Values.env.POSTGRES_DB }} already exists"
-    else
-      echo "Creating database {{ .Values.env.POSTGRES_DB }}"
-      psql -U "{{ .Values.env.POSTGRES_USER.secretKey }}" -c "CREATE DATABASE {{ .Values.env.POSTGRES_DB }};"
-      echo "Database {{ .Values.env.POSTGRES_DB }} created successfully"
-    fi
-  03_create_tables.sql: |
+  db-init.sql: |
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM pg_roles
+            WHERE rolname = '{{ .Values.env.POSTGRES_USER.secretKey }}'
+        ) THEN
+            CREATE ROLE "{{ .Values.env.POSTGRES_USER.secretKey }}"
+            WITH LOGIN
+            PASSWORD '{{ .Values.env.POSTGRES_PASSWORD.secretKey }}';
+            RAISE NOTICE 'Role {{ .Values.env.POSTGRES_USER.secretKey }} created successfully';
+        ELSE
+            RAISE NOTICE 'Role {{ .Values.env.POSTGRES_USER.secretKey }} already exists';
+        END IF;
+    END $$;
+
+    DO $$
+    BEGIN
+        IF NOT EXISTS (
+            SELECT 1
+            FROM pg_database
+            WHERE datname = '{{ .Values.env.POSTGRES_DB }}'
+        ) THEN
+            EXECUTE 'CREATE DATABASE "{{ .Values.env.POSTGRES_DB }}"';
+            RAISE NOTICE 'Database {{ .Values.env.POSTGRES_DB }} created successfully';
+        ELSE
+            RAISE NOTICE 'Database {{ .Values.env.POSTGRES_DB }} already exists';
+        END IF;
+    END $$;
+
     CREATE TABLE IF NOT EXISTS accounts (
         account_id SERIAL PRIMARY KEY,
         first_name VARCHAR(20),
@@ -47,7 +60,7 @@ data:
         score FLOAT,
         predicted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-  04_insert_into_accounts.sql: |
+
     DO $$
     BEGIN
         IF NOT EXISTS (

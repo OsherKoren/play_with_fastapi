@@ -12,9 +12,9 @@
 1. In the terminal run `docker-compose -f docker-compose-dev.yml --env-file .env.dev up -d --build` for testing dev app locally.
 
 ### Check the result
-6. Go to `http://127.0.0.1:8000/docs` to see the swagger docs
-7. Go to `http://127.0.0.1:8000/redoc` to see the redoc docs
-8. Go to `http://1270.0.0.1:8000/api/v1/messages` to send requests
+1. Go to `http://127.0.0.1:8000/docs` to see the swagger docs
+2. Go to `http://127.0.0.1:8000/redoc` to see the redoc docs
+3. Go to `http://1270.0.0.1:8000/api/v1/messages` to send requests
 
 
 ## How to run via kubernetes
@@ -43,11 +43,11 @@
 1. `kubectl create namespace msg-preds`
 2. `kubectl create secret generic pguser --from-literal=POSTGRES_USER=<your_postgres_user> -n msg-preds`
 3. `kubectl create secret generic pgpassword --from-literal=POSTGRES_PASSWORD=<your_postgres_password> -n msg-preds`
-4. Install/upgrade db micro-service `helm upgrade --install db ./helm/charts/db --namespace msg-preds`
-5. Install/upgrade kafka micro-service `helm upgrade --install kafka ./helm/charts/kafka --namespace msg-preds`
-6. Install/upgrade app micro-service `helm upgrade --install app ./helm/charts/app --namespace msg-preds`
-7. Install/upgrade worker micro-service `helm upgrade --install worker ./helm/charts/worker --namespace msg-preds`
-8. Install/upgrade ingress micro-service `helm upgrade --install ingress ./helm/charts/ingress --namespace msg-preds`
-9. Install/upgrade ingress-nginx controller `helm upgrade --install nginx ingress-nginx/ingress-nginx --namespace msg-preds`
-10. Verify the deployments: `helm list --namespace msg-preds`
+4. Install/upgrade db micro-service `helm upgrade --install db ./helm/charts/db -n msg-preds`
+5. Install/upgrade kafka micro-service `helm upgrade --install kafka ./helm/charts/kafka -n msg-preds`
+6. Install/upgrade app micro-service `helm upgrade --install app ./helm/charts/app -n msg-preds`
+7. Install/upgrade worker micro-service `helm upgrade --install worker ./helm/charts/worker -n msg-preds`
+8. Install/upgrade ingress micro-service `helm upgrade --install ingress ./helm/charts/ingress -n msg-preds`
+9. Install/upgrade ingress-nginx controller `helm upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds`
+10. Verify the deployments: `helm list -n msg-preds`
 11. Get all resources in the namespace: `kubectl get all -n msg-preds -o wide`

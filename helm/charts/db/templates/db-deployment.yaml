@@ -55,6 +55,26 @@ spec:
               memory: {{ .Values.resources.limits.memory }}
               cpu: {{ .Values.resources.limits.cpu }}
 
+          volumeMounts:
+          {{- range .Values.volumeMounts }}
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+          {{- end}}
+
+#          command: ["/bin/sh"]
+#          args:
+#            - /bin/sh
+#            - -c
+#            - |
+#              until pg_isready -h ${POSTGRES_HOST} -U ${POSTGRES_USER}; do
+#                echo "Waiting for PostgreSQL to be ready..."
+#                sleep 10
+#              done
+#              for f in /docker-entrypoint-initdb.d/*.sql; do
+#                echo "Running script $f"
+#                psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -f "$f"
+#              done
+
           livenessProbe:
             exec:
               command:
@@ -70,16 +90,11 @@ spec:
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
 
-          volumeMounts:
-          {{- range .Values.volumeMounts }}
-          - mountPath: {{ .mountPath }}
-            name: {{ .name }}
-          {{- end}}
 
       volumes:
-        - name: {{ .Values.configMap.name }}
+        - name: {{ .Values.initdbScriptsConfigMap }}
           configMap:
-            name: {{ .Values.configMap.name }}
+            name: {{ .Values.initdbScriptsConfigMap }}
         - name: {{ .Values.persistentVolumeClaim.claimName }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistentVolumeClaim.claimName}}

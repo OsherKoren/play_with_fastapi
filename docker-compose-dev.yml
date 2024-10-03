@@ -9,11 +9,11 @@ services:
     env_file:
       - .env.dev
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-db}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
     ports:
       - "5432:5432"
     healthcheck:
@@ -33,7 +33,7 @@ services:
 
 
   dev-kafka:
-    image: confluentinc/cp-zookeeper:7.7.0
+    image: confluentinc/cp-kafka:7.7.0
     command: [ "bash", "-c", "unset KAFKA_PORT; /etc/confluent/docker/run" ]
     depends_on:
       - dev-zookeeper
@@ -56,7 +56,7 @@ services:
 
 
   dev-init-kafka:
-    image: confluentinc/cp-zookeeper:7.7.0
+    image: confluentinc/cp-kafka:7.7.0
     depends_on:
       dev-kafka:
         condition: service_healthy
@@ -104,11 +104,11 @@ services:
     env_file:
       - .env.dev
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-db}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       DEV_ENV: "true"
     healthcheck:
       test: ["CMD", "python", "-c",
@@ -132,11 +132,11 @@ services:
     env_file:
       - .env.dev
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
       POSTGRES_HOST: ${POSTGRES_HOST:-dev-db}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
-      POSTGRES_DB: ${POSTGRES_DB:-db}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
       DEV_ENV: "true"
 
 
