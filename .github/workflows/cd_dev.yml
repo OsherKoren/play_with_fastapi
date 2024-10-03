@@ -1,6 +1,6 @@
 # Deploy to dev server
 
-name: Deploy main to dev
+name: Deploy main to dev env
 
 on:
   workflow_run:
