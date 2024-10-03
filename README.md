@@ -33,6 +33,10 @@
 ### Check the result
 1. Go to `msg-preds.com/docs` and try some get & post requests.
 
+### Delete all resources under `default` namespace
+1. Run `kubectl delete all --all`
+
+
 ## How to run via helm
 ### Pre-Requisites
 1. Install `helm`
@@ -43,11 +47,19 @@
 1. `kubectl create namespace msg-preds`
 2. `kubectl create secret generic pguser --from-literal=POSTGRES_USER=<your_postgres_user> -n msg-preds`
 3. `kubectl create secret generic pgpassword --from-literal=POSTGRES_PASSWORD=<your_postgres_password> -n msg-preds`
-4. Install/upgrade db micro-service `helm upgrade --install db ./helm/charts/db -n msg-preds`
-5. Install/upgrade kafka micro-service `helm upgrade --install kafka ./helm/charts/kafka -n msg-preds`
-6. Install/upgrade app micro-service `helm upgrade --install app ./helm/charts/app -n msg-preds`
-7. Install/upgrade worker micro-service `helm upgrade --install worker ./helm/charts/worker -n msg-preds`
-8. Install/upgrade ingress micro-service `helm upgrade --install ingress ./helm/charts/ingress -n msg-preds`
-9. Install/upgrade ingress-nginx controller `helm upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds`
-10. Verify the deployments: `helm list -n msg-preds`
-11. Get all resources in the namespace: `kubectl get all -n msg-preds -o wide`
+
+### Commands - Deploy services releases using `msg-preds` namespace.
+1. Install/upgrade db micro-service `helm upgrade --install db ./helm/charts/db -n msg-preds`
+2. Install/upgrade kafka micro-service `helm upgrade --install kafka ./helm/charts/kafka -n msg-preds`
+3. Install/upgrade app micro-service `helm upgrade --install app ./helm/charts/app -n msg-preds`
+4. Install/upgrade worker micro-service `helm upgrade --install worker ./helm/charts/worker -n msg-preds`
+5. Install/upgrade ingress micro-service `helm upgrade --install ingress ./helm/charts/ingress -n msg-preds`
+6. Install/upgrade ingress-nginx controller `helm upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds`
+7. Verify the deployments: `helm list -n msg-preds`
+8. Get all resources in the namespace: `kubectl get all -n msg-preds -o wide`
+
+### Check the result
+1. Go to `msg-preds.com/docs` and try some get & post requests.
+
+### Delete all resources under `msg-preds` namespace
+1. Run `kubectl delete all --all -n msg-preds`
