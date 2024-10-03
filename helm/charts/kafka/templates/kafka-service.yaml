@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Values.namespace | default "msg-preds" }}
+  labels:
+    app: {{ .Release.Name }}
+
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.kafka.service.port }}
+      targetPort: {{ .Values.kafka.service.targetPort }}
+      protocol: {{ .Values.kafka.service.protocol }}
+  selector:
+    app: {{ .Release.Name }}

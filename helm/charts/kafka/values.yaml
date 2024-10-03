@@ -1,0 +1,58 @@
+zookeeper:
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-zookeeper
+    tag: 7.7.0
+    pullPolicy: IfNotPresent
+  service:
+    port: 2181
+    targetPort: 2181
+    protocol: TCP
+  env:
+    ZOOKEEPER_CLIENT_PORT: "2181"
+    ZOOKEEPER_TICK_TIME: "2000"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+kafka:
+  replicaCount: 1
+  image:
+    repository: confluentinc/cp-kafka
+    tag: 7.7.0
+    pullPolicy: IfNotPresent
+
+  service:
+    port: 9092
+    targetPort: 9092
+    protocol: TCP
+
+  env:
+    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+    KAFKA_BROKER_ID: "1"
+    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    KAFKA_LOG_DIRS: /tmp/kafka-logs
+    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+
+  livenessProbe:
+    command:
+      - nc
+      - -zv
+      - kafka
+      - "9092"
+    failureThreshold: 3
+    periodSeconds: 30
+    timeoutSeconds: 10
+
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"

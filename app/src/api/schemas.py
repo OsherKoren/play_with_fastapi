@@ -17,7 +17,7 @@ class MessageIn(BaseModel):
         phone (Optional[str]): The phone number associated with the message (optional).
 
     Methods:
-        email_or_phone_valid(cls, values):
+        email_or_phone_valid(cls, values.yaml):
             Validates that at least one of email or phone is specified.
     """
 
@@ -85,7 +85,7 @@ class MessageIn(BaseModel):
 #         phone (Optional[str]): The phone number associated with the message (optional).
 #
 #     Methods:
-#         email_or_phone_valid(cls, values):
+#         email_or_phone_valid(cls, values.yaml):
 #         Validates that at least one of email or phone is specified.
 #     """
 #
@@ -126,19 +126,19 @@ class MessageIn(BaseModel):
 
 # @model_validator(mode="before")
 # @classmethod
-# def email_or_phone_valid(cls, values):
+# def email_or_phone_valid(cls, values.yaml):
 #     """
 #     Validate that at least one of email or phone is specified.
 #
 #     Args:
-#         values (dict): A dictionary of values containing 'email' and 'phone'.
+#         values.yaml (dict): A dictionary of values.yaml containing 'email' and 'phone'.
 #
 #     Raises:
 #         ValueError: If neither 'email' nor 'phone' is specified.
 #     """
-#     if "email" not in values and "phone" not in values:
+#     if "email" not in values.yaml and "phone" not in values.yaml:
 #         raise ValueError("At least one of email or phone must be specified")
-#     return values
+#     return values.yaml
 #
 #
 # class MessageOut(MessageIn):

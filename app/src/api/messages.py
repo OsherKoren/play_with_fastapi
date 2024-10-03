@@ -44,7 +44,7 @@ async def get_messages():
 
 
 @router.post(
-    "/send",
+    "/jobs",
     status_code=201,
     response_model=None,
     description="Post a message and store it in the database.",

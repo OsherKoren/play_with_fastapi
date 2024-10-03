@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   dev-db:
-    image: postgres:latest
+    image: postgres:16-alpine
     volumes:
       - ./setup_db:/docker-entrypoint-initdb.d
       - postgres_data_dev:/var/lib/postgresql/data
@@ -26,14 +26,15 @@ services:
 
 
   dev-zookeeper:
-    image: confluentinc/cp-zookeeper:latest
+    image: confluentinc/cp-zookeeper:7.7.0
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
 
   dev-kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.7.0
+    command: [ "bash", "-c", "unset KAFKA_PORT; /etc/confluent/docker/run" ]
     depends_on:
       - dev-zookeeper
     ports:
@@ -55,7 +56,7 @@ services:
 
 
   dev-init-kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:7.7.0
     depends_on:
       dev-kafka:
         condition: service_healthy

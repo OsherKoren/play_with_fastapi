@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   annotations:
     kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
@@ -7,8 +8,9 @@ metadata:
   labels:
     io.kompose.service: worker
   name: worker
+
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       io.kompose.service: worker
@@ -22,6 +24,7 @@ spec:
       labels:
         io.kompose.network/play-with-fastapi-default: "true"
         io.kompose.service: worker
+
     spec:
       containers:
         - env:
@@ -47,6 +50,7 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_PASSWORD
                   name: pgpassword
+
           resources:
             requests:
               memory: "512Mi"   # Request half a GB of memory
@@ -55,7 +59,7 @@ spec:
               memory: "1Gi"     # Limit memory usage to 1 GB
               cpu: "1"          # Limit CPU usage to 1 core
 
-          image: osherkoren/kafka-worker:1.43
+          image: osherkoren/kafka-worker:1.44
           name: worker
           ports:
             - containerPort: 81

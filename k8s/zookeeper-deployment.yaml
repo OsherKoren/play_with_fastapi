@@ -1,5 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
   annotations:
     kompose.cmd: C:\kompose\kompose-windows-amd64.exe -f docker-compose.yml convert
@@ -7,6 +8,7 @@ metadata:
   labels:
     io.kompose.service: zookeeper
   name: zookeeper
+
 spec:
   replicas: 1
   selector:
@@ -20,15 +22,19 @@ spec:
       labels:
         io.kompose.network/play-with-fastapi-default: "true"
         io.kompose.service: zookeeper
+
     spec:
       containers:
-        - env:
+        - name: zookeeper
+          image: confluentinc/cp-zookeeper:7.7.0
+
+          ports:
+            - containerPort: 2181
+
+          env:
             - name: ZOOKEEPER_CLIENT_PORT
               value: "2181"
             - name: ZOOKEEPER_TICK_TIME
               value: "2000"
-          image: confluentinc/cp-zookeeper:7.7.0
-          name: zookeeper
-          ports:
-            - containerPort: 2181
+
       restartPolicy: Always

@@ -1,0 +1,39 @@
+repositories:
+  - name: ingress-nginx
+    url: https://kubernetes.github.io/ingress-nginx
+
+releases:
+  - name: app
+    namespace: msg-preds
+    chart: ./charts/app
+    values:
+      - ./charts/app/values.yaml
+
+  - name: kafka
+    namespace: msg-preds
+    chart: ./charts/kafka
+    values:
+      - ./charts/kafka/values.yaml
+
+  - name: db
+    namespace: msg-preds
+    chart: ./charts/db
+    values:
+      - ./charts/db/values.yaml
+
+  - name: worker
+    namespace: msg-preds
+    chart: ./charts/worker
+    values:
+      - ./charts/worker/values.yaml
+
+#  - name: ingress-nginx
+#    namespace: ingress-nginx
+#    chart: ingress-nginx/ingress-nginx
+#    version: 4.11.2
+
+  - name: ingress
+    namespace: msg-preds
+    chart: ./charts/ingress
+    values:
+      - ./charts/ingress/values.yaml

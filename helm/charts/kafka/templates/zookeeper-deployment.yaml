@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: zookeeper
+  namespace: {{ .Values.namespace | default "msg-preds" }}
+  labels:
+    app: zookeeper
+
+spec:
+  replicas: {{ .Values.zookeeper.replicaCount }}
+  selector:
+    matchLabels:
+      app: zookeeper
+  template:
+    metadata:
+      labels:
+        app: zookeeper
+
+    spec:
+      containers:
+        - name: zookeeper
+          image: "{{ .Values.zookeeper.image.repository }}:{{ .Values.zookeeper.image.tag }}"
+
+          ports:
+            - containerPort: {{ .Values.zookeeper.service.port }}
+
+          env:
+            - name: ZOOKEEPER_CLIENT_PORT
+              value: "{{ .Values.zookeeper.env.ZOOKEEPER_CLIENT_PORT }}"
+            - name: ZOOKEEPER_TICK_TIME
+              value: "{{ .Values.zookeeper.env.ZOOKEEPER_TICK_TIME }}"
+
+          resources:
+            requests:
+              memory: "{{ .Values.zookeeper.resources.requests.memory }}"
+              cpu: "{{ .Values.zookeeper.resources.requests.cpu }}"
+            limits:
+              memory: "{{ .Values.zookeeper.resources.limits.memory }}"
+              cpu: "{{ .Values.zookeeper.resources.limits.cpu }}"
+
+      restartPolicy: Always

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Create postgres role based on environment variable
+# Create postgres db role based on environment variable
 if psql -U postgres -c "SELECT rolname FROM pg_roles" | grep -qw "$POSTGRES_USER"; then
   echo "Role $POSTGRES_USER already exists"
 else
