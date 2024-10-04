@@ -207,7 +207,9 @@ echo theBase64EncodedPassword== | base64 --decode
 ```
 5. Login using the decoded password
 6. Configure `application.yaml`
-7. Deploying with argocd for the first time only (after the first time it will be synced to the git repo)
+7. Deploying with argocd for the first time
 ```shell
-
+kubectl apply -f argocd.yaml
 ```
+
+## After deploying argocd for the first time to the cluster it will be synced to the git repo
