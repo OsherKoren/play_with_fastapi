@@ -59,7 +59,7 @@ spec:
               memory: "1Gi"     # Limit memory usage to 1 GB
               cpu: "1"          # Limit CPU usage to 1 core
 
-          image: osherkoren/kafka-worker:1.44
+          image: osherkoren/kafka-worker:latest
           name: worker
           ports:
             - containerPort: 81
