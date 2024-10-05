@@ -141,6 +141,24 @@ helmfile -f .helm/helmfile.yaml sync
 ### Check the result  🎯
 1. Go to `msg-preds.com/docs` and try some get & post requests.
 
+Also, you can run:
+```shell
+ helmfile -f ./helm/helmfile.yaml --output=json list
+```
+
+## Output
+```
+[
+{"name":"app","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"./charts/app","version":""},
+{"name":"kafka","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"./charts/kafka","version":""},
+{"name":"db","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"./charts/db","version":""},
+{"name":"worker","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"./charts/worker","version":""},
+{"name":"nginx","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"ingress-nginx/ingress-nginx","version":"4.11.2"},
+{"name":"ingress","namespace":"msg-preds","enabled":true,"installed":true,"labels":"","chart":"./charts/ingress","version":""}
+]
+```
+
+
 ### Delete all resources under `msg-preds` namespace  ❌
 ```shell
 helmfile -f .helm/helmfile.yaml destroy
