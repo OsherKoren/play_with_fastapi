@@ -2,8 +2,8 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: argocd
-  mamespace: argocd
+  name: msg-preds-argocd
+  namespace: argocd
 
 spec:
   project: default
@@ -15,12 +15,11 @@ spec:
 
   destination:
     server: https://kubernetes.default.svc  # The default kubernetes cluster `kubectl get svc`
-    namespace: msg-preds-argocd  # Check all namespaces on the cluster - `kubectl get ns`
+    namespace: msg-preds  # Check all namespaces on the cluster - `kubectl get ns`
 
   syncPolicy:
     syncOptions:
     - CreateNamespace=true
-    - ServerSideApply=true
 
     automated:
       selfHeal: true  # Override manually changes on the cluster by fetching the latest version in the git repo
