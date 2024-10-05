@@ -211,5 +211,31 @@ echo theBase64EncodedPassword== | base64 --decode
 ```shell
 kubectl apply -f argocd.yaml
 ```
+### Check the result  🎯
+1. Go to argocd UI and see your new argocd app and its details.
+2. Also, you can get all apps in all namespaces
+```shell
+kubectl get apps -A
+```
+
+## Output
+```
+NAMESPACE   NAME               SYNC STATUS   HEALTH STATUS
+argocd      msg-preds-argocd   Synced        Healthy
+```
+
+Or get ArgoCD Application CRD
+
+```shell
+kubectl get crd
+```
+
+## Output
+```
+NAME                          CREATED AT
+applications.argoproj.io      2024-10-04T09:26:31Z
+applicationsets.argoproj.io   2024-10-04T09:26:31Z
+appprojects.argoproj.io       2024-10-04T09:26:32Z
+```
 
 ## After deploying argocd for the first time to the cluster it will be synced to the git repo
