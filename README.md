@@ -217,20 +217,13 @@ Forwarding from [::1]:8080 -> 8080
 2. The user for login is `admin`.
 3. Gets the user secret
 ```shell
-kubectl get secret argocd-initial-admin-secret -n argocd -o yaml
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 ```
-4. Decode the base64 encoded password
+4. Login using the decoded password
+5. Configure `application.yaml`
+6. Deploying with argocd for the first time
 ```shell
-echo theBase64EncodedPassword== | base64 --decode
-```
-5. Login using the decoded password
-6. Configure `application.yaml`
-7. Deploying with argocd for the first time
-```shell
-kubectl apply -f infra-apps/ingress-nginx.yaml
-```
-```shell
-kubectl apply -f infra-apps/ingress-nginx.yaml
+kubectl apply -f infra-apps.yaml
 ```
 
 ### Check the result  🎯
@@ -243,10 +236,11 @@ kubectl get apps -A
 ## Output
 ```
 NAMESPACE   NAME               SYNC STATUS   HEALTH STATUS
-argocd      msg-preds-argocd   Synced        Healthy
+argocd      msg-preds          Synced        Healthy
+argocd      ingress-nginx      Synced        Healthy
 ```
 
-Or get ArgoCD Application CRD
+Or get ArgoCD Application CRD (custom resource definition)
 
 ```shell
 kubectl get crd
