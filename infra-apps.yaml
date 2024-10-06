@@ -2,14 +2,14 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 
 metadata:
-  name: infra-apps-application
+  name: msg-preds
   namespace: argocd
 
 spec:
   project: default
   source:
     repoURL: https://github.com/OsherKoren/play_with_fastapi.git
-    path: infra-apps
+    path: infra_apps
     targetRevision: HEAD
 
   destination:
