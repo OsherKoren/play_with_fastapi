@@ -13,3 +13,4 @@ __pycache__/
 /.pytest_cache/
 /helm/templates/_helpers.tpl
 /helm/templates/NOTES.txt
+/helm/templates/
