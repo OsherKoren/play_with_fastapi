@@ -235,9 +235,10 @@ kubectl get apps -A
 
 ## Output
 ```
-NAMESPACE   NAME               SYNC STATUS   HEALTH STATUS
-argocd      msg-preds          Synced        Healthy
-argocd      ingress-nginx      Synced        Healthy
+NAMESPACE   NAME                    SYNC STATUS   HEALTH STATUS
+argocd      msg-preds-infra-apps       Synced        Healthy
+argocd      msg-preds-apps             Synced        Healthy
+argocd      ingress-nginx              Synced        Healthy
 ```
 
 Or get ArgoCD Application CRD (custom resource definition)
