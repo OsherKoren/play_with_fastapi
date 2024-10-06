@@ -227,8 +227,12 @@ echo theBase64EncodedPassword== | base64 --decode
 6. Configure `application.yaml`
 7. Deploying with argocd for the first time
 ```shell
-kubectl apply -f argocd.yaml
+kubectl apply -f infra-apps/ingress-nginx.yaml
 ```
+```shell
+kubectl apply -f infra-apps/ingress-nginx.yaml
+```
+
 ### Check the result  🎯
 1. Go to argocd UI and see your new argocd app and its details.
 2. Also, you can get all apps in all namespaces
