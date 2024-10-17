@@ -73,11 +73,27 @@ helm repo update
 ```
 
 ### Setup  ⚙️
-1. Create namespace
+1. Check if namespace exist
+```shell
+kubectl get ns
+```
+## Output
+```
+NAME              STATUS   AGE
+argocd            Active   13d
+default           Active   14d
+ingress-nginx     Active   11d
+kube-node-lease   Active   14d
+kube-public       Active   14d
+kube-system       Active   14d
+msg-preds         Active   14d
+
+```
+2. If namespace doesn't exist (In my case it already exists ...)
 ```shell
 kubectl create namespace msg-preds
 ```
-1. Create kubectl postgres user and secret on the namespace
+3. Create kubectl postgres user and secret on the namespace
 ```shell
 kubectl create secret generic pguser --from-literal=POSTGRES_USER=<your_postgres_user> -n msg-preds
 ```
@@ -86,35 +102,35 @@ kubectl create secret generic pgpassword --from-literal=POSTGRES_PASSWORD=<your_
 ```
 
 ### Deploy services of `msg-preds` namespace.  🚀
-1. Deploy db microservice
+4. Deploy db microservice
 ```shell
 helm upgrade --install db ./helm/charts/db -n msg-preds
 ```
-2. Deploy kafka microservice
+5. Deploy kafka microservice
 ```shell
 helm upgrade --install kafka ./helm/charts/kafka -n msg-preds
 ```
-3. Deploy app microservice
+6. Deploy app microservice
 ```shell
 helm upgrade --install app ./helm/charts/app -n msg-preds
 ```
-4. Deploy worker microservice
+7. Deploy worker microservice
 ```shell
 helm upgrade --install worker ./helm/charts/worker -n msg-preds
 ```
-5. Deploy ingress microservice
+8. Deploy ingress microservice
 ```shell
 helm upgrade --install ingress ./helm/charts/ingress -n msg-preds
 ```
-6. Deploy ingress-nginx controller
+9. Deploy ingress-nginx controller
 ```shell
 helm upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds
 ```
-7. Verify the deployments
+10. Verify the deployments
 ```shell
 helm list -n msg-preds
 ```
-8. Get all resources in the namespace
+11. Get all resources in the namespace
 ```shell
 kubectl get all -n msg-preds -o wide
 ```
@@ -135,7 +151,7 @@ kubectl delete all --all -n msg-preds
 ### Deploy services of `msg-preds` namespace.  🚀
 1. Deploy all micro-services:
 ```shell
-helmfile -f .helm/helmfile.yaml sync
+helmfile -f ./helm/helmfile.yaml sync
 ```
 
 ### Check the result  🎯
@@ -161,7 +177,7 @@ Also, you can run:
 
 ### Delete all resources under `msg-preds` namespace  ❌
 ```shell
-helmfile -f .helm/helmfile.yaml destroy
+helmfile -f ./helm/helmfile.yaml destroy
 ```
 
 
@@ -213,7 +229,7 @@ Forwarding from 127.0.0.1:8080 -> 8080
 Forwarding from [::1]:8080 -> 8080
 ```
 
-1. Go to ` 127.0.0.1:8080` in your browser, click on `Advanced` and then `proceed`.
+1. Go to `127.0.0.1:8080` in your browser, click on `Advanced` and then `proceed`.
 2. The user for login is `admin`.
 3. Gets the user secret
 ```shell

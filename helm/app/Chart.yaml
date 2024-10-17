@@ -1,0 +1,6 @@
+apiVersion: v2
+name: app
+description: A Helm chart for Kubernetes app
+type: application
+version: 0.1.0  # helm chart version - used by Helm when installing or upgrading the chart
+appVersion: "1.0.0" # The version of the actual application being deployed by the chart.

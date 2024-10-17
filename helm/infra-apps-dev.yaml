@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: msg-preds-infra-apps-dev
+  namespace: argocd
+
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/OsherKoren/play_with_fastapi.git
+    path: helm/infra_apps  # Points to the infra_apps directory in your Git repo
+    targetRevision: HEAD
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+    automated:
+      selfHeal: true
+      prune: true

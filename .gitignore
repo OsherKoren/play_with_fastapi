@@ -14,3 +14,4 @@ __pycache__/
 /helm/templates/_helpers.tpl
 /helm/templates/NOTES.txt
 /helm/templates/
+**/*.tgz
