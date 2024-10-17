@@ -1,0 +1,23 @@
+apiVersion: v2
+name: msg-preds-dev
+description: An umbrella chart for the project microservices in dev env
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: app
+    version: 0.1.0
+    repository: "file://./app" # Points to ./helm/app
+  - name: db
+    version: 0.1.0
+    repository: "file://./db"
+  - name: ingress
+    version: 0.1.0
+    repository: "file://./ingress"
+  - name: kafka
+    version: 0.1.0
+    repository: "file://./kafka"
+  - name: worker
+    version: 0.1.0
+    repository: "file://./worker"

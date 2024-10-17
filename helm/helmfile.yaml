@@ -5,27 +5,27 @@ repositories:
 releases:
   - name: app
     namespace: msg-preds
-    chart: ./charts/app
+    chart: ./app
     values:
-      - ./charts/app/values.yaml
+      - ./app/values.yaml
 
   - name: kafka
     namespace: msg-preds
-    chart: ./charts/kafka
+    chart: ./kafka
     values:
-      - ./charts/kafka/values.yaml
+      - ./kafka/values.yaml
 
   - name: db
     namespace: msg-preds
-    chart: ./charts/db
+    chart: ./db
     values:
-      - ./charts/db/values.yaml
+      - ./db/values.yaml
 
   - name: worker
     namespace: msg-preds
-    chart: ./charts/worker
+    chart: ./worker
     values:
-      - ./charts/worker/values.yaml
+      - ./worker/values.yaml
 
   - name: nginx
     namespace: msg-preds
@@ -34,6 +34,6 @@ releases:
 
   - name: ingress
     namespace: msg-preds
-    chart: ./charts/ingress
+    chart: ./ingress
     values:
-      - ./charts/ingress/values.yaml
+      - ./ingress/values.yaml
