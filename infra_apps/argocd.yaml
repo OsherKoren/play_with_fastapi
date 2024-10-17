@@ -8,10 +8,11 @@ metadata:
 spec:
   project: default
 
-  source: # k8s manifests
+  source: # Umbrella chart for all helm manifests
     repoURL: https://github.com/OsherKoren/play_with_fastapi.git
     targetRevision: HEAD
-    path: k8s
+    path: helm  # Path to the umbrella chart directory
+
 
   destination:
     server: https://kubernetes.default.svc  # The default kubernetes cluster `kubectl get svc`

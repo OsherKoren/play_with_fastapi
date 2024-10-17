@@ -9,7 +9,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/OsherKoren/play_with_fastapi.git
-    path: infra_apps
+    path: infra_apps  # Points to the infra_apps directory in your Git repo
     targetRevision: HEAD
 
   destination:
