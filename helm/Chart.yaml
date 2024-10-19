@@ -1,5 +1,5 @@
 apiVersion: v2
-name: msg-preds-dev
+name: msg-preds
 description: An umbrella chart for the project microservices in dev env
 type: application
 version: 0.1.0
