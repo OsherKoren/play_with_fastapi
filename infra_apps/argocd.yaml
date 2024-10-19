@@ -8,10 +8,10 @@ metadata:
 spec:
   project: default
 
-  source: # Umbrella chart for all helm manifests
+  source: # Umbrella chart for all charts manifests
     repoURL: https://github.com/OsherKoren/play_with_fastapi.git
     targetRevision: HEAD
-    path: helm  # Path to the umbrella chart directory
+    path: k8s  # Path to the umbrella chart directory
 
 
   destination:
