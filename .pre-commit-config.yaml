@@ -13,7 +13,7 @@ repos:
       - id: check-merge-conflict
       - id: debug-statements
       - id: check-yaml
-        exclude: ^helm/
+        exclude: ^charts/
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
     rev: "0.28.0"

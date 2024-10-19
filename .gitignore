@@ -11,7 +11,8 @@ __pycache__/
 /.env.dev
 **/poetry.lock
 /.pytest_cache/
-/helm/templates/_helpers.tpl
-/helm/templates/NOTES.txt
-/helm/templates/
+/charts/templates/_helpers.tpl
+/charts/templates/NOTES.txt
+/charts/templates/
 **/*.tgz
+/charts/Chart.yaml

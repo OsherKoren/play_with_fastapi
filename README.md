@@ -65,11 +65,11 @@ kubectl delete all --all
 1. Install `helm`
 2. Add ingress-nginx repo:
 ```shell
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+charts repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 ```
 3. Then update your local repositories
 ```shell
-helm repo update
+charts repo update
 ```
 
 ### Setup  ⚙️
@@ -104,31 +104,31 @@ kubectl create secret generic pgpassword --from-literal=POSTGRES_PASSWORD=<your_
 ### Deploy services of `msg-preds` namespace.  🚀
 4. Deploy db microservice
 ```shell
-helm upgrade --install db ./helm/charts/db -n msg-preds
+charts upgrade --install db ./charts/db -n msg-preds
 ```
 5. Deploy kafka microservice
 ```shell
-helm upgrade --install kafka ./helm/charts/kafka -n msg-preds
+charts upgrade --install kafka ./charts/kafka -n msg-preds
 ```
 6. Deploy app microservice
 ```shell
-helm upgrade --install app ./helm/charts/app -n msg-preds
+charts upgrade --install app ./charts/app -n msg-preds
 ```
 7. Deploy worker microservice
 ```shell
-helm upgrade --install worker ./helm/charts/worker -n msg-preds
+charts upgrade --install worker ./charts/worker -n msg-preds
 ```
 8. Deploy ingress microservice
 ```shell
-helm upgrade --install ingress ./helm/charts/ingress -n msg-preds
+charts upgrade --install ingress ./charts/ingress -n msg-preds
 ```
 9. Deploy ingress-nginx controller
 ```shell
-helm upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds
+charts upgrade --install nginx ingress-nginx/ingress-nginx -n msg-preds
 ```
 10. Verify the deployments
 ```shell
-helm list -n msg-preds
+charts list -n msg-preds
 ```
 11. Get all resources in the namespace
 ```shell
@@ -151,7 +151,7 @@ kubectl delete all --all -n msg-preds
 ### Deploy services of `msg-preds` namespace.  🚀
 1. Deploy all micro-services:
 ```shell
-helmfile -f ./helm/helmfile.yaml sync
+helmfile -f ./charts/helmfile.yaml sync
 ```
 
 ### Check the result  🎯
@@ -159,7 +159,7 @@ helmfile -f ./helm/helmfile.yaml sync
 
 Also, you can run:
 ```shell
- helmfile -f ./helm/helmfile.yaml --output=json list
+ helmfile -f ./charts/helmfile.yaml --output=json list
 ```
 
 ## Output
@@ -177,7 +177,7 @@ Also, you can run:
 
 ### Delete all resources under `msg-preds` namespace  ❌
 ```shell
-helmfile -f ./helm/helmfile.yaml destroy
+helmfile -f ./charts/helmfile.yaml destroy
 ```
 
 
