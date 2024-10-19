@@ -11,14 +11,7 @@ spec:
   source: # Umbrella chart for all charts manifests
     repoURL: https://github.com/OsherKoren/play_with_fastapi.git
     targetRevision: HEAD
-    directories:
-      - path: charts/app  # Path to the app chart
-      - path: charts/db   # Path to the db chart
-      - path: charts/ingress # Path to the ingress chart
-      - path: charts/kafka   # Path to the kafka chart
-      - path: charts/worker   # Path to the worker chart
-    #path: charts  # Path to the umbrella chart directory
-    #path: k8s # Path to all apps manifests
+    path: k8s # Path to all apps manifests
 
   destination:
     server: https://kubernetes.default.svc  # The default kubernetes cluster `kubectl get svc`
