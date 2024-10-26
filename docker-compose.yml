@@ -69,10 +69,10 @@ services:
         fi
       }
       # Check and create topics
-      echo "Topic evt.userMessage"  # Debug statement
-      create_topic_if_not_exists evt.userMessage
-      echo "Topic evt.messageScore"  # Debug statement
-      create_topic_if_not_exists evt.messageScore
+      echo "Topic $TOPIC_1"  # Debug statement
+      create_topic_if_not_exists $TOPIC_1
+      echo "Topic $TOPIC_2"  # Debug statement
+      create_topic_if_not_exists $TOPIC_2
 
       echo -e "Successfully checked and created topics as needed"
       '

@@ -19,6 +19,8 @@ docker-compose -f docker-compose-dev.yml --env-file .env.dev up -d --build
 2. Go to `http://127.0.0.1:8000/redoc` to see the redoc docs
 3. Go to `http://1270.0.0.1:8000/api/v1/messages` to send requests
 
+![API Docs](https://github.com/OsherKoren/play_with_fastapi/blob/dev/images/openapi.png)
+
 ### Stop all services  ❌
 ```shell
 docker compose -f docker-compose-dev.yml --env-file ./.env.dev down
