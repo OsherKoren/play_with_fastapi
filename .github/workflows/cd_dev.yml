@@ -3,16 +3,20 @@
 name: Deploy to dev environment
 
 on:
-    pull_request:
-      types: [ closed ]
-      branches:
-        - main
+  pull_request:
+    branches: [ "main" ]
+    types: [ closed ]
+#    pull_request:
+#      types: [ closed ]
+#      branches:
+#        - main
 
 jobs:
   deploy:
     environment: dev
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged
+    #if: github.event.pull_request.merged
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
 
     steps:
       - name: Checkout code
