@@ -2,19 +2,13 @@
 
 name: Register Docker images
 
-#on:
-#  workflow_run:
-#    workflows: ["Build"]
-#    types: [requested]
-#    branches:
-#      - 'releases/**'
 
 on:
   workflow_run:
     workflows: ["Tests"]
-    types: [completed]
-    branches:
-      - 'dev'
+    types:
+      - completed
+
 
 jobs:
   docker_registry:
