@@ -4,7 +4,7 @@ name: Register Docker images
 
 on:
   workflow_run:
-    workflows: [ "Quality. Lint. Format.", "Tests" ]
+    workflows: [ "Quality", "Tests" ]
     types:
       - completed
   push:

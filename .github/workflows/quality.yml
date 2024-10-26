@@ -1,6 +1,6 @@
 # Test the quality of the code
 
-name: Quality. Lint. Format.
+name: Quality
 
 on:
   push:
