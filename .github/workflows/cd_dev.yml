@@ -7,6 +7,10 @@ on:
     workflows: ["Register Docker images"]
     types:
       - completed
+    pull_request:
+      types: [ closed ]
+      branches:
+        - main
 
 jobs:
   deploy:
