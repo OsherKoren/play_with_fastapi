@@ -12,10 +12,9 @@ name: Register Docker images
 on:
   workflow_run:
     workflows: ["Tests"]
-    types:
-      - completed
+    types: [completed]
     branches:
-      - dev
+      - 'dev'
 
 jobs:
   docker_registry:
