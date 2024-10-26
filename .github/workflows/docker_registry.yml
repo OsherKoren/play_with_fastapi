@@ -10,9 +10,6 @@ on:
   push:
     branches: [ "dev" ]
 
-concurrency:
-  group: ci-tests
-  cancel-in-progress: true   # Cancel any in-progress runs for this group
 
 jobs:
   docker_registry:
