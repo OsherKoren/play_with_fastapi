@@ -54,6 +54,9 @@ kubectl apply -f k8s
 ### Check the result  🎯
 1. Go to `msg-preds.com/docs` and try some get & post requests.
 
+![screenshot](https://github.com/OsherKoren/play_with_fastapi/images/openapi.png)
+
+
 ### Delete all resources under `default` namespace  ❌
 ```shell
 kubectl delete all --all
