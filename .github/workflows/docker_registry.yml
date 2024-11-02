@@ -14,6 +14,7 @@ jobs:
   register-docker:
     name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
 #    if: >
 #      ${{ github.event.workflow_run.conclusion == 'success' &&
 #      github.event.action == 'opened' &&
