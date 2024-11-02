@@ -4,17 +4,21 @@ name: Register Docker images
 
 
 on:
-  workflow_run:
-    workflows: ["Check env", "Quality", "Tests"]
+  pull_request:
+    branches: [ "main" ]
     types:
-      - completed
+      - opened
+#  workflow_run:
+#    workflows: ["Check env", "Quality", "Tests"]
+#    types:
+#      - completed
 
 
 jobs:
   register-docker:
     name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
+#    if: github.event.workflow_run.conclusion == 'success'
 #    if: >
 #      ${{ github.event.workflow_run.conclusion == 'success' &&
 #      github.event.action == 'opened' &&
