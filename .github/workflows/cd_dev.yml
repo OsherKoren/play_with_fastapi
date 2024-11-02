@@ -7,22 +7,14 @@ on:
       workflows: ["Register Docker images"]
       types:
         - completed
-    pull_request:
-      branches: [ "main" ]
-      types:
-        - closed
-#    types: [ closed ]
-#    pull_request:
-#      types: [ closed ]
-#      branches:
-#        - main
+
 
 jobs:
   deploy:
     environment: dev
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged
-#    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    if: >
+      ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Checkout code

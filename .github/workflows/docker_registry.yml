@@ -4,19 +4,19 @@ name: Register Docker images
 
 
 on:
-  pull_request:
-    branches: [ 'main', 'releases/**' ]
+  workflow_run:
+    workflows: ["Tests"]
     types:
-      - opened
-#  workflow_run:
-#    workflows: ["Tests"]
-#    types:
-#      - completed
+      - completed
 
 
 jobs:
-  docker_registry:
+  register-docker:
     name: Push Docker images to Docker Hub
+    if: >
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.pull_request &&
+          github.base_ref == 'main' }}
     runs-on: ubuntu-latest
 
     steps:
