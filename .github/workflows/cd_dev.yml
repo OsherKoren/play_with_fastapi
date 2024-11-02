@@ -3,10 +3,14 @@
 name: Deploy to dev environment
 
 on:
-  pull_request:
-    branches: [ "main" ]
-    types:
-      - closed
+    workflow_run:
+      workflows: ["Register Docker images"]
+      types:
+        - completed
+    pull_request:
+      branches: [ "main" ]
+      types:
+        - closed
 #    types: [ closed ]
 #    pull_request:
 #      types: [ closed ]

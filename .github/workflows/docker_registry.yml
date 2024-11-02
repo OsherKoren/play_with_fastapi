@@ -5,10 +5,9 @@ name: Register Docker images
 
 on:
   pull_request:
-    types: [ opened ]
-    branches:
-      - main
-      - 'releases/**'
+    branches: [ 'main', 'releases/**' ]
+    types:
+      - opened
 #  workflow_run:
 #    workflows: ["Tests"]
 #    types:
