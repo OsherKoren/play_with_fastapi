@@ -3,19 +3,20 @@
 name: Deploy to dev environment
 
 on:
-    workflow_run:
-      workflows: ["Register Docker images"]
-      types:
-        - completed
-
+  pull_request:
+    branches: [ "main"]
+    types:
+      - closed
 
 jobs:
   deploy:
     environment: dev
     runs-on: ubuntu-latest
-    if: >
-      ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/main' }}
+    if: github.event.pull_request.merged == true
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - run: |
+        echo The PR was merged
+
+    - name: Checkout code
+      uses: actions/checkout@v4
