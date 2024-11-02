@@ -8,21 +8,13 @@ on:
     branches: [ "main" ]
     types:
       - opened
-#  workflow_run:
-#    workflows: ["Check env", "Quality", "Tests"]
-#    types:
-#      - completed
+      - reopened
 
 
 jobs:
   register-docker:
     name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
-#    if: github.event.workflow_run.conclusion == 'success'
-#    if: >
-#      ${{ github.event.workflow_run.conclusion == 'success' &&
-#      github.event.action == 'opened' &&
-#      github.event.pull_request.base.ref == 'main' }}
 
     steps:
       - name: Checkout
