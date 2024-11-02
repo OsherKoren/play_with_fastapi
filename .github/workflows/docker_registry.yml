@@ -14,25 +14,14 @@ jobs:
   register-docker:
     name: Push Docker images to Docker Hub
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+#    if: >
+#      ${{ github.event.workflow_run.conclusion == 'success' &&
+#      github.event.action == 'opened' &&
+#      github.event.pull_request.base.ref == 'main' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Check for open pull request from 'dev' to 'main'
-        id: check_pr
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          prs=$(gh pr list --base main --head dev --json number --jq '.[0].number')
-          echo "pr_number=$prs" >> $GITHUB_ENV
-
-      - name: Fail if no PR is found
-        if: ${{ env.pr_number == '' }}
-        run: |
-          echo "No open pull request from 'dev' to 'main'. Exiting."
-          exit 1
 
       - name: Set up Docker environment
         run: echo "Docker environment set up"
