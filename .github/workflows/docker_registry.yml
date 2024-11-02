@@ -4,10 +4,15 @@ name: Register Docker images
 
 
 on:
-  workflow_run:
-    workflows: ["Tests"]
-    types:
-      - completed
+  pull_request:
+    types: [ opened ]
+    branches:
+      - main
+      - 'releases/**'
+#  workflow_run:
+#    workflows: ["Tests"]
+#    types:
+#      - completed
 
 
 jobs:
