@@ -27,6 +27,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
           env:
+            - name: PGDATA
+              value: {{ .Values.persistence.pgdata | default "/var/lib/postgresql/data" | quote }}
             - name: POSTGRES_HOST
               value: "{{ .Values.env.POSTGRES_HOST }}"
             - name: POSTGRES_DB

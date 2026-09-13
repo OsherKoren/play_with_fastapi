@@ -50,6 +50,13 @@ spec:
                   name: {{ .Values.env.POSTGRES_PASSWORD.secretName }}
                   key: {{ .Values.env.POSTGRES_PASSWORD.secretKey }}
 
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health/
+              port: {{ .Values.service.targetPort }}
+            periodSeconds: 5
+            timeoutSeconds: 3
+
           livenessProbe:
             httpGet:
               path: {{ .Values.livenessProbe.httpGet.path }}
