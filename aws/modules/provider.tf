@@ -5,11 +5,11 @@
 terraform {
   required_version = "~> 1.16"
   backend "s3" {
-    bucket         = "msg-preds-dev-directive-tf-state"
-    key            = "tf-infra/terraform.tfstate"
-    region         = "us-east-2"
-    dynamodb_table = "msg-preds-dev-state-locking"
-    encrypt        = true
+    bucket       = "msg-preds-dev-directive-tf-state"
+    key          = "tf-infra/terraform.tfstate"
+    region       = "us-east-2"
+    encrypt      = true
+    use_lockfile = true
   }
 
   required_providers {

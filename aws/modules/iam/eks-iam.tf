@@ -43,7 +43,7 @@ module "eks_admin_iam_role" {
   use_name_prefix = false
 
   trust_policy_permissions = {
-    account_root = {
+    accountRoot = {
       actions = ["sts:AssumeRole"]
       principals = [{
         type        = "AWS"

@@ -17,6 +17,7 @@ __pycache__/
 **/*.tgz
 /charts/Chart.yaml
 **/nul
+aws/.deploy.env
 
 # Terraform local state, credentials and generated artifacts
 **/.terraform/

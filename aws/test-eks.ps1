@@ -6,7 +6,7 @@ $ErrorActionPreference = 'Stop'
 $BaseUrl = $BaseUrl.TrimEnd('/')
 $health = Invoke-RestMethod "$BaseUrl/api/v1/health/" -TimeoutSec 15
 if ($health.status -ne 'ok') { throw 'Health check failed' }
-$docs = Invoke-WebRequest "$BaseUrl/docs" -TimeoutSec 15
+$docs = Invoke-WebRequest "$BaseUrl/docs" -UseBasicParsing -TimeoutSec 15
 if ($docs.StatusCode -ne 200) { throw 'Swagger is unavailable' }
 $message = "EKS smoke test $([guid]::NewGuid())"
 $job = Invoke-RestMethod "$BaseUrl/api/v1/messages/jobs" -Method Post -ContentType 'application/json' -Body (@{message=$message; email='eks-test@example.com'} | ConvertTo-Json) -TimeoutSec 15

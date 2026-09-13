@@ -19,6 +19,9 @@ module "compute" {
   admin_cidrs        = var.admin_cidrs
   vpc_id             = module.network.vpc_id
   private_subnets    = module.network.private_subnets
+
+  # EKS nodes need the complete network, including NAT egress, during bootstrap.
+  depends_on = [module.network]
 }
 
 # ###############################################################################

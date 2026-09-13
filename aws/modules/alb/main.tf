@@ -7,8 +7,9 @@ resource "helm_release" "alb-controller" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
   namespace  = "kube-system"
-  version    = "~> 3.5"
-  timeout    = 600
+  # helm_release requires the configured chart version to match the resolved version.
+  version = "3.5.0"
+  timeout = 600
 
   # -----------------------------------------------------------------------------
   # EKS cluster settings and IRSA (IAM Roles for Service Accounts)
