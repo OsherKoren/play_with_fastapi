@@ -18,7 +18,9 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ vars.AWS_REGION || 'us-east-2' }}
       - name: Verify assumed identity
-        run: aws sts get-caller-identity
+        run: |
+          aws sts get-caller-identity >/dev/null
+          echo "AWS role assumption succeeded."
       - name: Verify database parameter access
         run: |
           aws ssm get-parameters \
