@@ -24,6 +24,8 @@ jobs:
     environment: aws-lab
     env:
       AWS_REGION: ${{ vars.AWS_REGION || 'us-east-2' }}
+      POSTGRES_USER_PARAMETER: /msg-preds/aws-lab/postgres/user
+      POSTGRES_PASSWORD_PARAMETER: /msg-preds/aws-lab/postgres/password
       TF_IN_AUTOMATION: "true"
       TF_INPUT: "false"
       TF_VAR_region: ${{ vars.AWS_REGION || 'us-east-2' }}
@@ -122,14 +124,33 @@ jobs:
           tags: ${{ steps.images.outputs.worker }}:${{ steps.images.outputs.worker_tag }}
           cache-from: type=gha,scope=ecr-worker
           cache-to: type=gha,mode=max,scope=ecr-worker
+      - name: Load database credentials from SSM Parameter Store
+        shell: bash
+        run: |
+          PG_USER="$(aws ssm get-parameter \
+            --name "$POSTGRES_USER_PARAMETER" \
+            --with-decryption \
+            --query 'Parameter.Value' \
+            --output text)"
+          PG_PASSWORD="$(aws ssm get-parameter \
+            --name "$POSTGRES_PASSWORD_PARAMETER" \
+            --with-decryption \
+            --query 'Parameter.Value' \
+            --output text)"
+          if [[ -z "$PG_USER" || -z "$PG_PASSWORD" ]]; then
+            echo "Database credentials could not be loaded from Parameter Store." >&2
+            exit 1
+          fi
+          echo "::add-mask::$PG_USER"
+          echo "::add-mask::$PG_PASSWORD"
+          echo "PG_USER=$PG_USER" >> "$GITHUB_ENV"
+          echo "PG_PASSWORD=$PG_PASSWORD" >> "$GITHUB_ENV"
       - name: Bootstrap Argo CD applications
         env:
           APP_REPO: ${{ steps.images.outputs.app }}
           WORKER_REPO: ${{ steps.images.outputs.worker }}
           APP_IMAGE_TAG: ${{ steps.images.outputs.app_tag }}
           WORKER_IMAGE_TAG: ${{ steps.images.outputs.worker_tag }}
-          PG_USER: ${{ secrets.POSTGRES_USER }}
-          PG_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         run: bash aws/scripts/03-deploy-app.sh
       - name: Run end-to-end test
         run: bash aws/scripts/04-test.sh

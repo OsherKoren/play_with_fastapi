@@ -34,6 +34,18 @@ variable "state_bucket" {
   default     = "msg-preds-dev-directive-tf-state"
 }
 
+variable "postgres_user_parameter" {
+  description = "SSM Parameter Store path containing the AWS lab PostgreSQL username"
+  type        = string
+  default     = "/msg-preds/aws-lab/postgres/user"
+}
+
+variable "postgres_password_parameter" {
+  description = "SSM Parameter Store path containing the AWS lab PostgreSQL password"
+  type        = string
+  default     = "/msg-preds/aws-lab/postgres/password"
+}
+
 variable "budget_email" {
   description = "Optional email address for a monthly AWS budget notification"
   type        = string

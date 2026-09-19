@@ -12,7 +12,7 @@ for command in kubectl python; do
 done
 
 if [[ "${CI:-false}" == "true" && ( -z "${PG_USER:-}" || -z "${PG_PASSWORD:-}" ) ]]; then
-  echo "POSTGRES_USER and POSTGRES_PASSWORD must be configured as aws-lab environment secrets." >&2
+  echo "PG_USER and PG_PASSWORD must be loaded from SSM Parameter Store before deployment." >&2
   exit 1
 fi
 
