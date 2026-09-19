@@ -124,10 +124,18 @@ Configure it as follows:
    repository's GitHub plan.
 3. Add environment variable `AWS_ROLE_ARN` with the bootstrap output.
 4. Add environment variable `AWS_REGION` with value `us-east-2`.
-5. Add environment secrets `POSTGRES_USER` and `POSTGRES_PASSWORD`.
+5. In AWS Systems Manager Parameter Store in `us-east-2`, create
+   `/msg-preds/aws-lab/postgres/user` as a Standard `String` and
+   `/msg-preds/aws-lab/postgres/password` as a Standard `SecureString`. The
+   workflow reads them after assuming the deployment role; do not duplicate
+   their values in GitHub secrets.
 
 Protect the `main` branch and require the `CI` and `Terraform check` status checks.
 Do not permit outside collaborators to merge without review.
+
+Before creating infrastructure, run **Actions → Check AWS Authentication → Run
+workflow** from `main`. It verifies OIDC role assumption and access to the two SSM
+parameters without creating EKS, networking, or other application resources.
 
 ## Start AWS Lab
 

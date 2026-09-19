@@ -1,0 +1,30 @@
+name: Check AWS Authentication
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: aws-lab
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-2' }}
+      - name: Verify assumed identity
+        run: aws sts get-caller-identity
+      - name: Verify database parameter access
+        run: |
+          aws ssm get-parameters \
+            --names \
+              /msg-preds/aws-lab/postgres/user \
+              /msg-preds/aws-lab/postgres/password \
+            --with-decryption \
+            --query 'Parameters[].Name' \
+            --output text

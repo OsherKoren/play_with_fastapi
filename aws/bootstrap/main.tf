@@ -72,6 +72,15 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = "arn:${data.aws_partition.current.partition}:s3:::${var.state_bucket}"
       },
       {
+        Sid    = "PostgresParameters"
+        Effect = "Allow"
+        Action = ["ssm:GetParameter", "ssm:GetParameters"]
+        Resource = [
+          "arn:${data.aws_partition.current.partition}:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${var.postgres_user_parameter}",
+          "arn:${data.aws_partition.current.partition}:ssm:${var.region}:${data.aws_caller_identity.current.account_id}:parameter${var.postgres_password_parameter}"
+        ]
+      },
+      {
         Sid    = "LabInfrastructure"
         Effect = "Allow"
         Action = [
