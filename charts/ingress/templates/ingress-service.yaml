@@ -4,6 +4,10 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Values.namespace | default "msg-preds" }}
+  {{- with .Values.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
     app: {{ .Release.Name }}
 
@@ -12,7 +16,9 @@ spec:
 
   rules:
   {{- range .Values.ingress.rules }}
-  - host: {{ .host }}
+  - {{- if .host }}
+    host: {{ .host | quote }}
+    {{- end }}
     http:
       paths:
       {{- range .http.paths }}

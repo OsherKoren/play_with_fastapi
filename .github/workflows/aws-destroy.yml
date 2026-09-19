@@ -1,0 +1,87 @@
+name: Destroy AWS Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type DESTROY to remove the AWS lab
+        required: true
+        type: string
+      administrator_cidr:
+        description: Optional personal public IPv4 CIDR to retain while destruction runs
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: aws-lab
+  cancel-in-progress: false
+
+jobs:
+  destroy:
+    if: inputs.confirmation == 'DESTROY' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: aws-lab
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-2' }}
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      TF_VAR_region: ${{ vars.AWS_REGION || 'us-east-2' }}
+      TF_VAR_admin_iam_users: "[]"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-2' }}
+          role-duration-seconds: 7200
+      - name: Set current runner CIDR
+        env:
+          ADMINISTRATOR_CIDR: ${{ inputs.administrator_cidr }}
+        run: |
+          RUNNER_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
+          python - "$RUNNER_IP" "$ADMINISTRATOR_CIDR" >> "$GITHUB_ENV" <<'PY'
+          import ipaddress, json, sys
+          cidrs = [str(ipaddress.ip_network(f"{sys.argv[1]}/32"))]
+          if sys.argv[2].strip():
+              cidrs.append(str(ipaddress.ip_network(sys.argv[2].strip())))
+          print("TF_VAR_admin_cidrs=" + json.dumps(list(dict.fromkeys(cidrs))))
+          PY
+      - name: Initialize Terraform
+        run: terraform -chdir=aws/modules init -reconfigure
+      - name: Confirm that the lab exists
+        id: lab
+        run: |
+          if terraform -chdir=aws/modules state list | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No disposable infrastructure exists in Terraform state."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Admit this runner to the EKS API
+        if: steps.lab.outputs.exists == 'true'
+        run: |
+          terraform -chdir=aws/modules plan -target=module.compute -out=access.tfplan
+          terraform -chdir=aws/modules apply access.tfplan
+          CLUSTER_NAME="$(terraform -chdir=aws/modules output -raw cluster_name)"
+          aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION" --alias msg-preds-eks
+      - name: Remove applications and infrastructure
+        if: steps.lab.outputs.exists == 'true'
+        run: bash aws/scripts/06-destroy.sh
+      - name: Verify cleanup
+        if: steps.lab.outputs.exists == 'true'
+        run: bash aws/scripts/07-verify-destroyed.sh
+      - name: Write cleanup summary
+        if: always()
+        run: |
+          echo "## AWS lab destroy" >> "$GITHUB_STEP_SUMMARY"
+          echo "Terraform state and the persistent OIDC bootstrap were retained." >> "$GITHUB_STEP_SUMMARY"
+          echo "Review AWS Budgets and billing after the run." >> "$GITHUB_STEP_SUMMARY"

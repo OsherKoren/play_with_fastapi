@@ -16,3 +16,22 @@ __pycache__/
 /charts/templates/
 **/*.tgz
 /charts/Chart.yaml
+**/nul
+aws/.deploy.env
+
+# Terraform local state, credentials and generated artifacts
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+/aws/modules/nul

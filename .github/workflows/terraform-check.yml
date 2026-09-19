@@ -1,0 +1,36 @@
+name: Terraform check
+
+on:
+  pull_request:
+    paths:
+      - "aws/**/*.tf"
+      - "aws/**/.terraform.lock.hcl"
+      - ".github/workflows/terraform-check.yml"
+  push:
+    branches: [main, dev]
+    paths:
+      - "aws/**/*.tf"
+      - "aws/**/.terraform.lock.hcl"
+      - ".github/workflows/terraform-check.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+      - name: Check formatting
+        run: terraform fmt -check -recursive aws
+      - name: Initialize without remote state
+        run: terraform -chdir=aws/modules init -backend=false -input=false
+      - name: Validate disposable infrastructure
+        run: terraform -chdir=aws/modules validate
+      - name: Initialize bootstrap without remote state
+        run: terraform -chdir=aws/bootstrap init -backend=false -input=false
+      - name: Validate bootstrap
+        run: terraform -chdir=aws/bootstrap validate

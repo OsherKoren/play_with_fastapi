@@ -1,47 +1,41 @@
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS requirements
 
 ENV PIP_DEFAULT_TIMEOUT=100 \
-    # Allow statements and log messages to immediately appear
-    PYTHONUNBUFFERED=1 \
-    # disable a pip version check to reduce run-time & log-spam
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    # cache is useless in docker image, so disable to reduce image size
     PIP_NO_CACHE_DIR=1
 
-ARG POETRY_VERSION=1.8.3
-
-WORKDIR /app
-
-COPY pyproject.toml ./pyproject.toml
-
+ARG POETRY_VERSION=1.8.5
+WORKDIR /build
+COPY pyproject.toml ./
 RUN pip install "poetry==$POETRY_VERSION" \
-    && poetry config virtualenvs.create false \
-    && poetry install --no-root --no-cache --only main \
-    && poetry export --output requirements.txt
+    && poetry export --only main --without-hashes --output requirements-production.txt \
+    && poetry export --with test --without-hashes --output requirements-development.txt
 
+FROM python:3.11-slim AS runtime
 
-FROM python:3.11-slim as final
+ENV PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH=/app
 
 WORKDIR /app
-
-COPY --from=builder /app/requirements.txt .
-
-RUN set -ex \
-    # Security - Upgrade the package index and install security upgrades
-    && apt-get update \
+RUN apt-get update \
     && apt-get upgrade -y \
-    # Install dependencies \
-    && pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt \
-    # Clean up after upgrading - save space in the docker image
-    && apt-get autoremove -y \
-    && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-ENV PYTHONPATH=/app
-
+FROM runtime AS development
+COPY --from=requirements /build/requirements-development.txt ./requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 COPY src ./src
+COPY tests ./tests
+EXPOSE 8000
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
 
+FROM runtime AS production
+COPY --from=requirements /build/requirements-production.txt ./requirements.txt
+RUN pip install --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
+COPY src ./src
 EXPOSE 80
-
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80", "--log-level", "debug"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "80", "--log-level", "info"]

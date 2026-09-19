@@ -3,6 +3,7 @@
 """This module sets up the database connection"""
 
 import os
+from urllib.parse import quote
 
 from databases import Database
 from dotenv import load_dotenv
@@ -49,14 +50,9 @@ def get_database_url():
     db_name = os.getenv("POSTGRES_DB")
 
     if None in (user, password, port, db_name):
-        log.debug(
-            f"\nuser: {user}\npassword: {password}\nhostname: {hostname}\nport: {port}"
-            f"\ndb_name: {db_name}"
-        )
         raise ValueError("Some required environment variables are not set.")
 
-    database_url = f"postgresql://{user}:{password}@{hostname}:{port}/{db_name}"
-    log.debug(f"Database URL:\n{database_url}")
+    database_url = f"postgresql://{quote(user, safe='')}:{quote(password, safe='')}@{hostname}:{port}/{quote(db_name, safe='')}"
     return database_url
 
 

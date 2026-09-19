@@ -8,6 +8,9 @@ metadata:
     app: {{ .Values.persistentVolumeClaim.claimName }}
 
 spec:
+  {{- with .Values.persistence.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
   accessModes:
     {{- range .Values.persistence.accessModes }}
     - {{ . }}
