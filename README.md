@@ -279,6 +279,9 @@ appprojects.argoproj.io       2024-10-04T09:26:32Z
 ## Deploy and destroy the application on AWS EKS (Git Bash)
 
 The complete AWS-only runbook is also available in [`aws/README.md`](aws/README.md).
+The planned reusable GitHub Actions start/destroy lifecycle and long-term return
+checklist are documented separately in
+[`aws/AUTOMATED-LAB.md`](aws/AUTOMATED-LAB.md).
 Run these commands from the repository root. The supported Terraform root is
 `aws/modules`; do not run Terraform from `aws` and do not use the Docker Desktop
 `charts/helmfile.yaml` for EKS.

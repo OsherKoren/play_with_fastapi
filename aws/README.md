@@ -5,6 +5,11 @@ it afterward. Run every command from the repository root in Git Bash. Terraform'
 supported root is `aws/modules`; `aws/main.tf` only guards against using the wrong
 directory. The S3 backend already exists, so do not run `aws/backend-setup`.
 
+For the planned one-button GitHub Actions start/destroy lifecycle, its security
+model, and the checklist for returning after a long break, see
+[`AUTOMATED-LAB.md`](AUTOMATED-LAB.md). That guide clearly marks the automation that
+has not been implemented yet; this file remains the current runnable procedure.
+
 Docker Desktop may stay closed while Terraform creates AWS infrastructure. Start it
 only when building the `app` and `worker` images.
 
