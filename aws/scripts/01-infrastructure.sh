@@ -24,7 +24,6 @@ CLUSTER_NAME="$(terraform -chdir=aws/modules output -raw cluster_name)"
 aws eks update-kubeconfig \
   --name "$CLUSTER_NAME" \
   --region "$AWS_REGION" \
-  --profile "$AWS_PROFILE" \
   --alias msg-preds-eks
 
 terraform -chdir=aws/modules plan -out=eks.tfplan

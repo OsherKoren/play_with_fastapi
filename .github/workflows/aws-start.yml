@@ -1,0 +1,149 @@
+name: Start AWS Lab
+
+on:
+  workflow_dispatch:
+    inputs:
+      administrator_cidr:
+        description: Optional personal public IPv4 CIDR that should retain EKS access (for example 203.0.113.10/32)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: aws-lab
+  cancel-in-progress: false
+
+jobs:
+  start:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: aws-lab
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'us-east-2' }}
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "false"
+      TF_VAR_region: ${{ vars.AWS_REGION || 'us-east-2' }}
+      TF_VAR_admin_iam_users: "[]"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.2
+          terraform_wrapper: false
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'us-east-2' }}
+          role-duration-seconds: 7200
+      - uses: docker/setup-buildx-action@v3
+      - name: Allow this runner to reach the EKS API
+        env:
+          ADMINISTRATOR_CIDR: ${{ inputs.administrator_cidr }}
+        run: |
+          RUNNER_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
+          python - "$RUNNER_IP" "$ADMINISTRATOR_CIDR" >> "$GITHUB_ENV" <<'PY'
+          import ipaddress, json, sys
+          cidrs = [str(ipaddress.ip_network(f"{sys.argv[1]}/32"))]
+          if sys.argv[2].strip():
+              cidrs.append(str(ipaddress.ip_network(sys.argv[2].strip())))
+          print("TF_VAR_admin_cidrs=" + json.dumps(list(dict.fromkeys(cidrs))))
+          PY
+      - name: Confirm AWS identity
+        run: aws sts get-caller-identity
+      - name: Initialize and validate Terraform
+        run: |
+          terraform -chdir=aws/modules init -reconfigure
+          terraform -chdir=aws/modules validate
+      - name: Create network
+        run: |
+          terraform -chdir=aws/modules plan -target=module.network -out=network.tfplan
+          terraform -chdir=aws/modules apply network.tfplan
+      - name: Create EKS control plane and nodes
+        run: |
+          terraform -chdir=aws/modules plan -target=module.compute -out=cluster.tfplan
+          terraform -chdir=aws/modules apply cluster.tfplan
+      - name: Apply complete infrastructure plan
+        run: |
+          terraform -chdir=aws/modules plan -out=eks.tfplan
+          terraform -chdir=aws/modules apply eks.tfplan
+      - name: Configure Kubernetes
+        run: |
+          CLUSTER_NAME="$(terraform -chdir=aws/modules output -raw cluster_name)"
+          aws eks update-kubeconfig --name "$CLUSTER_NAME" --region "$AWS_REGION" --alias msg-preds-eks
+          kubectl --context msg-preds-eks get nodes
+          kubectl --context msg-preds-eks apply -f aws/k8s/storage-class.yaml
+          kubectl --context msg-preds-eks create namespace msg-preds --dry-run=client -o yaml |
+            kubectl --context msg-preds-eks apply -f -
+          kubectl --context msg-preds-eks -n argocd rollout status deployment/argocd-server --timeout=10m
+      - id: images
+        name: Read ECR destinations
+        run: |
+          APP_REPO="$(terraform -chdir=aws/modules output -json image_repositories | jq -r .app)"
+          WORKER_REPO="$(terraform -chdir=aws/modules output -json image_repositories | jq -r .worker)"
+          echo "app=$APP_REPO" >> "$GITHUB_OUTPUT"
+          echo "worker=$WORKER_REPO" >> "$GITHUB_OUTPUT"
+          echo "registry=${APP_REPO%%/*}" >> "$GITHUB_OUTPUT"
+          echo "app_tag=${{ hashFiles('app/.dockerignore', 'app/Dockerfile', 'app/pyproject.toml', 'app/src/**') }}" >> "$GITHUB_OUTPUT"
+          echo "worker_tag=${{ hashFiles('worker/.dockerignore', 'worker/Dockerfile', 'worker/pyproject.toml', 'worker/src/**') }}" >> "$GITHUB_OUTPUT"
+          if aws ecr describe-images --repository-name "${APP_REPO#*/}" --image-ids "imageTag=${{ hashFiles('app/.dockerignore', 'app/Dockerfile', 'app/pyproject.toml', 'app/src/**') }}" >/dev/null 2>&1; then
+            echo "app_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "app_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          if aws ecr describe-images --repository-name "${WORKER_REPO#*/}" --image-ids "imageTag=${{ hashFiles('worker/.dockerignore', 'worker/Dockerfile', 'worker/pyproject.toml', 'worker/src/**') }}" >/dev/null 2>&1; then
+            echo "worker_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "worker_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: aws-actions/amazon-ecr-login@v2
+      - name: Build and push application
+        if: steps.images.outputs.app_exists != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./app
+          target: production
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.images.outputs.app }}:${{ steps.images.outputs.app_tag }}
+          cache-from: type=gha,scope=ecr-app
+          cache-to: type=gha,mode=max,scope=ecr-app
+      - name: Build and push worker
+        if: steps.images.outputs.worker_exists != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./worker
+          target: production
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.images.outputs.worker }}:${{ steps.images.outputs.worker_tag }}
+          cache-from: type=gha,scope=ecr-worker
+          cache-to: type=gha,mode=max,scope=ecr-worker
+      - name: Bootstrap Argo CD applications
+        env:
+          APP_REPO: ${{ steps.images.outputs.app }}
+          WORKER_REPO: ${{ steps.images.outputs.worker }}
+          APP_IMAGE_TAG: ${{ steps.images.outputs.app_tag }}
+          WORKER_IMAGE_TAG: ${{ steps.images.outputs.worker_tag }}
+          PG_USER: ${{ secrets.POSTGRES_USER }}
+          PG_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        run: bash aws/scripts/03-deploy-app.sh
+      - name: Run end-to-end test
+        run: bash aws/scripts/04-test.sh
+      - name: Write deployment summary
+        if: success()
+        run: |
+          ALB_HOST="$(kubectl --context msg-preds-eks -n msg-preds get ingress ingress -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+          echo "## AWS lab is running" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Application: http://$ALB_HOST/docs" >> "$GITHUB_STEP_SUMMARY"
+          echo "- App image tag: \`${{ steps.images.outputs.app_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Worker image tag: \`${{ steps.images.outputs.worker_tag }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Run **Destroy AWS Lab** when you finish." >> "$GITHUB_STEP_SUMMARY"
+      - name: Collect Kubernetes diagnostics
+        if: failure()
+        run: |
+          kubectl --context msg-preds-eks -n msg-preds get all,ingress,pvc || true
+          kubectl --context msg-preds-eks -n msg-preds get events --sort-by=.lastTimestamp || true

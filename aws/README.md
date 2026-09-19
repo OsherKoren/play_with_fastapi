@@ -1,232 +1,111 @@
-# AWS EKS deployment runbook
+# AWS EKS and Argo CD runbook
 
-This runbook deploys the `msg-preds` learning application to Amazon EKS and removes
-it afterward. Run every command from the repository root in Git Bash. Terraform's
-supported root is `aws/modules`; `aws/main.tf` only guards against using the wrong
-directory. The S3 backend already exists, so do not run `aws/backend-setup`.
+This runbook creates the disposable `msg-preds-dev` EKS lab, builds immutable
+application images in ECR, bootstraps Argo CD, tests the deployment, and removes the
+chargeable resources afterward. Run local commands from the repository root in Git
+Bash. The Terraform root is `aws/modules`.
 
-For the planned one-button GitHub Actions start/destroy lifecycle, its security
-model, and the checklist for returning after a long break, see
-[`AUTOMATED-LAB.md`](AUTOMATED-LAB.md). That guide clearly marks the automation that
-has not been implemented yet; this file remains the current runnable procedure.
+For the one-time GitHub OIDC setup and protected workflow buttons, see
+[`AUTOMATED-LAB.md`](AUTOMATED-LAB.md).
 
-Docker Desktop may stay closed while Terraform creates AWS infrastructure. Start it
-only when building the `app` and `worker` images.
+## Architecture and ownership
 
-## Git Bash scripts
+```text
+Terraform
+  VPC, EKS, ECR, IAM, AWS controllers, Argo CD
 
-The commands below are collected into scripts in `aws/scripts`. Run them from the
-repository root in this order:
+Argo CD (inside EKS, namespace argocd)
+  db, Kafka, worker, API, ALB ingress
 
-```bash
-# Fresh infrastructure deployment (already completed for the current cluster)
-bash aws/scripts/01-infrastructure.sh
-
-# Next step for the current cluster; Docker Desktop must be running
-bash aws/scripts/02-build-and-push.sh
-
-# Deploy PostgreSQL, Kafka, worker, API and ingress
-bash aws/scripts/03-deploy-app.sh
-
-# Wait for the ALB and run the end-to-end test
-bash aws/scripts/04-test.sh
-
-# Optional status report
-bash aws/scripts/05-status.sh
-
-# Remove the application and all Terraform-managed AWS resources
-bash aws/scripts/06-destroy.sh
+GitHub Actions or local scripts
+  Terraform orchestration, image build/push, Argo bootstrap, smoke test
 ```
 
-The image script writes the ECR URLs and generated image tag to the ignored
-`aws/.deploy.env` file. It contains no database password. The deployment script
-prompts for PostgreSQL credentials without displaying the password.
+Argo CD is a `ClusterIP` service. It does not create a public administrative load
+balancer. The application ingress still creates the public ALB.
 
-## 1. Configure the terminal
+## Prerequisites
+
+- AWS CLI v2 with profile `AwsDev`
+- Terraform 1.16.x
+- Docker Desktop in Linux-container mode
+- kubectl, Helm 3, Git Bash, curl, and Python
+- The persistent S3 backend and GitHub OIDC bootstrap described in
+  [`AUTOMATED-LAB.md`](AUTOMATED-LAB.md)
+
+## Complete local lifecycle
 
 ```bash
 export AWS_PROFILE="AwsDev"
 export AWS_REGION="us-east-2"
-export TF_VAR_aws_profile="$AWS_PROFILE"
-export TF_VAR_region="$AWS_REGION"
 
-ADMIN_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
-export TF_VAR_admin_cidrs="[\"${ADMIN_IP}/32\"]"
-export TF_VAR_admin_iam_users='["AwsDev"]'
-
-terraform version
-aws sts get-caller-identity
+bash aws/scripts/01-infrastructure.sh
+bash aws/scripts/02-build-and-push.sh
+bash aws/scripts/03-deploy-app.sh
+bash aws/scripts/04-test.sh
+bash aws/scripts/05-status.sh       # optional
+bash aws/scripts/06-destroy.sh      # always run when finished
+bash aws/scripts/07-verify-destroyed.sh
 ```
 
-Terraform must be 1.16.x. Confirm that the AWS account is the intended account.
+The infrastructure script admits the current public IP to the EKS API. The image
+script calculates independent content hashes from each production Dockerfile,
+dependency file, and `src` tree. If that immutable tag already exists in ECR, the
+build and push are skipped.
 
-## 2. Initialize and inspect state
+The deployment script prompts for PostgreSQL credentials, creates Kubernetes
+Secrets, and applies the Argo CD Applications from
+`aws/argocd/applications.yaml.tpl`. Argo CD continuously reconciles the Helm charts
+on `main`; later chart commits are applied without another `helm upgrade` command.
+
+## Inspect Argo CD
+
+Confirm the applications:
 
 ```bash
-terraform -chdir=aws/modules init -reconfigure
-terraform -chdir=aws/modules validate
-terraform -chdir=aws/modules state list
+kubectl --context msg-preds-eks -n argocd get applications
 ```
 
-For a fresh deployment, `state list` should be empty. Do not apply if it unexpectedly
-lists older resources.
-
-## 3. Create the network and bootstrap EKS
-
-The one-time targeted applies create the complete network first and then the cluster
-before Terraform configures Helm. Inspect each plan before applying it.
+Start a private local tunnel to the Argo CD UI:
 
 ```bash
-terraform -chdir=aws/modules plan -target=module.network -out=network.tfplan
-terraform -chdir=aws/modules apply network.tfplan
-
-terraform -chdir=aws/modules plan -target=module.compute -out=cluster.tfplan
-terraform -chdir=aws/modules apply cluster.tfplan
-
-CLUSTER_NAME="$(terraform -chdir=aws/modules output -raw cluster_name)"
-aws eks update-kubeconfig \
-  --name "$CLUSTER_NAME" \
-  --region "$AWS_REGION" \
-  --profile "$AWS_PROFILE" \
-  --alias msg-preds-eks
-kubectl --context msg-preds-eks get nodes
+kubectl --context msg-preds-eks -n argocd \
+  port-forward service/argocd-server 8080:443
 ```
 
-## 4. Complete the AWS infrastructure
-
-This creates IAM integrations, the EBS CSI add-on, ECR repositories, and the AWS
-Load Balancer Controller.
+Open `https://localhost:8080`. A browser warning for the internal certificate is
+expected. The username is `admin`. Read the initial password in another terminal:
 
 ```bash
-terraform -chdir=aws/modules plan -out=eks.tfplan
-terraform -chdir=aws/modules apply eks.tfplan
-
-kubectl --context msg-preds-eks -n kube-system rollout status \
-  deployment/alb-controller-aws-load-balancer-controller --timeout=5m
-kubectl --context msg-preds-eks -n kube-system rollout status \
-  deployment/ebs-csi-controller --timeout=5m
-kubectl --context msg-preds-eks apply -f aws/k8s/storage-class.yaml
-kubectl --context msg-preds-eks create namespace msg-preds \
-  --dry-run=client -o yaml | kubectl --context msg-preds-eks apply -f -
+kubectl --context msg-preds-eks -n argocd get secret argocd-initial-admin-secret \
+  -o jsonpath='{.data.password}' | base64 -d
 ```
 
-## 5. Build and push images
+## CI image strategy
 
-Start Docker Desktop in Linux-container mode.
+Each service now has one multi-stage Dockerfile:
 
-```bash
-APP_REPO="$(terraform -chdir=aws/modules output -json image_repositories | python -c 'import json,sys; print(json.load(sys.stdin)["app"])')"
-WORKER_REPO="$(terraform -chdir=aws/modules output -json image_repositories | python -c 'import json,sys; print(json.load(sys.stdin)["worker"])')"
-REGISTRY="${APP_REPO%%/*}"
-IMAGE_TAG="$(date -u +%Y%m%d%H%M%S)"
+- `development` contains development/test behavior and is selected by
+  `docker-compose-dev.yml`.
+- `production` contains only runtime dependencies and is the default final stage.
 
-aws ecr get-login-password --region "$AWS_REGION" | \
-  docker login --username AWS --password-stdin "$REGISTRY"
-docker build --platform linux/amd64 -t "${APP_REPO}:${IMAGE_TAG}" ./app
-docker build --platform linux/amd64 -t "${WORKER_REPO}:${IMAGE_TAG}" ./worker
-docker push "${APP_REPO}:${IMAGE_TAG}"
-docker push "${WORKER_REPO}:${IMAGE_TAG}"
-```
+CI runs pytest once in the development app container. It separately build-validates
+only a changed service's `production` stage and does not start a duplicate
+production Compose stack. Buildx stores reusable layers in the GitHub Actions cache.
 
-Keep this terminal open so the repository and tag variables remain available.
+AWS deployment uses content-based tags rather than the repository commit SHA. An
+infrastructure-only commit therefore reuses existing images. After a full destroy,
+ECR is empty and images must be rebuilt, but BuildKit caching can still accelerate
+that operation.
 
-## 6. Deploy `msg-preds`
+## Safe destruction
 
-```bash
-read -rp "PostgreSQL username: " PG_USER
-read -rsp "PostgreSQL password: " PG_PASSWORD
-echo
-kubectl --context msg-preds-eks -n msg-preds create secret generic pguser \
-  --from-literal=POSTGRES_USER="$PG_USER" --dry-run=client -o yaml | \
-  kubectl --context msg-preds-eks apply -f -
-kubectl --context msg-preds-eks -n msg-preds create secret generic pgpassword \
-  --from-literal=POSTGRES_PASSWORD="$PG_PASSWORD" --dry-run=client -o yaml | \
-  kubectl --context msg-preds-eks apply -f -
-unset PG_PASSWORD
+The destroy script deletes the Argo CD Applications first. Their finalizers let
+Argo CD remove Kubernetes resources and give the AWS Load Balancer Controller time
+to delete the ALB. Terraform then destroys Argo CD, EKS, networking, ECR, and other
+disposable resources.
 
-helm upgrade --install db ./charts/db --kube-context msg-preds-eks \
-  -n msg-preds -f charts/db/values-eks.yaml --wait --timeout 10m
-helm upgrade --install kafka ./charts/kafka --kube-context msg-preds-eks \
-  -n msg-preds --wait --timeout 10m
-kubectl --context msg-preds-eks -n msg-preds exec deployment/kafka -- \
-  kafka-topics --bootstrap-server kafka:9092 --list
-
-helm upgrade --install worker ./charts/worker --kube-context msg-preds-eks \
-  -n msg-preds --set-string "image.repository=$WORKER_REPO" \
-  --set-string "image.tag=$IMAGE_TAG" --wait --timeout 10m
-kubectl --context msg-preds-eks -n msg-preds exec deployment/kafka -- \
-  kafka-consumer-groups --bootstrap-server kafka:9092 \
-  --describe --group MlEngineersGroup --state
-
-helm upgrade --install app ./charts/app --kube-context msg-preds-eks \
-  -n msg-preds --set-string "image.repository=$APP_REPO" \
-  --set-string "image.tag=$IMAGE_TAG" --wait --timeout 10m
-helm upgrade --install ingress ./charts/ingress --kube-context msg-preds-eks \
-  -n msg-preds -f charts/ingress/values-eks.yaml --wait --timeout 10m
-kubectl --context msg-preds-eks -n msg-preds get pods,svc,ingress,pvc
-```
-
-Repeat either Kafka inspection command if the broker or consumer is still starting.
-
-## 7. Test the complete application
-
-```bash
-kubectl --context msg-preds-eks -n msg-preds get ingress ingress -w
-# Press Ctrl+C after ADDRESS appears.
-ALB_HOST="$(kubectl --context msg-preds-eks -n msg-preds get ingress ingress \
-  -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
-test -n "$ALB_HOST" || { echo "ALB is not ready"; exit 1; }
-BASE_URL="http://$ALB_HOST"
-powershell.exe -NoProfile -ExecutionPolicy Bypass \
-  -File "$(cygpath -w "$PWD/aws/test-eks.ps1")" -BaseUrl "$BASE_URL"
-```
-
-Successful output begins with `PASS: Swagger, API, PostgreSQL, Kafka and worker`.
-
-Useful diagnostics:
-
-```bash
-kubectl --context msg-preds-eks -n msg-preds get events --sort-by=.lastTimestamp
-kubectl --context msg-preds-eks -n msg-preds logs deployment/app --tail=100
-kubectl --context msg-preds-eks -n msg-preds logs deployment/worker --tail=100
-kubectl --context msg-preds-eks -n kube-system logs \
-  deployment/alb-controller-aws-load-balancer-controller --tail=100
-kubectl --context msg-preds-eks -n msg-preds describe pvc db-data
-```
-
-## 8. Destroy everything created for the application
-
-Delete Kubernetes ingress before Terraform removes the controller. This lets its
-finalizer remove the ALB. Record the EBS volume so its deletion can be verified.
-
-```bash
-PV_NAME="$(kubectl --context msg-preds-eks -n msg-preds get pvc db-data \
-  -o jsonpath='{.spec.volumeName}' 2>/dev/null || true)"
-DB_VOLUME_ID=""
-if [ -n "$PV_NAME" ]; then
-  DB_VOLUME_ID="$(kubectl --context msg-preds-eks get pv "$PV_NAME" \
-    -o jsonpath='{.spec.csi.volumeHandle}' 2>/dev/null || true)"
-fi
-
-helm uninstall ingress --kube-context msg-preds-eks -n msg-preds || true
-kubectl --context msg-preds-eks -n msg-preds wait \
-  --for=delete ingress/ingress --timeout=10m || true
-helm uninstall app worker kafka db --kube-context msg-preds-eks -n msg-preds || true
-kubectl --context msg-preds-eks delete namespace msg-preds --wait=true || true
-kubectl --context msg-preds-eks delete storageclass gp3 --ignore-not-found
-
-terraform -chdir=aws/modules plan -destroy -out=destroy.tfplan
-terraform -chdir=aws/modules apply destroy.tfplan
-
-if [ -n "$DB_VOLUME_ID" ]; then
-  aws ec2 describe-volumes --volume-ids "$DB_VOLUME_ID" \
-    --region "$AWS_REGION" --profile "$AWS_PROFILE" >/dev/null 2>&1 && \
-    echo "WARNING: EBS volume $DB_VOLUME_ID still exists; inspect and delete it." || \
-    echo "Database EBS volume was deleted."
-fi
-```
-
-The ECR repositories and their images are deleted by Terraform. Verify in AWS that
-the EKS cluster, EC2 workers, NAT gateway, ALB, and database EBS volume are gone.
-The older S3 state bucket and DynamoDB table are not part of this application destroy.
-Delete that backend separately only after confirming no Terraform project uses it.
+The final verification checks Terraform state, EKS, EC2 nodes, NAT gateways, EBS
+volumes, Kubernetes load balancers, and ECR repositories. The S3 state bucket,
+GitHub OIDC provider, deployment role, and optional AWS Budget remain intentionally
+so the lab can be recreated later.

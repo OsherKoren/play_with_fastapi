@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:16-alpine
@@ -61,11 +59,11 @@ services:
       # Function to create a topic if it does not exist
       create_topic_if_not_exists() {
         local topic_name=$1
-        if kafka-topics --bootstrap-server kafka:9092 --list | grep -q "^${topic_name}$"; then
-          echo -e "Topic ${topic_name} already exists"
+        if kafka-topics --bootstrap-server kafka:9092 --list | grep -q "^$${topic_name}$"; then
+          echo -e "Topic $${topic_name} already exists"
         else
-          echo -e "Creating topic ${topic_name} ..."
-          kafka-topics --bootstrap-server kafka:9092 --create --topic ${topic_name} --replication-factor 1 --partitions 1
+          echo -e "Creating topic $${topic_name} ..."
+          kafka-topics --bootstrap-server kafka:9092 --create --topic $${topic_name} --replication-factor 1 --partitions 1
         fi
       }
       # Check and create topics

@@ -2,7 +2,7 @@
 
 source "$(dirname -- "$0")/common.sh"
 
-for command in terraform aws kubectl helm curl; do
+for command in terraform aws kubectl curl; do
   require_command "$command"
 done
 
@@ -17,10 +17,11 @@ if [[ -n "$PV_NAME" ]]; then
     -o jsonpath='{.spec.csi.volumeHandle}' 2>/dev/null || true)"
 fi
 
-helm uninstall ingress --kube-context msg-preds-eks -n msg-preds || true
+kubectl --context msg-preds-eks -n argocd delete applications.argoproj.io \
+  msg-preds-ingress msg-preds-app msg-preds-worker msg-preds-kafka msg-preds-db \
+  --ignore-not-found --wait=true --timeout=15m
 kubectl --context msg-preds-eks -n msg-preds wait \
   --for=delete ingress/ingress --timeout=10m || true
-helm uninstall app worker kafka db --kube-context msg-preds-eks -n msg-preds || true
 kubectl --context msg-preds-eks delete namespace msg-preds --wait=true || true
 kubectl --context msg-preds-eks delete storageclass gp3 --ignore-not-found
 
@@ -29,7 +30,7 @@ terraform -chdir=aws/modules apply destroy.tfplan
 
 if [[ -n "$DB_VOLUME_ID" ]]; then
   if aws ec2 describe-volumes --volume-ids "$DB_VOLUME_ID" \
-    --region "$AWS_REGION" --profile "$AWS_PROFILE" >/dev/null 2>&1; then
+    --region "$AWS_REGION" >/dev/null 2>&1; then
     echo "WARNING: EBS volume $DB_VOLUME_ID still exists; inspect and delete it."
   else
     echo "Database EBS volume was deleted."

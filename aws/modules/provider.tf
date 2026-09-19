@@ -29,8 +29,7 @@ terraform {
 # ###############################################################################
 
 provider "aws" {
-  region  = var.region
-  profile = var.aws_profile
+  region = var.region
 }
 
 # ###############################################################################
@@ -48,8 +47,7 @@ provider "helm" {
       args = [
         "eks", "get-token",
         "--cluster-name", module.compute.cluster_name,
-        "--region", var.region,
-        "--profile", var.aws_profile
+        "--region", var.region
       ]
     }
   }

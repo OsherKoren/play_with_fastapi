@@ -279,8 +279,8 @@ appprojects.argoproj.io       2024-10-04T09:26:32Z
 ## Deploy and destroy the application on AWS EKS (Git Bash)
 
 The complete AWS-only runbook is also available in [`aws/README.md`](aws/README.md).
-The planned reusable GitHub Actions start/destroy lifecycle and long-term return
-checklist are documented separately in
+The reusable GitHub Actions start/destroy lifecycle, one-time setup, and long-term
+return checklist are documented separately in
 [`aws/AUTOMATED-LAB.md`](aws/AUTOMATED-LAB.md).
 Run these commands from the repository root. The supported Terraform root is
 `aws/modules`; do not run Terraform from `aws` and do not use the Docker Desktop
@@ -293,22 +293,27 @@ The complete workflow is available as Git Bash scripts. Run them from the reposi
 root in numeric order:
 
 ```bash
-bash aws/scripts/01-infrastructure.sh  # Skip now: the current infrastructure exists
-bash aws/scripts/02-build-and-push.sh  # Run next with Docker Desktop started
+bash aws/scripts/01-infrastructure.sh
+bash aws/scripts/02-build-and-push.sh  # Docker Desktop must be running
 bash aws/scripts/03-deploy-app.sh
 bash aws/scripts/04-test.sh
 bash aws/scripts/05-status.sh          # Optional
 bash aws/scripts/06-destroy.sh         # Run after testing to stop AWS charges
+bash aws/scripts/07-verify-destroyed.sh
 ```
 
-The detailed commands and explanations remain below for reference.
+The scripts and [`aws/README.md`](aws/README.md) are the supported procedure. The
+older direct-Helm command transcript below is retained only as historical learning
+material; it does not describe the current Argo CD deployment path.
+
+<details>
+<summary>Legacy direct-Helm AWS command transcript</summary>
 
 ### 1. Select the AWS account and initialize Terraform
 
 ```bash
 export AWS_PROFILE="AwsDev"
 export AWS_REGION="us-east-2"
-export TF_VAR_aws_profile="$AWS_PROFILE"
 export TF_VAR_region="$AWS_REGION"
 
 ADMIN_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
@@ -343,7 +348,6 @@ CLUSTER_NAME="$(terraform -chdir=aws/modules output -raw cluster_name)"
 aws eks update-kubeconfig \
   --name "$CLUSTER_NAME" \
   --region "$AWS_REGION" \
-  --profile "$AWS_PROFILE" \
   --alias msg-preds-eks
 kubectl --context msg-preds-eks get nodes
 
@@ -464,7 +468,7 @@ terraform -chdir=aws/modules apply destroy.tfplan
 
 if [ -n "$DB_VOLUME_ID" ]; then
   aws ec2 describe-volumes --volume-ids "$DB_VOLUME_ID" \
-    --region "$AWS_REGION" --profile "$AWS_PROFILE" >/dev/null 2>&1 && \
+    --region "$AWS_REGION" >/dev/null 2>&1 && \
     echo "WARNING: EBS volume $DB_VOLUME_ID still exists; inspect and delete it." || \
     echo "Database EBS volume was deleted."
 fi
@@ -475,3 +479,5 @@ Terraform. Confirm that no load balancer, NAT gateway, EKS cluster, worker insta
 or database EBS volume remains. The pre-existing backend bucket and DynamoDB table
 are deliberately excluded from the application destroy because they may hold state
 history; remove them separately only when no Terraform configuration still uses them.
+
+</details>

@@ -2,7 +2,7 @@
 
 source "$(dirname -- "$0")/common.sh"
 
-for command in kubectl curl powershell.exe cygpath; do
+for command in kubectl curl; do
   require_command "$command"
 done
 
@@ -35,6 +35,12 @@ if ! curl -fsS --max-time 10 "$BASE_URL/api/v1/health/" >/dev/null 2>&1; then
 fi
 
 echo "Testing $BASE_URL"
-powershell.exe -NoProfile -ExecutionPolicy Bypass \
-  -File "$(cygpath -w "$REPO_ROOT/aws/test-eks.ps1")" \
-  -BaseUrl "$BASE_URL"
+if command -v powershell.exe >/dev/null 2>&1; then
+  require_command cygpath
+  powershell.exe -NoProfile -ExecutionPolicy Bypass \
+    -File "$(cygpath -w "$REPO_ROOT/aws/test-eks.ps1")" \
+    -BaseUrl "$BASE_URL"
+else
+  require_command pwsh
+  pwsh -NoProfile -File "$REPO_ROOT/aws/test-eks.ps1" -BaseUrl "$BASE_URL"
+fi

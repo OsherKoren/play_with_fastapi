@@ -3,7 +3,7 @@
 resource "terraform_data" "use_modules" {
   lifecycle {
     precondition {
-      condition = path.module == "__never_deploy_this_directory__"
+      condition     = path.module == "__never_deploy_this_directory__"
       error_message = "Run Terraform with -chdir=aws/modules. See the root README for deployment instructions."
     }
   }

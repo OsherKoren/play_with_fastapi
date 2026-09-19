@@ -1,0 +1,156 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, dev]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.filter.outputs.python }}
+      app: ${{ steps.filter.outputs.app }}
+      worker: ${{ steps.filter.outputs.worker }}
+      integration: ${{ steps.filter.outputs.integration }}
+      helm: ${{ steps.filter.outputs.helm }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            python:
+              - 'pyproject.toml'
+              - 'app/**'
+              - 'worker/**'
+            app:
+              - 'app/Dockerfile'
+              - 'app/pyproject.toml'
+              - 'app/src/**'
+            worker:
+              - 'worker/Dockerfile'
+              - 'worker/pyproject.toml'
+              - 'worker/src/**'
+            integration:
+              - 'app/**'
+              - 'worker/**'
+              - 'setup_db/**'
+              - 'docker-compose-dev.yml'
+            helm:
+              - 'charts/**'
+              - 'aws/argocd/**'
+
+  python:
+    name: Python ${{ matrix.python-version }}
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Poetry
+        run: python -m pip install "poetry==1.8.5"
+      - name: Validate and install
+        run: |
+          poetry check
+          poetry install --no-interaction
+      - name: Quality checks
+        if: matrix.python-version == '3.12'
+        run: |
+          poetry run black --check .
+          poetry run mypy app worker
+          poetry run pylint app
+          poetry run pylint worker
+
+  integration:
+    name: Development image integration
+    needs: changes
+    if: needs.changes.outputs.integration == 'true'
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: ci_user
+      POSTGRES_PASSWORD: ci_password
+      POSTGRES_HOST: dev-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: accounts_db
+      KAFKA_HOST: dev-kafka
+      KAFKA_PORT: "29092"
+      TOPIC_1: evt.userMessage
+      TOPIC_2: evt.messageScore
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create local CI environment
+        run: env | grep -E '^(POSTGRES_|KAFKA_|TOPIC_)' > .env.dev
+      - name: Start development services
+        run: docker compose -f docker-compose-dev.yml --env-file .env.dev up -d --build --wait
+      - name: Run tests inside the development app image
+        run: docker compose -f docker-compose-dev.yml exec -T dev-app pytest tests/
+      - name: Show service logs
+        if: failure()
+        run: docker compose -f docker-compose-dev.yml logs --no-color
+      - name: Stop services
+        if: always()
+        run: docker compose -f docker-compose-dev.yml --env-file .env.dev down --volumes
+
+  app-production-image:
+    name: Build production app image
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./app
+          target: production
+          push: false
+          cache-from: type=gha,scope=ecr-app
+          cache-to: type=gha,mode=max,scope=ecr-app
+
+  worker-production-image:
+    name: Build production worker image
+    needs: changes
+    if: needs.changes.outputs.worker == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./worker
+          target: production
+          push: false
+          cache-from: type=gha,scope=ecr-worker
+          cache-to: type=gha,mode=max,scope=ecr-worker
+
+  helm:
+    name: Validate Helm charts
+    needs: changes
+    if: needs.changes.outputs.helm == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+      - name: Lint charts
+        run: |
+          helm lint charts/db -f charts/db/values-eks.yaml
+          helm lint charts/kafka
+          helm lint charts/worker --set image.repository=test/worker --set image.tag=test
+          helm lint charts/app --set image.repository=test/app --set image.tag=test
+          helm lint charts/ingress -f charts/ingress/values-eks.yaml

@@ -5,11 +5,10 @@ the `msg-preds` AWS learning environment. The goal is to make the lab easy to us
 again after a long break without leaving chargeable application infrastructure
 running between study sessions.
 
-> [!IMPORTANT]
-> The automated `aws-start.yml` and `aws-destroy.yml` workflows described here are
-> not implemented yet. Until they are added, use the tested manual procedure in
-> [`README.md`](README.md). Do not assume that a GitHub Actions button currently
-> deploys or removes the AWS environment.
+The repository provides manual lifecycle scripts as well as protected GitHub
+Actions workflows. Complete the one-time bootstrap and GitHub configuration below
+before using the workflow buttons. The tested local fallback remains in
+[`README.md`](README.md).
 
 ## Lifecycle at a glance
 
@@ -21,7 +20,7 @@ Persistent bootstrap
                               |
                               v
 Start AWS Lab
-  Terraform apply -> ECR build/push -> Helm deploy -> smoke test
+  Terraform apply -> ECR build/push -> Argo CD sync -> smoke test
                               |
                               v
 Destroy AWS Lab
@@ -33,7 +32,7 @@ and the GitHub OIDC provider have no hourly charge, and the nearly empty state b
 should have only a very small storage cost. Keeping these resources makes a later
 restart possible without recreating CI authentication or losing Terraform state.
 
-## Planned controls
+## Security controls
 
 The deployment workflows should use all of the following controls:
 
@@ -56,7 +55,8 @@ The important OIDC trust condition is expected to have this shape:
   "StringEquals": {
     "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
     "token.actions.githubusercontent.com:sub":
-      "repo:OsherKoren/play_with_fastapi:environment:aws-lab"
+      "repo:OsherKoren/play_with_fastapi:environment:aws-lab",
+    "token.actions.githubusercontent.com:ref": "refs/heads/main"
   }
 }
 ```
@@ -67,43 +67,103 @@ role. Do not use `pull_request_target` to check out and execute contributor code
 
 ## One-time bootstrap
 
-The planned `aws/bootstrap` Terraform root will own:
+The `aws/bootstrap` Terraform root owns:
 
-- The versioned and encrypted S3 Terraform state bucket.
 - The GitHub Actions OIDC provider.
 - The narrowly trusted GitHub deployment role and policies.
 - An optional AWS Budget and billing notification.
 
-Bootstrap is an administrator operation performed locally with an authenticated AWS
-profile. It should be applied once and retained between lab sessions. Its outputs
-will include the role ARN to configure as a GitHub environment variable.
+The existing state bucket is intentionally managed separately by
+`aws/backend-setup`, because Terraform cannot create the bucket in which it is
+already storing its own state. The bootstrap root uses a separate state key in that
+same persistent bucket.
 
-Until that root is implemented, the existing backend remains managed through
-`aws/backend-setup`, and the deployment itself must follow the manual AWS runbook.
+Bootstrap is an administrator operation performed once from a local terminal. From
+the repository root in Git Bash:
 
-## Planned Start AWS Lab workflow
+```bash
+export AWS_PROFILE="AwsDev"
+export AWS_REGION="us-east-2"
 
-The future `.github/workflows/aws-start.yml` workflow will:
+aws sts get-caller-identity
+terraform -chdir=aws/bootstrap init -reconfigure
+terraform -chdir=aws/bootstrap plan -out=bootstrap.tfplan
+terraform -chdir=aws/bootstrap apply bootstrap.tfplan
+terraform -chdir=aws/bootstrap output -raw github_actions_role_arn
+```
+
+To create email budget notifications, add a real address when creating the saved
+plan by using a local variable file or
+`-var='budget_email=you@example.com'`, then apply that saved plan normally. Never
+commit a personal address in this public repository.
+
+If the AWS account already contains the GitHub OIDC provider, Terraform reports that
+it already exists. Import it instead of creating a duplicate:
+
+```bash
+ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+terraform -chdir=aws/bootstrap import \
+  aws_iam_openid_connect_provider.github \
+  "arn:aws:iam::$ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+```
+
+## One-time GitHub configuration
+
+In the original GitHub repository—not a fork—open **Settings → Environments** and
+create an environment named `aws-lab`.
+
+Configure it as follows:
+
+1. Allow deployments only from the `main` branch.
+2. Add yourself as a required reviewer if that control is available for the
+   repository's GitHub plan.
+3. Add environment variable `AWS_ROLE_ARN` with the bootstrap output.
+4. Add environment variable `AWS_REGION` with value `us-east-2`.
+5. Add environment secrets `POSTGRES_USER` and `POSTGRES_PASSWORD`.
+
+Protect the `main` branch and require the `CI` and `Terraform check` status checks.
+Do not permit outside collaborators to merge without review.
+
+## Start AWS Lab
+
+Open **Actions → Start AWS Lab → Run workflow**. Optionally enter your current
+public IPv4 address with `/32` as `administrator_cidr` if you also want local
+`kubectl` access after the workflow finishes. The workflow:
 
 1. Wait for approval on the protected `aws-lab` environment.
 2. Exchange its GitHub OIDC token for temporary AWS credentials.
 3. Validate Terraform and create a saved infrastructure plan.
 4. Apply the network and EKS bootstrap stages required by the provider dependency.
-5. Apply the complete Terraform configuration.
+5. Apply the complete Terraform configuration, including Argo CD.
 6. Build the `app` and `worker` images for Linux AMD64.
-7. Tag and push both images to ECR using the Git commit SHA.
-8. Update the EKS kubeconfig and deploy the Helm releases.
-9. Wait for the ALB and run the end-to-end smoke test.
+7. Tag each image with a hash of its production build inputs and push it only when
+   that immutable tag is missing from ECR.
+8. Update the EKS kubeconfig and bootstrap the Argo CD Applications.
+9. Wait for Argo CD health and the ALB, then run the end-to-end smoke test.
 10. Write the application URL and deployed image tag to the workflow summary.
 
-## Planned Destroy AWS Lab workflow
+## Container build cache
 
-The future `.github/workflows/aws-destroy.yml` workflow will:
+The path-aware production build jobs and AWS deployment use Docker Buildx with
+GitHub Actions cache storage. The application uses cache scope `ecr-app`, and the
+worker uses `ecr-worker`. Repeated commits on the same branch can reuse dependency
+and filesystem layers. Builds on `main` also warm the cache used by **Start AWS
+Lab**. Infrastructure-only changes skip application CI jobs.
+
+The optional Docker Hub workflow has separate `docker-hub-app` and
+`docker-hub-worker` scopes so publishing public images cannot replace the AWS build
+cache. A cache miss is safe: Docker simply performs a complete build and stores new
+layers for later runs.
+
+## Destroy AWS Lab
+
+Open **Actions → Destroy AWS Lab → Run workflow**, type `DESTROY`, and approve the
+protected environment. The workflow:
 
 1. Require the operator to type `DESTROY` and approve the `aws-lab` environment.
 2. Capture the persistent-volume and EBS-volume identifiers for verification.
-3. Uninstall ingress first and wait for the AWS load balancer to disappear.
-4. Uninstall the application, worker, Kafka, and database releases.
+3. Delete the Argo CD Applications and let their finalizers remove ingress first.
+4. Wait for the application, worker, Kafka, database, and load balancer to disappear.
 5. Delete the namespace, claims, and storage class.
 6. Create and apply a saved Terraform destroy plan.
 7. Check for leftover EKS clusters, load balancers, NAT gateways, EBS volumes, and
@@ -129,9 +189,8 @@ Use this checklist when reopening the project months or years later:
 9. Run **Destroy AWS Lab** and wait for its cleanup verification to pass.
 10. Review AWS billing and Resource Explorer for unexpected remaining resources.
 
-If the automated workflows have not yet been implemented, run the numbered scripts
-in the manual runbook instead. They follow the same create, deploy, test, and destroy
-sequence.
+If GitHub Actions is unavailable, run the numbered scripts in the manual runbook.
+They follow the same create, deploy, test, and destroy sequence.
 
 ## Emergency lockout
 

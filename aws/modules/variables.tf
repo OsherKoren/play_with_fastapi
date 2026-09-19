@@ -8,11 +8,6 @@ variable "region" {
   default     = "us-east-2"
 }
 
-variable "aws_profile" {
-  default     = "AwsDev"
-  description = "AWS CLI profile to use for authentication"
-}
-
 variable "kubernetes_version" {
   type    = string
   default = "1.36"
