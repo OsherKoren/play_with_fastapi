@@ -154,3 +154,38 @@ jobs:
           helm lint charts/worker --set image.repository=test/worker --set image.tag=test
           helm lint charts/app --set image.repository=test/app --set image.tag=test
           helm lint charts/ingress -f charts/ingress/values-eks.yaml
+
+  ci-success:
+    name: CI success
+    if: always()
+    needs:
+      - changes
+      - python
+      - integration
+      - app-production-image
+      - worker-production-image
+      - helm
+    runs-on: ubuntu-latest
+    env:
+      CHANGES_RESULT: ${{ needs.changes.result }}
+      PYTHON_RESULT: ${{ needs.python.result }}
+      INTEGRATION_RESULT: ${{ needs.integration.result }}
+      APP_IMAGE_RESULT: ${{ needs.app-production-image.result }}
+      WORKER_IMAGE_RESULT: ${{ needs.worker-production-image.result }}
+      HELM_RESULT: ${{ needs.helm.result }}
+    steps:
+      - name: Require every applicable CI job to pass
+        shell: bash
+        run: |
+          for result in \
+            "$CHANGES_RESULT" \
+            "$PYTHON_RESULT" \
+            "$INTEGRATION_RESULT" \
+            "$APP_IMAGE_RESULT" \
+            "$WORKER_IMAGE_RESULT" \
+            "$HELM_RESULT"; do
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "CI dependency ended with result: $result"
+              exit 1
+            fi
+          done
