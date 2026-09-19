@@ -133,6 +133,10 @@ Configure it as follows:
 Protect the `main` branch and require the `CI` and `Terraform check` status checks.
 Do not permit outside collaborators to merge without review.
 
+Before creating infrastructure, run **Actions → Check AWS Authentication → Run
+workflow** from `main`. It verifies OIDC role assumption and access to the two SSM
+parameters without creating EKS, networking, or other application resources.
+
 ## Start AWS Lab
 
 Open **Actions → Start AWS Lab → Run workflow**. Optionally enter your current
