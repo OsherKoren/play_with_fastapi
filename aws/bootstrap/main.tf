@@ -1,4 +1,6 @@
 resource "aws_iam_openid_connect_provider" "github" {
+  count = var.create_github_oidc_provider ? 1 : 0
+
   url             = "https://token.actions.githubusercontent.com"
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = []
@@ -7,6 +9,15 @@ resource "aws_iam_openid_connect_provider" "github" {
     Project   = "msg-preds"
     ManagedBy = "Terraform"
   }
+}
+
+data "aws_iam_openid_connect_provider" "github" {
+  count = var.create_github_oidc_provider ? 0 : 1
+  url   = "https://token.actions.githubusercontent.com"
+}
+
+locals {
+  github_oidc_provider_arn = var.create_github_oidc_provider ? aws_iam_openid_connect_provider.github[0].arn : data.aws_iam_openid_connect_provider.github[0].arn
 }
 
 resource "aws_iam_role" "github_actions" {
@@ -18,7 +29,7 @@ resource "aws_iam_role" "github_actions" {
     Statement = [{
       Effect = "Allow"
       Principal = {
-        Federated = aws_iam_openid_connect_provider.github.arn
+        Federated = local.github_oidc_provider_arn
       }
       Action = "sts:AssumeRoleWithWebIdentity"
       Condition = {
@@ -81,21 +92,20 @@ resource "aws_iam_role_policy" "github_actions" {
         Action = [
           "iam:AddUserToGroup", "iam:AttachGroupPolicy", "iam:AttachRolePolicy",
           "iam:AddRoleToInstanceProfile", "iam:CreateGroup", "iam:CreateInstanceProfile",
-          "iam:CreateOpenIDConnectProvider", "iam:CreatePolicy",
+          "iam:CreatePolicy",
           "iam:CreatePolicyVersion", "iam:CreateRole", "iam:CreateServiceLinkedRole",
-          "iam:DeleteGroup", "iam:DeleteInstanceProfile", "iam:DeleteOpenIDConnectProvider", "iam:DeletePolicy",
+          "iam:DeleteGroup", "iam:DeleteInstanceProfile", "iam:DeletePolicy",
           "iam:DeletePolicyVersion", "iam:DeleteRole", "iam:DeleteRolePolicy",
           "iam:DetachGroupPolicy", "iam:DetachRolePolicy", "iam:GetGroup",
-          "iam:GetInstanceProfile", "iam:GetOpenIDConnectProvider", "iam:GetPolicy", "iam:GetPolicyVersion",
+          "iam:GetInstanceProfile", "iam:GetPolicy", "iam:GetPolicyVersion",
           "iam:GetRole", "iam:GetRolePolicy", "iam:ListAttachedGroupPolicies",
           "iam:ListAttachedRolePolicies", "iam:ListGroupsForUser", "iam:ListInstanceProfilesForRole",
           "iam:ListPolicyVersions", "iam:ListRolePolicies", "iam:ListRoles",
           "iam:ListUsers", "iam:PassRole", "iam:PutRolePolicy", "iam:RemoveRoleFromInstanceProfile",
           "iam:RemoveUserFromGroup", "iam:SetDefaultPolicyVersion", "iam:TagInstanceProfile",
-          "iam:TagOpenIDConnectProvider", "iam:TagPolicy", "iam:TagRole",
+          "iam:TagPolicy", "iam:TagRole",
           "iam:UntagInstanceProfile",
-          "iam:UntagOpenIDConnectProvider", "iam:UntagPolicy", "iam:UntagRole",
-          "iam:UpdateAssumeRolePolicy", "iam:UpdateOpenIDConnectProviderThumbprint"
+          "iam:UntagPolicy", "iam:UntagRole", "iam:UpdateAssumeRolePolicy"
         ]
         Resource = "*"
       }

@@ -22,6 +22,12 @@ variable "github_branch" {
   default     = "main"
 }
 
+variable "create_github_oidc_provider" {
+  description = "Create the account-level GitHub OIDC provider; leave false when the account already has one"
+  type        = bool
+  default     = false
+}
+
 variable "state_bucket" {
   description = "Existing S3 bucket containing the disposable stack state"
   type        = string

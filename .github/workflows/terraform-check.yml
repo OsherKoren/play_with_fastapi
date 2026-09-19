@@ -2,10 +2,6 @@ name: Terraform check
 
 on:
   pull_request:
-    paths:
-      - "aws/**/*.tf"
-      - "aws/**/.terraform.lock.hcl"
-      - ".github/workflows/terraform-check.yml"
   push:
     branches: [main, dev]
     paths:

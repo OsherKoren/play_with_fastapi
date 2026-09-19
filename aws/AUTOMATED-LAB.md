@@ -69,9 +69,13 @@ role. Do not use `pull_request_target` to check out and execute contributor code
 
 The `aws/bootstrap` Terraform root owns:
 
-- The GitHub Actions OIDC provider.
-- The narrowly trusted GitHub deployment role and policies.
+- The narrowly trusted GitHub deployment role and policy.
 - An optional AWS Budget and billing notification.
+
+The GitHub OIDC provider is account-wide. By default, the bootstrap reuses an
+existing provider instead of taking ownership of one that another project may
+need. In a brand-new account with no GitHub provider, create it during the first
+plan with `-var='create_github_oidc_provider=true'`; Terraform will then own it.
 
 The existing state bucket is intentionally managed separately by
 `aws/backend-setup`, because Terraform cannot create the bucket in which it is
@@ -97,15 +101,16 @@ plan by using a local variable file or
 `-var='budget_email=you@example.com'`, then apply that saved plan normally. Never
 commit a personal address in this public repository.
 
-If the AWS account already contains the GitHub OIDC provider, Terraform reports that
-it already exists. Import it instead of creating a duplicate:
+Check whether the AWS account already contains the GitHub OIDC provider:
 
 ```bash
-ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
-terraform -chdir=aws/bootstrap import \
-  aws_iam_openid_connect_provider.github \
-  "arn:aws:iam::$ACCOUNT_ID:oidc-provider/token.actions.githubusercontent.com"
+aws iam list-open-id-connect-providers
 ```
+
+When it exists, use the default bootstrap plan, which reads but does not own it.
+When it does not exist, add `-var='create_github_oidc_provider=true'` to the saved
+plan command. Continue using the same value for future bootstrap plans so the
+state and configuration remain consistent.
 
 ## One-time GitHub configuration
 
