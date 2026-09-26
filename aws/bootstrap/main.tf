@@ -87,6 +87,67 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = "arn:${data.aws_partition.current.partition}:ssm:${var.region}::parameter/aws/service/eks/optimized-ami/*"
       },
       {
+        Sid      = "CreateTaggedLabKmsKey"
+        Effect   = "Allow"
+        Action   = ["kms:CreateKey", "kms:TagResource"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "aws:RequestTag/Environment" = "dev"
+            "aws:RequestTag/Project"     = "msg-preds"
+            "aws:RequestTag/Terraform"   = "true"
+            "kms:KeySpec"                = "SYMMETRIC_DEFAULT"
+            "kms:KeyUsage"               = "ENCRYPT_DECRYPT"
+          }
+          Bool = {
+            "kms:MultiRegion" = "false"
+          }
+        }
+      },
+      {
+        Sid    = "ManageTaggedLabKmsKey"
+        Effect = "Allow"
+        Action = [
+          "kms:CancelKeyDeletion",
+          "kms:CreateAlias",
+          "kms:DeleteAlias",
+          "kms:DescribeKey",
+          "kms:DisableKey",
+          "kms:DisableKeyRotation",
+          "kms:EnableKey",
+          "kms:EnableKeyRotation",
+          "kms:GetKeyPolicy",
+          "kms:GetKeyRotationStatus",
+          "kms:ListResourceTags",
+          "kms:PutKeyPolicy",
+          "kms:ScheduleKeyDeletion",
+          "kms:TagResource",
+          "kms:UntagResource",
+          "kms:UpdateAlias",
+          "kms:UpdateKeyDescription"
+        ]
+        Resource = "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:key/*"
+        Condition = {
+          StringEquals = {
+            "aws:ResourceTag/Environment" = "dev"
+            "aws:ResourceTag/Project"     = "msg-preds"
+            "aws:ResourceTag/Terraform"   = "true"
+          }
+        }
+      },
+      {
+        Sid      = "ManageLabKmsAlias"
+        Effect   = "Allow"
+        Action   = ["kms:CreateAlias", "kms:DeleteAlias", "kms:UpdateAlias"]
+        Resource = "arn:${data.aws_partition.current.partition}:kms:${var.region}:${data.aws_caller_identity.current.account_id}:alias/eks/msg-preds-dev"
+      },
+      {
+        Sid      = "ListKmsAliases"
+        Effect   = "Allow"
+        Action   = "kms:ListAliases"
+        Resource = "*"
+      },
+      {
         Sid    = "LabInfrastructure"
         Effect = "Allow"
         Action = [

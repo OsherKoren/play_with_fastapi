@@ -72,6 +72,10 @@ The `aws/bootstrap` Terraform root owns:
 - The narrowly trusted GitHub deployment role and policy.
 - Read access to AWS's public EKS optimized-AMI parameters and the two private
   application parameter paths.
+- Tag- and alias-scoped KMS key-administration actions needed to create and later
+  schedule deletion of the EKS secrets-encryption key. The role cannot administer
+  unrelated keys and does not receive data-plane actions such as `Encrypt` or
+  `Decrypt`.
 - An optional AWS Budget and billing notification.
 
 The GitHub OIDC provider is account-wide. By default, the bootstrap reuses an

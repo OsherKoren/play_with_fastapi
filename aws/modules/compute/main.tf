@@ -41,6 +41,7 @@ module "eks" {
 
   tags = {
     Environment = var.env
+    Project     = var.app_name
     Terraform   = "true"
   }
 }
