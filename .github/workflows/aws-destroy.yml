@@ -7,10 +7,6 @@ on:
         description: Type DESTROY to remove the AWS lab
         required: true
         type: string
-      administrator_cidr:
-        description: Optional personal public IPv4 CIDR to retain while destruction runs
-        required: false
-        type: string
 
 permissions:
   contents: read
@@ -45,7 +41,7 @@ jobs:
           role-duration-seconds: 7200
       - name: Set current runner CIDR
         env:
-          ADMINISTRATOR_CIDR: ${{ inputs.administrator_cidr }}
+          ADMINISTRATOR_CIDR: ${{ secrets.ADMINISTRATOR_CIDR }}
         run: |
           RUNNER_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
           python - "$RUNNER_IP" "$ADMINISTRATOR_CIDR" >> "$GITHUB_ENV" <<'PY'

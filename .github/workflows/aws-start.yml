@@ -2,11 +2,6 @@ name: Start AWS Lab
 
 on:
   workflow_dispatch:
-    inputs:
-      administrator_cidr:
-        description: Optional personal public IPv4 CIDR that should retain EKS access (for example 203.0.113.10/32)
-        required: false
-        type: string
 
 permissions:
   contents: read
@@ -44,7 +39,7 @@ jobs:
       - uses: docker/setup-buildx-action@v3
       - name: Allow this runner to reach the EKS API
         env:
-          ADMINISTRATOR_CIDR: ${{ inputs.administrator_cidr }}
+          ADMINISTRATOR_CIDR: ${{ secrets.ADMINISTRATOR_CIDR }}
         run: |
           RUNNER_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
           python - "$RUNNER_IP" "$ADMINISTRATOR_CIDR" >> "$GITHUB_ENV" <<'PY'
