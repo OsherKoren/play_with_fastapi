@@ -55,7 +55,9 @@ jobs:
           print("TF_VAR_admin_cidrs=" + json.dumps(list(dict.fromkeys(cidrs))))
           PY
       - name: Confirm AWS identity
-        run: aws sts get-caller-identity
+        run: |
+          aws sts get-caller-identity >/dev/null
+          echo "AWS role assumption succeeded."
       - name: Initialize and validate Terraform
         run: |
           terraform -chdir=aws/modules init -reconfigure
