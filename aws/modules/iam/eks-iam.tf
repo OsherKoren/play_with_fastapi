@@ -21,8 +21,11 @@ module "allow_eks_access_iam_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "eks:ListClusters"
+        Effect = "Allow"
+        Action = [
+          "eks:DescribeClusterVersions",
+          "eks:ListClusters"
+        ]
         Resource = "*"
       },
       {
