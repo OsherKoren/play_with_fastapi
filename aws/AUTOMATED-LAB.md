@@ -133,13 +133,17 @@ Configure it as follows:
    repository's GitHub plan.
 3. Add environment variable `AWS_ROLE_ARN` with the bootstrap output.
 4. Add environment variable `AWS_REGION` with value `us-east-2`.
-5. Add environment secret `ADMINISTRATOR_CIDR` with your current public IPv4
+5. Add environment variable `ADMIN_IAM_USERS_JSON` containing a JSON list of
+   existing IAM users that may assume `EKSAdminRole`, for example `["AwsDev"]`.
+   Use `[]` when access is provided only through IAM Identity Center or another
+   role. This is an identifier, not a secret.
+6. Add environment secret `ADMINISTRATOR_CIDR` with your current public IPv4
    address followed by `/32`, for example `203.0.113.10/32`. This grants your
    computer access to the EKS API without exposing the address as a workflow
    input. If your ISP changes your public address, update this secret before the
    next start or destroy run. You can obtain the current value with
    `curl -fsS https://checkip.amazonaws.com` and append `/32`.
-6. In AWS Systems Manager Parameter Store in `us-east-2`, create
+7. In AWS Systems Manager Parameter Store in `us-east-2`, create
    `/msg-preds/aws-lab/postgres/user` as a Standard `String` and
    `/msg-preds/aws-lab/postgres/password` as a Standard `SecureString`. The
    workflow reads them after assuming the deployment role; do not duplicate

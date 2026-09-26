@@ -27,7 +27,7 @@ jobs:
       TF_IN_AUTOMATION: "true"
       TF_INPUT: "false"
       TF_VAR_region: ${{ vars.AWS_REGION || 'us-east-2' }}
-      TF_VAR_admin_iam_users: "[]"
+      TF_VAR_admin_iam_users: ${{ vars.ADMIN_IAM_USERS_JSON || '[]' }}
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
