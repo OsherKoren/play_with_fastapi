@@ -76,8 +76,9 @@ The `aws/bootstrap` Terraform root owns:
   schedule deletion of the EKS secrets-encryption key. The role cannot administer
   unrelated keys and does not receive data-plane actions such as `Encrypt` or
   `Decrypt`.
-- Lifecycle access for OIDC providers whose URL is under the regional EKS issuer
-  path. This permits IRSA while excluding the account-wide GitHub OIDC provider.
+- Lifecycle access restricted by ARN to OIDC providers whose URL is under the
+  regional EKS issuer path. This permits IRSA while excluding the account-wide
+  GitHub OIDC provider.
 - An optional AWS Budget and billing notification.
 
 The GitHub OIDC provider is account-wide. By default, the bootstrap reuses an
