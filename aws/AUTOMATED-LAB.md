@@ -70,6 +70,8 @@ role. Do not use `pull_request_target` to check out and execute contributor code
 The `aws/bootstrap` Terraform root owns:
 
 - The narrowly trusted GitHub deployment role and policy.
+- Read access to AWS's public EKS optimized-AMI parameters and the two private
+  application parameter paths.
 - An optional AWS Budget and billing notification.
 
 The GitHub OIDC provider is account-wide. By default, the bootstrap reuses an
