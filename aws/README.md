@@ -81,6 +81,30 @@ kubectl --context msg-preds-eks -n argocd get secret argocd-initial-admin-secret
   -o jsonpath='{.data.password}' | base64 -d
 ```
 
+## Test the deployed API
+
+Read the public Application Load Balancer hostname from the Kubernetes ingress:
+
+```bash
+ALB_HOST="$(kubectl --context msg-preds-eks -n msg-preds \
+  get ingress ingress \
+  -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+
+test -n "$ALB_HOST" || { echo "ALB is not ready"; exit 1; }
+echo "Swagger UI: http://$ALB_HOST/docs"
+```
+
+Open the printed `/docs` URL to test the endpoints with Swagger UI. Confirm the
+API independently from Git Bash with:
+
+```bash
+curl -fsS "http://$ALB_HOST/api/v1/health/"
+```
+
+The expected response is `{"status":"ok"}`. The learning ALB is internet-facing
+and uses HTTP without application authentication, so use only synthetic test data
+and destroy the lab when the study session ends.
+
 ## CI image strategy
 
 Each service now has one multi-stage Dockerfile:

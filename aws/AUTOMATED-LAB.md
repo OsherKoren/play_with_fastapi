@@ -178,6 +178,11 @@ the latter lets the workflow configure the cluster. The workflow:
 9. Wait for Argo CD health and the ALB, then run the end-to-end smoke test.
 10. Write the application URL and deployed image tag to the workflow summary.
 
+Open the `/docs` URL from the successful workflow summary to use Swagger UI. To
+retrieve the ALB hostname or test `/api/v1/health/` manually, follow **Test the
+deployed API** in [`README.md`](README.md). The ALB is public and unauthenticated,
+so use only synthetic test data.
+
 ## Container build cache
 
 The path-aware production build jobs and AWS deployment use Docker Buildx with
