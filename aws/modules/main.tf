@@ -33,6 +33,7 @@ module "iam" {
 
   cluster_name      = module.compute.cluster_name
   oidc_provider_arn = module.compute.oidc_provider_arn
+  region            = var.region
 }
 
 # ###############################################################################

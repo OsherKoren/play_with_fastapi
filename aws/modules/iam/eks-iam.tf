@@ -6,9 +6,8 @@
 # https://navyadevops.hashnode.dev/step-by-step-guide-creating-an-eks-cluster-with-alb-controller-using-terraform-modules
 # Creates IAM Entities for allowing access to the EKS cluster
 # Creates an IAM Role and Policy for accessing the EKS cluster
-# This role is assumed by the root user of the AWS account that owns the VPC
-# where the EKS cluster is deployed. This is required for the AWS Load Balancer
-# Controller.
+# Existing administrator users receive permission through EKSAdminsGroup to
+# assume EKSAdminRole. The role is registered as an EKS cluster administrator.
 
 
 module "allow_eks_access_iam_policy" {
@@ -22,17 +21,23 @@ module "allow_eks_access_iam_policy" {
     Version = "2012-10-17"
     Statement = [
       {
+        Effect   = "Allow"
+        Action   = "eks:ListClusters"
+        Resource = "*"
+      },
+      {
         Effect = "Allow"
         Action = [
-          "eks:DescribeCluster",
-          "eks:ListClusters"
+          "eks:AccessKubernetesApi",
+          "eks:DescribeCluster"
         ]
-        Resource = "*"
+        Resource = "arn:${data.aws_partition.current.partition}:eks:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/${var.cluster_name}"
       }
     ]
   })
 }
 
+data "aws_partition" "current" {}
 data "aws_caller_identity" "current" {}
 
 module "eks_admin_iam_role" {

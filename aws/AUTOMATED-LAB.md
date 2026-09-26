@@ -136,7 +136,9 @@ Configure it as follows:
 5. Add environment variable `ADMIN_IAM_USERS_JSON` containing a JSON list of
    existing IAM users that may assume `EKSAdminRole`, for example `["AwsDev"]`.
    Use `[]` when access is provided only through IAM Identity Center or another
-   role. This is an identifier, not a secret.
+   role. This is an identifier, not a secret. After deployment, assume
+   `EKSAdminRole` to use local `kubectl` or the AWS Console Kubernetes Resources
+   view; the role is scoped to the lab cluster API.
 6. Add environment secret `ADMINISTRATOR_CIDR` with your current public IPv4
    address followed by `/32`, for example `203.0.113.10/32`. This grants your
    computer access to the EKS API without exposing the address as a workflow
