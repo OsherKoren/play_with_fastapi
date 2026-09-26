@@ -81,6 +81,12 @@ resource "aws_iam_role_policy" "github_actions" {
         ]
       },
       {
+        Sid      = "EksOptimizedAmiParameters"
+        Effect   = "Allow"
+        Action   = "ssm:GetParameter"
+        Resource = "arn:${data.aws_partition.current.partition}:ssm:${var.region}::parameter/aws/service/eks/optimized-ami/*"
+      },
+      {
         Sid    = "LabInfrastructure"
         Effect = "Allow"
         Action = [
