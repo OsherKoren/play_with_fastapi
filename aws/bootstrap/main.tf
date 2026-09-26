@@ -148,6 +148,34 @@ resource "aws_iam_role_policy" "github_actions" {
         Resource = "*"
       },
       {
+        Sid      = "CreateTaggedEksOidcProvider"
+        Effect   = "Allow"
+        Action   = ["iam:CreateOpenIDConnectProvider", "iam:TagOpenIDConnectProvider"]
+        Resource = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.${var.region}.amazonaws.com/id/*"
+        Condition = {
+          StringEquals = {
+            "aws:RequestTag/Environment" = "dev"
+            "aws:RequestTag/Project"     = "msg-preds"
+            "aws:RequestTag/Terraform"   = "true"
+          }
+        }
+      },
+      {
+        Sid    = "ManageEksOidcProvider"
+        Effect = "Allow"
+        Action = [
+          "iam:AddClientIDToOpenIDConnectProvider",
+          "iam:DeleteOpenIDConnectProvider",
+          "iam:GetOpenIDConnectProvider",
+          "iam:ListOpenIDConnectProviderTags",
+          "iam:RemoveClientIDFromOpenIDConnectProvider",
+          "iam:TagOpenIDConnectProvider",
+          "iam:UntagOpenIDConnectProvider",
+          "iam:UpdateOpenIDConnectProviderThumbprint"
+        ]
+        Resource = "arn:${data.aws_partition.current.partition}:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.${var.region}.amazonaws.com/id/*"
+      },
+      {
         Sid    = "LabInfrastructure"
         Effect = "Allow"
         Action = [
